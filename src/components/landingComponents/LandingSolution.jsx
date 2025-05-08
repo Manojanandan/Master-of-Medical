@@ -20,8 +20,8 @@ const LandingSolution = () => {
         };
       }, [])
     return (
-        <React.Fragment>
-            <Box sx={{ height: 'auto', width: '100%', textAlign: 'center' }}>
+        <React.Fragment >
+            <Box sx={{ height: 'auto', width: '100%', textAlign: 'center' }} id='solution'>
                 <Typography variant='h3' sx={{ margin: '4% 0 3%', fontWeight: '500' }}>Our Solutions</Typography>
                 <Box sx={{ height: 'auto', width: '90%', margin: '5% auto', display: 'flex', justifyContent: 'space-between' }}>
                     <Box sx={{ height: '100%', width: '40%' }}></Box>

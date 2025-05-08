@@ -45,11 +45,11 @@ const LandingFooter = () => {
               <Box style={{height:'100px',width:'100%',margin:'5% 0 0'}}>
                 <Typography variant='h6' sx={{fontWeight:'bold',color:'#fff',marginBottom:'2%',fontSize:'16px'}}>SOCIAL MEDIA</Typography>
                 <List>
-                  <ListItemIcon sx={{minWidth:'40px',color:'#fff'}}><TwitterIcon /></ListItemIcon>
-                  <ListItemIcon sx={{minWidth:'40px',color:'#fff'}}><LinkedInIcon /></ListItemIcon>
-                  <ListItemIcon sx={{minWidth:'40px',color:'#fff'}}><FacebookIcon /></ListItemIcon>
-                  <ListItemIcon sx={{minWidth:'40px',color:'#fff'}}><InstagramIcon /></ListItemIcon>
-                  <ListItemIcon sx={{minWidth:'40px',color:'#fff'}}><YouTubeIcon /></ListItemIcon>
+                  <ListItemIcon sx={{minWidth:'40px',color:'#fff',cursor:'pointer'}}><TwitterIcon /></ListItemIcon>
+                  <ListItemIcon sx={{minWidth:'40px',color:'#fff',cursor:'pointer'}}><LinkedInIcon /></ListItemIcon>
+                  <ListItemIcon sx={{minWidth:'40px',color:'#fff',cursor:'pointer'}}><FacebookIcon /></ListItemIcon>
+                  <ListItemIcon sx={{minWidth:'40px',color:'#fff',cursor:'pointer'}}><InstagramIcon /></ListItemIcon>
+                  <ListItemIcon sx={{minWidth:'40px',color:'#fff',cursor:'pointer'}}><YouTubeIcon /></ListItemIcon>
                 </List>
               </Box>
             </Box>

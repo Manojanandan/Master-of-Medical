@@ -1,42 +1,89 @@
-import React from "react";
-import { List, ListItemButton, ListItemText, Collapse } from "@mui/material";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
+import React, { useState } from "react";
+import { List, ListItemButton, ListItemText, Collapse, ListItemIcon, Divider } from "@mui/material";
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import GridViewIcon from '@mui/icons-material/GridView';
 
-const categories = [
-  "Beauty Products",
-  "Health & Wellness",
-  "New Born",
-  "Medicines",
-  "Injections",
-  "Drips",
-  "Men's Products",
-  "Customer Services",
-  "Baby & Pregnancy",
-];
 
 const Sidebar = () => {
-  const [open, setOpen] = React.useState(null);
+  const [openIndex, setOpenIndex] = useState(null);
 
   const handleClick = (index) => {
-    setOpen(open === index ? null : index);
+    setOpenIndex(openIndex === index ? null : index);
   };
 
+  const categoriesList = [
+    {
+      name: "Beauty Products",
+      children: ["Face Wash", "Creams", "Makeup"],
+    },
+    {
+      name: "Health & Wellness",
+      children: ["Supplements", "Fitness", "Diet"],
+    },
+    {
+      name: "New Born",
+      children: ["Diapers", "Wipes", "Baby Oil"],
+    },
+    {
+      name: "Medicines",
+      children: ["Pain Relief", "Cough", "Allergy"],
+    },
+    {
+      name: "Injections",
+      children: [],
+    },
+    {
+      name: "Drips",
+      children: [],
+    },
+    {
+      name: "Men's Products",
+      children: ["Shaving", "Hair", "Skin"],
+    },
+    {
+      name: "Customer Services",
+      children: [],
+    },
+    {
+      name: "Baby & Pregnancy",
+      children: ["Prenatal", "Baby Food", "Toys"],
+    },
+  ];
+
+  
   return (
-    <List>
-      {categories.map((category, index) => (
-        <React.Fragment key={index}>
-          <ListItemButton onClick={() => handleClick(index)}>
-            <ListItemText primary={category} />
-            {open === index ? <ExpandLess /> : <ExpandMore />}
+    <List disablePadding>
+      <ListItemButton sx={{padding:'7px 16px'}}>
+        <ListItemIcon>
+          <GridViewIcon />
+        </ListItemIcon>
+        <ListItemText primary="All Categories" />
+      </ListItemButton>
+      <Divider />
+      {categoriesList.map((category, i) => (
+        <React.Fragment key={i}>
+          <ListItemButton
+            onClick={() => handleClick(i)}
+            sx={{ padding: "5px 16px" }}
+          >
+            <ListItemIcon />
+            <ListItemText primary={category.name} />
+            {openIndex === i ? <ExpandLess /> : <ExpandMore />}
           </ListItemButton>
-          <Collapse in={open === index} timeout="auto" unmountOnExit>
+          <Divider />
+
+          <Collapse in={openIndex === i} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
-              <ListItemButton sx={{ pl: 4 }}>
-                <ListItemText primary="Subcategory" />
-              </ListItemButton>
+              {category.children?.map((child, j) => (
+                <ListItemButton key={j} sx={{ padding: "5px 16px 5px 30px" }}>
+                  <ListItemIcon />
+                  <ListItemText primary={child} />
+                </ListItemButton>
+              ))}
             </List>
           </Collapse>
+          <Divider />
         </React.Fragment>
       ))}
     </List>

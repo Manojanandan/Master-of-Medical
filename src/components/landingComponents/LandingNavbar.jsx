@@ -1,8 +1,8 @@
 import React from 'react'
-import { Link, useNavigate } from 'react-router-dom';
-import pharmaLogo from '../assets/pharmaLogo.jpeg'
+import { useNavigate } from 'react-router-dom';
+import pharmaLogo from '../../assets/pharmaLogo.jpeg'
 import { AppBar, Button, Stack, Toolbar, Typography } from '@mui/material'
-
+import {Link} from 'react-scroll';
 
 const LandingNavbar = () => {
     const navigate = useNavigate()
@@ -14,10 +14,10 @@ const LandingNavbar = () => {
                     <img src={pharmaLogo} alt={pharmaLogo} width='50' height='50' />
                 </Stack>
                 <Stack direction='row' spacing={4}>
-                    <Link to='/' style={{textDecoration:'none',color:'#000',cursor:'pointer'}}><Typography variant='h6' sx={{fontSize:'1.1rem'}}>Home</Typography></Link>
-                    <Link to='/' style={{textDecoration:'none',color:'#000',cursor:'pointer'}}> <Typography variant='h6' sx={{fontSize:'1.1rem'}} >Our Solutions
+                    <Link to='home' spy={true} smooth={true} offset={-100} duration={500} style={{textDecoration:'none',color:'#000',cursor:'pointer'}}><Typography variant='h6' sx={{fontSize:'1.1rem'}}>Home</Typography></Link>
+                    <Link to='solution' spy={true} smooth={true} offset={-100} duration={500} style={{textDecoration:'none',color:'#000',cursor:'pointer'}}> <Typography variant='h6' sx={{fontSize:'1.1rem'}} >Our Solutions
                     </Typography></Link>
-                    <Link to='/' style={{textDecoration:'none',color:'#000',cursor:'pointer'}}><Typography variant='h6' sx={{fontSize:'1.1rem'}}>
+                    <Link to='reach' spy={true} smooth={true} offset={-100} duration={500} style={{textDecoration:'none',color:'#000',cursor:'pointer'}}><Typography variant='h6' sx={{fontSize:'1.1rem'}}>
                         Reach Us</Typography></Link>
                 </Stack>
                 <Stack direction='row' spacing={2}>

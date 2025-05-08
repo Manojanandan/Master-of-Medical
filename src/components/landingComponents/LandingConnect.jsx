@@ -4,8 +4,8 @@ import { Box, Button, Stack, Typography } from '@mui/material'
 
 const LandingConnect = () => {
     return (
-        <React.Fragment>
-            <Box sx={{ height: '400px', width: '100%', position: 'relative' }}>
+        <React.Fragment >
+            <Box id='reach' sx={{ height: '400px', width: '100%', position: 'relative' }}>
                 <Box sx={{ height: '300px', width: '100%', position: 'absolute', bottom: '0', backgroundColor: '#c5225f', display: 'flex', justifyContent: 'space-evenly' }}>
                     <Box sx={{ height: '445px', width: '350px', transform: 'translateY(-11rem)' }}>
                         <img src='http://web.archive.org/web/20240720115017im_/https://www.medikabazaar.com/static/images/connectUs.png' alt="http://web.archive.org/web/20240720115017im_/https://www.medikabazaar.com/static/images/connectUs.png" height='478px' width='320px' />

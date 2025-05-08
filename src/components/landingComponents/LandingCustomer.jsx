@@ -3,7 +3,6 @@ import {Box, Container, Stack, Typography} from '@mui/material'
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import '../App.css'
 
 const settings = {
     dots: false,

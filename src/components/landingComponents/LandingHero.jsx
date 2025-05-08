@@ -3,7 +3,7 @@ import {Box, Button, Container, Stack, Typography} from '@mui/material'
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import pharmaLogo from '../assets/pharmaLogo.jpeg'
+import pharmaLogo from '../../assets/pharmaLogo.jpeg'
 import StoreIcon from '@mui/icons-material/Store';
 import { useNavigate } from 'react-router-dom';
 
@@ -21,8 +21,8 @@ const settings = {
 const LandingHero = () => {
     const navigate = useNavigate()
     return (
-        <React.Fragment>
-            <Box sx={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', height: '100%', width: '100%', margin: '5% 0 0 ' }}>
+        <React.Fragment >
+            <Box id='home' sx={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', height: '100%', width: '100%', margin: '5% 0 0 ' }}>
                 <Container maxWidth="sm">
                     <Typography variant='h3' component='div' sx={{ margin: '0 8%', fontWeight: 'bold', color: '#291175' }}>Supply</Typography>
                     <Stack direction='row'>
@@ -36,20 +36,20 @@ const LandingHero = () => {
                         <Typography variant='p'>What we offer?</Typography>
                     </Stack>
                     <Stack direction='row' sx={{ margin: '3% 0 1% 8%', width: '96%' }} spacing={4}>
-                        <Typography variant='p' sx={{ color: '#080808', }}>Buy Medical & Veterinary Supplies </Typography>
-                        <Typography variant='p' sx={{ color: '#8c8787', }}>Buy Equipment </Typography>
+                        <Typography variant='p' sx={{ color: '#080808',cursor:'pointer' }}>Buy Medical & Veterinary Supplies </Typography>
+                        <Typography variant='p' sx={{ color: '#8c8787',cursor:'pointer' }}>Buy Equipment </Typography>
                     </Stack>
                     <Stack direction='row' sx={{ margin: '3% 0 1% 8%', width: '96%' }} spacing={9}>
-                        <Typography variant='p' sx={{ color: '#8c8787', }}>Asset Lifecycle Management </Typography>
-                        <Typography variant='p' sx={{ color: '#8c8787', }}>Financing Solutions</Typography>
+                        <Typography variant='p' sx={{ color: '#8c8787',cursor:'pointer' }}>Asset Lifecycle Management </Typography>
+                        <Typography variant='p' sx={{ color: '#8c8787',cursor:'pointer' }}>Financing Solutions</Typography>
                     </Stack>
                     <Stack direction='row' sx={{ margin: '3% 0 1% 8%', width: '96%' }} spacing={7}>
-                        <Typography variant='p' sx={{ color: '#8c8787', }}>Dental Supplies/ Custom Made</Typography>
-                        <Typography variant='p' sx={{ color: '#8c8787', }}>AI for Inventory Management </Typography>
+                        <Typography variant='p' sx={{ color: '#8c8787',cursor:'pointer' }}>Dental Supplies/ Custom Made</Typography>
+                        <Typography variant='p' sx={{ color: '#8c8787',cursor:'pointer' }}>AI for Inventory Management </Typography>
                     </Stack>
                     <Stack direction='row' sx={{ margin: '3% 0 4% 8%', width: '96%' }} spacing={9}>
-                        <Typography variant='p' sx={{ color: '#8c8787', }}>Value Procurement Optimizer</Typography>
-                        <Typography variant='p' sx={{ color: '#8c8787', }}>Turnkey Projects </Typography>
+                        <Typography variant='p' sx={{ color: '#8c8787',cursor:'pointer' }}>Value Procurement Optimizer</Typography>
+                        <Typography variant='p' sx={{ color: '#8c8787',cursor:'pointer' }}>Turnkey Projects </Typography>
                     </Stack>
                 </Container>
                 <Container maxWidth="sm" sx={{ height:'400px' }}>

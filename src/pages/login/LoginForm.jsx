@@ -15,9 +15,9 @@ const LoginForm = () => {
                     </Stack>
                     <Stack direction='column' sx={{ width: 700, maxWidth: '100%', margin: '5% 7% 0' }} spacing={1}>
                         <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>User Name</Typography>
-                        <TextField fullWidth id="userName" /><br />
+                        <TextField fullWidth id="userName" size="small" /><br />
                         <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>Password</Typography>
-                        <TextField fullWidth id="password" /><br />
+                        <TextField fullWidth id="password" size="small" /><br />
                     </Stack>
                     <Stack direction='column' sx={{margin:'0 7%',fontWeight:'bold'}}>
                         <Link to=''>Forgot password</Link>
