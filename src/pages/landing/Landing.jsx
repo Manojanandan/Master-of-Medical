@@ -13,7 +13,7 @@ import LandingCallAction from '../../components/landingComponents/LandingCallAct
 
 const customerLogos = [
   {
-    imagePath0: 'https://murali.mywrk.in/wp-content/uploads/2024/07/yashoda.jpg',
+    imagePath0: 'https://appointment.carehospitals.com/Image/Logo.png',
     imagePath1: 'https://media.telanganatoday.com/wp-content/uploads/2023/09/medicover.jpg',
     imagePath2: 'https://pbs.twimg.com/profile_images/1427869142913142790/zAJZHxhp_400x400.jpg',
     imagePath3: 'https://appointment.carehospitals.com/Image/Logo.png',
@@ -21,7 +21,7 @@ const customerLogos = [
     imagePath5: 'https://upload.wikimedia.org/wikipedia/en/d/d8/Jaslok_Hospital_Logo.png',
   },
   {
-    imagePath0: 'https://murali.mywrk.in/wp-content/uploads/2024/07/yashoda.jpg',
+    imagePath0: 'https://appointment.carehospitals.com/Image/Logo.png',
     imagePath1: 'https://media.telanganatoday.com/wp-content/uploads/2023/09/medicover.jpg',
     imagePath2: 'https://pbs.twimg.com/profile_images/1427869142913142790/zAJZHxhp_400x400.jpg',
     imagePath3: 'https://appointment.carehospitals.com/Image/Logo.png',
@@ -32,7 +32,7 @@ const customerLogos = [
 
 const brandLogos = [
   {
-    imagePath0: 'https://murali.mywrk.in/wp-content/uploads/2024/07/yashoda.jpg',
+    imagePath0: 'https://appointment.carehospitals.com/Image/Logo.png',
     imagePath1: 'https://media.telanganatoday.com/wp-content/uploads/2023/09/medicover.jpg',
     imagePath2: 'https://pbs.twimg.com/profile_images/1427869142913142790/zAJZHxhp_400x400.jpg',
     imagePath3: 'https://appointment.carehospitals.com/Image/Logo.png',
@@ -40,7 +40,7 @@ const brandLogos = [
     imagePath5: 'https://upload.wikimedia.org/wikipedia/en/d/d8/Jaslok_Hospital_Logo.png',
   },
   {
-    imagePath0: 'https://murali.mywrk.in/wp-content/uploads/2024/07/yashoda.jpg',
+    imagePath0: 'https://appointment.carehospitals.com/Image/Logo.png',
     imagePath1: 'https://media.telanganatoday.com/wp-content/uploads/2023/09/medicover.jpg',
     imagePath2: 'https://pbs.twimg.com/profile_images/1427869142913142790/zAJZHxhp_400x400.jpg',
     imagePath3: 'https://appointment.carehospitals.com/Image/Logo.png',

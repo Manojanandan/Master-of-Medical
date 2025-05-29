@@ -36,9 +36,8 @@ const LandingCustomer = () => {
                         </Container>
                         <Container maxWidth='sm' sx={{height:'100%',padding:'2%'}}>
                             <Box style={{width:'80%',margin:'20% auto'}}>
-                            <Typography variant='p' sx={{fontStyle:'italic',color:"#534d4d"}}>We would like to thank Medikabazaar for filling the gap between high-quality consumables at the right price.</Typography><br /><br/>
-                            <Typography variant='p' sx={{fontStyle:'italic',color:"#534d4d",fontSize:'15px'}}>Mr. Vikas Verma</Typography><br/>
-                            <Typography variant='p' sx={{fontStyle:'italic',color:"#110473",fontSize:'15px',fontWeight:'bold'}}>7 Med India</Typography>
+                            <Typography variant='p' sx={{fontStyle:'italic',color:"#534d4d"}}>"Since using Master of Medical, we’ve cut our procurement time in half and improved our margins significantly. It’s a game changer."</Typography><br /><br/>
+                            <Typography variant='p' sx={{fontStyle:'italic',color:"#534d4d",fontSize:'15px'}}><b>Dr. Rajeev Menon,</b> Procurement Head, MedLink Hospitals</Typography><br/>
                             </Box>
                         </Container>
                     </Stack>
@@ -59,9 +58,8 @@ const LandingCustomer = () => {
                         </Container>
                         <Container maxWidth='sm' sx={{height:'100%',padding:'2%'}}>
                             <Box style={{width:'80%',margin:'20% auto'}}>
-                            <Typography variant='p' sx={{fontStyle:'italic',color:"#534d4d"}}>We would like to thank Medikabazaar for filling the gap between high-quality consumables at the right price.</Typography><br /><br/>
-                            <Typography variant='p' sx={{fontStyle:'italic',color:"#534d4d",fontSize:'15px'}}>Mr. Vikas Verma</Typography><br/>
-                            <Typography variant='p' sx={{fontStyle:'italic',color:"#110473",fontSize:'15px',fontWeight:'bold'}}>7 Med India</Typography>
+                            <Typography variant='p' sx={{fontStyle:'italic',color:"#534d4d"}}>"The platform is intuitive, inventory updates are live, and customer service is top-notch. Highly recommended."</Typography><br /><br/>
+                            <Typography variant='p' sx={{fontStyle:'italic',color:"#534d4d",fontSize:'15px'}}><b>Dr. Priya Bansal,</b> Director, Lifecare Diagnostics</Typography><br/>
                             </Box>
                         </Container>
                     </Stack>

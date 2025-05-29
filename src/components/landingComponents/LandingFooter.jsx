@@ -77,7 +77,7 @@ const LandingFooter = () => {
             </Box>
           </Box>
           <Box style={{height:'30px',width:'50%',margin:'0 auto',textAlign:'center',color:'#fff',fontSize:'10px',letterSpacing:'5px',paddingBottom:'10%'}}>
-            <Typography variant='p'>COPYRIGHTS @Boston Ivy Healthcare Solutions Private Limited</Typography>
+            <Typography variant='p'>COPYRIGHTS @Master Of Medical</Typography>
           </Box>
         </Box>
     </React.Fragment>

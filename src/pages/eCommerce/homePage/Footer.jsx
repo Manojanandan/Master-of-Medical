@@ -142,9 +142,9 @@ const Footer = () => {
                         <Typography
                           variant="h6"
                           component="h6"
-                          sx={{ fontSize: 18, fontWeight: 'bold' }}
+                          sx={{ fontSize: 17, fontWeight: 'bold' }}
                         >
-                          0 800 300-353
+                          +91-XXXXXXXXXX
                         </Typography>
                       </Box>
                     </Box>
@@ -174,7 +174,7 @@ const Footer = () => {
                           component="h6"
                           sx={{ fontSize: 14, fontWeight: 'bold' }}
                         >
-                          info@example.com
+                          support@masterofmedical.in
                         </Typography>
                       </Box>
                     </Box>
@@ -405,8 +405,7 @@ const Footer = () => {
           <Box sx={{ display: 'flex',width: '97%', margin:'2%',justifyContent:'space-between'}}>
             <Box sx={{ width: '50%' }}>
               <Typography variant="p" component="p" sx={{ fontSize: 13, color:'#6b7280', }}>
-                Copyright 2025 © Origin WhoCommerce WordPress Theme. All rights
-                reserved Powered by <Link to='' sx={{color:'blue'}}>KLBTHEME</Link>
+                Copyright 2025 © Master Of Medcal 
               </Typography>
             </Box>
             <Box sx={{ width: '30%', textAlign: 'center',color:'blue' }}>

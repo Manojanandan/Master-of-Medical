@@ -6,6 +6,7 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import { AppBar, Badge, Box, IconButton, InputAdornment, Stack, TextField, Toolbar, Typography } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
+import Logo from '../../assets/pharmaSiteLogo.png'
 
 const Navbar = () => {
   const navigate = useNavigate()
@@ -14,8 +15,10 @@ const Navbar = () => {
       <Box>
         <AppBar sx={{ backgroundColor: '#ffffff', boxShadow: 'none', color: '#000', padding: '10px 0 0px', borderBottom: 'solid 1.5px #2424' }}>
           <Toolbar variant="dense" sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
-            <Box sx={{ height: '50px', width: '25%', display: 'flex', alignItems: 'center', }}>
-              <Box sx={{ height: '100%', width: '60%', border: 'solid 1px black' }}></Box>
+            <Box sx={{ height: '50px', width: '25%', display: 'flex', alignItems: 'center',justifyContent:'center' }}>
+              <Box sx={{ height: 'auto', width: '60%',alignItems:'center' }}>
+                <img src={Logo} alt={Logo} width='100%' />
+              </Box>
               <Box sx={{ height: '100%', width: '40%' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                   <IconButton sx={{ height: '100%', width: '30%', marginLeft: '7%' }}><LocationOnOutlinedIcon sx={{ fontSize: '2rem', color: '#000' }} /></IconButton>
@@ -62,7 +65,7 @@ const Navbar = () => {
                   <FavoriteBorderIcon color="action" sx={{ fontSize: '2rem' }} />
                 </Badge>
               </Box>
-              <Box sx={{ height: 'auto', width: '10%', display: 'flex', justifyContent: 'center', alignItems: 'center' }} onClick={()=>navigate('/ecommerceDashboard/cart')}>
+              <Box sx={{ height: 'auto', width: '10%', display: 'flex', justifyContent: 'center', alignItems: 'center',cursor:'pointer' }} onClick={()=>navigate('/ecommerceDashboard/cart')}>
                 <Badge badgeContent={4} color="secondary">
                   <AddShoppingCartIcon color="action" sx={{ fontSize: '2rem' }} />
                 </Badge>

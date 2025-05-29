@@ -29,21 +29,21 @@ const CartList = () => {
                                 onChange={handleChange}
                             />
                             <Box sx={{height:'150px',width:'250px',margin:'1%'}}>
-                                <img height='150px' width='90%' src='https://m.media-amazon.com/images/I/61dDx7O3sOL._AC_AA360_.jpg' alt='' />
+                                <img height='150px' width='90%' src='https://www.lifenowhealth.com/cdn/shop/files/Untitled-3_0021_Plantbasedcollagenbuilder.jpg?v=1695386987' alt='' />
                             </Box>
                         </Box>
                         <Box sx={{ width: '700px', height: '100%', display:'flex',justifyContent:'space-between'}}>
                             <Box sx={{height:'100%',width:'550px',}}>
                                 <Box sx={{height:'auto',width:'100%',}}>
-                                    <Typography variant='p' sx={{fontSize:'17px'}}>SAMSUNG Galaxy S24 FE AI Phone, 128GB Unlocked Android Smartphone, High-Res 50MP Camera, Long Battery Life, Brighter Display Screen, US</Typography>
+                                    <Typography variant='p' sx={{fontSize:'17px'}}>Eur Health Planet Based Collagen builder mix fruit Eur Health Planet Based Collagen builder mix fruitEur Health Planet Based Collagen builder mix fruit</Typography>
                                 </Box>
                                 <Box sx={{height:'auto',width:'100%',padding:'10px 0'}}>
-                                    <Typography variant='p' sx={{fontSize:'14px',}}>Sold by <Link to="" style={{textDecoration:'none'}}>Oppo Mobiles</Link></Typography><br />
+                                    <Typography variant='p' sx={{fontSize:'14px',}}>Sold by <Link to="" style={{textDecoration:'none'}}>Master Of Medical</Link></Typography><br />
                                     <Typography variant='p' sx={{fontSize:'14px',}}>Gift options not available. <Link to="" style={{textDecoration:'none'}}>Learn more</Link></Typography><br />
-                                    <Typography variant='p' sx={{fontSize: '15px',fontWeight:'bold'}}>Colour :</Typography>
-                                    <Typography variant='p' sx={{fontSize:'14px', }}> Cast Black & Accent</Typography><br />
+                                    <Typography variant='p' sx={{fontSize: '15px',fontWeight:'bold'}}>Brand :</Typography>
+                                    <Typography variant='p' sx={{fontSize:'14px', }}> Master Of Medical</Typography><br />
                                     <Typography variant='p' sx={{fontSize: '15px',fontWeight:'bold'}}>Size :</Typography>
-                                    <Typography variant='p' sx={{fontSize:'14px', }}> Self Start</Typography>
+                                    <Typography variant='p' sx={{fontSize:'14px', }}> Medium</Typography>
                                 </Box>
                                 <Box sx={{height:'50px',width:'100%',display:'flex'}} >
                                     <Box sx={{height:'40px',width:'130px',border:'solid 3px #f1ac1b',display:'flex',justifyContent:'space-around',alignItems:'center',borderRadius:'20px'}}>
