@@ -34,9 +34,9 @@ const LandingCustomer = () => {
                             ></iframe>
                             </Box>
                         </Container>
-                        <Container maxWidth='sm' sx={{height:'100%',padding:'2%'}}>
-                            <Box style={{width:'80%',margin:'20% auto'}}>
-                            <Typography variant='p' sx={{fontStyle:'italic',color:"#534d4d"}}>"Since using Master of Medical, we’ve cut our procurement time in half and improved our margins significantly. It’s a game changer."</Typography><br /><br/>
+                        <Container maxWidth='sm' sx={{height:'100%',padding:'1%',}}>
+                            <Box style={{width:'85%',margin:'15% auto',}}>
+                            <Typography variant='p' sx={{fontStyle:'italic',color:"#534d4d",fontSize:'16px'}}>"Since using Master of Medical, we’ve cut our procurement time in half and improved our margins significantly. It’s a game changer."</Typography><br /><br/>
                             <Typography variant='p' sx={{fontStyle:'italic',color:"#534d4d",fontSize:'15px'}}><b>Dr. Rajeev Menon,</b> Procurement Head, MedLink Hospitals</Typography><br/>
                             </Box>
                         </Container>

@@ -52,13 +52,13 @@ const brandLogos = [
 const Landing = () => {
   return (
     <React.Fragment>
-      <Box style={{ height: '100%', width: "100%", background: "linear-gradient(145deg, rgb(246 186 209) 9%, rgb(252 229 161 / 59%) 89%)" }} >
+      <Box style={{ height: '100%', width: "100%", backgroundImage: 'linear-gradient(174.2deg, rgb(255, 244, 228) 7.1%, rgb(240, 246, 238) 67.4%)'}} >
         <LandingNavbar />
         <LandingHero />
       </Box>
-      <LandingTitleBanner text="Our Valued Customers" bgColor="#f9d5cb" data={customerLogos}  />
+      <LandingTitleBanner text="Our Valued Customers" bgColor="#fff" data={customerLogos}  />
       <LandingCustomer />
-      <LandingTitleBanner text="Our Brand Partners" bgColor="#fcebc8" data={brandLogos} />
+      <LandingTitleBanner text="Our Brand Partners" bgColor="rgb(240, 246, 238)" data={brandLogos} />
       <LandingSolution />
       <LandingCallAction />
       <LandingFeature />

@@ -22,32 +22,32 @@ const LandingHero = () => {
     const navigate = useNavigate()
     return (
         <React.Fragment >
-            <Box id='home' sx={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', height: '100%', width: '100%', margin: '5% 0 0 ' }}>
-                <Container maxWidth="sm">
-                    <Typography variant='h3' component='div' sx={{ margin: '0 8%', fontWeight: 'bold', color: '#291175' }}>Supply</Typography>
+            <Box id='home' sx={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', height: '100%', width: '90%', margin: '5% auto 0',}}>
+                <Container maxWidth="sm" >
+                    <Typography variant='h3' component='div' sx={{ margin: '0 5%', fontWeight: 'bold', color: '#291175' }}>Supply</Typography>
                     <Stack direction='row'>
-                        <Typography variant='h3' component='div' sx={{ marginLeft: '8% ', fontWeight: 'bold', color: '#c5225f', lineHeight: '4rem' }}>Health. </Typography>
+                        <Typography variant='h3' component='div' sx={{ marginLeft: '5% ', fontWeight: 'bold', color: '#c5225f', lineHeight: '4rem' }}>Health. </Typography>
                         <Typography variant='h3' component='div' sx={{ fontWeight: 'bold', color: '#291175', lineHeight: '4rem' }}>Care</Typography>
                     </Stack>
-                    <Stack direction='row' sx={{ margin: '5% 0 0 8%', width: '75%', color: '#7a7a7d' }}>
+                    <Stack direction='row' sx={{ margin: '5% 0 0 5%', width: '75%', color: '#7a7a7d' }}>
                         <Typography variant='p'>Empowering Healthcare through tech-driven platform for end to end medical procurement solutions.</Typography>
                     </Stack>
-                    <Stack direction='row' sx={{ margin: '5% 0 0 8%', width: '75%', color: '#030303', fontWeight: 'bold' }}>
+                    <Stack direction='row' sx={{ margin: '5% 0 0 5%', width: '75%', color: '#030303', fontWeight: 'bold' }}>
                         <Typography variant='p'>What we offer?</Typography>
                     </Stack>
-                    <Stack direction='row' sx={{ margin: '3% 0 1% 8%', width: '96%' }} spacing={4}>
+                    <Stack direction='row' sx={{ margin: '3% 0 1% 5%', width: '96%' }} spacing={4}>
                         <Typography variant='p' sx={{ color: '#080808',cursor:'pointer' }}>Buy Medical & Veterinary Supplies </Typography>
                         <Typography variant='p' sx={{ color: '#8c8787',cursor:'pointer' }}>Buy Equipment </Typography>
                     </Stack>
-                    <Stack direction='row' sx={{ margin: '3% 0 1% 8%', width: '96%' }} spacing={9}>
+                    <Stack direction='row' sx={{ margin: '3% 0 1% 5%', width: '96%' }} spacing={9}>
                         <Typography variant='p' sx={{ color: '#8c8787',cursor:'pointer' }}>Asset Lifecycle Management </Typography>
                         <Typography variant='p' sx={{ color: '#8c8787',cursor:'pointer' }}>Financing Solutions</Typography>
                     </Stack>
-                    <Stack direction='row' sx={{ margin: '3% 0 1% 8%', width: '96%' }} spacing={7}>
+                    <Stack direction='row' sx={{ margin: '3% 0 1% 5%', width: '96%' }} spacing={7}>
                         <Typography variant='p' sx={{ color: '#8c8787',cursor:'pointer' }}>Dental Supplies/ Custom Made</Typography>
                         <Typography variant='p' sx={{ color: '#8c8787',cursor:'pointer' }}>AI for Inventory Management </Typography>
                     </Stack>
-                    <Stack direction='row' sx={{ margin: '3% 0 4% 8%', width: '96%' }} spacing={9}>
+                    <Stack direction='row' sx={{ margin: '3% 0 4% 5%', width: '96%' }} spacing={9}>
                         <Typography variant='p' sx={{ color: '#8c8787',cursor:'pointer' }}>Value Procurement Optimizer</Typography>
                         <Typography variant='p' sx={{ color: '#8c8787',cursor:'pointer' }}>Turnkey Projects </Typography>
                     </Stack>
