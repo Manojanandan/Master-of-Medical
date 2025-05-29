@@ -422,7 +422,7 @@ const Footer = () => {
                   Privacy Policy
                 </span>{' '}
                 <span
-                  style={{ textDecoration: 'underline', marginRight: '6px' }}
+                  style={{ textDecoration: 'underline', marginRight: '6px' }} onClick={()=>navigate('/ecommerceDashboard/orderTracking')}
                 >
                   Order Tracking
                 </span>

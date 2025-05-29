@@ -78,7 +78,7 @@ const Navbar = () => {
               <Link to='' style={{ textDecoration: 'none', color: '#242424', fontWeight: 'bold', fontSize: '16px', marginRight: '2%' }}>Contact Us</Link>
             </Box>
             <Box sx={{ width: '20%', height: '40px', textAlign: 'center', paddingTop: '0.5%' }}>
-              <Link to='' style={{ textDecoration: 'none', color: '#c5225f', fontSize: '14px', fontWeight: 'bold',marginRight:'10%' }}>Order Tracking</Link>
+              <Link to='/ecommerceDashboard/orderTracking' style={{ textDecoration: 'none', color: '#c5225f', fontSize: '14px', fontWeight: 'bold',marginRight:'10%' }}>Order Tracking</Link>
               <Link to='/ecommerceDashboard/faq' style={{ textDecoration: 'none', color: '#c5225f', fontSize: '14px', fontWeight: 'bold' }}>FAQ</Link>
             </Box>
           </Box>

@@ -15,6 +15,7 @@ import FAQ from "./pages/eCommerce/FAQ/FAQ.jsx";
 import Termsofuse from "./pages/eCommerce/termsCondition/Termsofuse.jsx";
 import PrivacyPolicy from "./pages/eCommerce/privacyPolicy/PrivacyPolicy.jsx";
 import CookiesPolicy from "./pages/eCommerce/cookiesPolicy/CookiesPolicy.jsx";
+import OrderTracking from "./pages/eCommerce/orderTracking/OrderTracking.jsx";
 
 const App = () => {
   return (
@@ -37,6 +38,7 @@ const App = () => {
           <Route path="/ecommerceDashboard/termsofuse" element={<Termsofuse />} />
           <Route path="/ecommerceDashboard/privacyPolicy" element={<PrivacyPolicy />} />
           <Route path="/ecommerceDashboard/cookiesPolicy" element={<CookiesPolicy />} />
+          <Route path="/ecommerceDashboard/orderTracking" element={<OrderTracking />} />
         </Route>
       </Routes>
     </>

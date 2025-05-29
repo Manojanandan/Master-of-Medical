@@ -13,20 +13,28 @@ const FAQ = () => {
 
     const smallAcor = [
         {
-            title: "Why is it mandatory to complete KYC for purchasing on Medikabazaar?",
-            description: 'Medikabazaar offers regulated and OTC medical products. According to FDA guidelines, only medical professionals and institutions can purchase these items. KYC ensures identity verification during purchase. Individual customers are not eligible to buy. However, certain products do not require KYC verification for purchase.'
+            title: "What is Master of Medical (M.O.M)?",
+            description: 'M.O.M is a B2B web and mobile platform that connects healthcare institutions with certified medical product manufacturers, streamlining the supply chain for better pricing and transparency.'
         },
         {
-            title: "Which documents are required for KYC verification?",
-            description: 'For regulated products, acceptable documents include a drug license, medical registration number, or shop and establishment certificate of your clinic, lab, or institution. For OTC products, a GST number or PAN card can also be submitted.'
+            title: "Who can use the M.O.M platform?",
+            description: 'Our platform is designed for:	Hospitals,Clinics,Diagnostic Centres,Pathology Labs,Medical Institutions,Manufacturers of medical and surgical products.'
         },
         {
-            title: "Can I purchase products without doing KYC?",
-            description: 'Yes, you can purchase certain products without KYC. However, for regulated items, submitting valid business proof during checkout is mandatory.'
+            title: "What types of products can I purchase?",
+            description: 'We offer: Surgical Supplies,	Medical Equipment & Instruments,Disposables (Gloves, Masks, Syringes, etc.),Diagnostic Tools,Medical Furniture,Wellness & Preventive Care Products.'
         },
         {
-            title: "What should I do if my valid KYC documents are not accepted?",
-            description: 'If your valid KYC documents are not accepted, email them to support@medikabazaar.com. A confirmation email will be sent once your KYC is reviewed and approved.'
+            title: "How do I place an order?",
+            description: 'Simply register as a buyer, browse products, check live inventory, and place bulk orders directly from verified sellers.'
+        },
+        {
+            title: "Can I track my order?",
+            description: 'Yes, our platform offers real-time order tracking and status updates.'
+        },
+        {
+            title: "Is there a minimum order quantity?",
+            description: 'Minimum order requirements vary by manufacturer. Details are visible on each product listing.'
         },
     ]
     return (
