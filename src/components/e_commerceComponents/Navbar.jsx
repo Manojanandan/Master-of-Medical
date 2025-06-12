@@ -12,10 +12,9 @@ const Navbar = () => {
   const navigate = useNavigate()
   return (
     <React.Fragment>
-      <Box>
         <AppBar sx={{ backgroundColor: '#ffffff', boxShadow: 'none', color: '#000', padding: '10px 0 0px', borderBottom: 'solid 1.5px #2424' }}>
           <Toolbar variant="dense" sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
-            <Box sx={{ height: '50px', width: '25%', display: 'flex', alignItems: 'center',justifyContent:'center' }}>
+            <Box sx={{ height: 'auto', width: '25%', display: 'flex', alignItems: 'center',justifyContent:'center' }}>
               <Box sx={{ height: 'auto', width: '60%',alignItems:'center' }}>
                 <img src={Logo} alt={Logo} width='100%' />
               </Box>
@@ -73,20 +72,19 @@ const Navbar = () => {
             </Box>
           </Toolbar>
           <Box sx={{ display: 'flex', justifyContent: 'end', alignItems: 'center', height: 'auto', width: '100%', marginTop: '1%', }}>
-            <Box sx={{ width: '51%', height: '40px', display: 'flex', alignItems: 'center', paddingLeft: '10px' }}>
+            <Box sx={{ width: '51%', height: 'auto', display: 'flex', alignItems: 'center', padding: '7px 10px' }}>
               <Link to='/ecommerceDashboard' style={{ textDecoration: 'none', color: '#242424', fontWeight: 'bold', fontSize: '16px', marginRight: '2%' }}>Home</Link>
               <Link to='' style={{ textDecoration: 'none', color: '#242424', fontWeight: 'bold', fontSize: '16px', marginRight: '2%' }}>Shop</Link>
               <Link to='' style={{ textDecoration: 'none', color: '#242424', fontWeight: 'bold', fontSize: '16px', marginRight: '2%' }}>About Us</Link>
               <Link to='' style={{ textDecoration: 'none', color: '#242424', fontWeight: 'bold', fontSize: '16px', marginRight: '2%' }}>Blog</Link>
               <Link to='' style={{ textDecoration: 'none', color: '#242424', fontWeight: 'bold', fontSize: '16px', marginRight: '2%' }}>Contact Us</Link>
             </Box>
-            <Box sx={{ width: '20%', height: '40px', textAlign: 'center', paddingTop: '0.5%' }}>
+            <Box sx={{ width: '20%', height: 'auto', textAlign: 'center', paddingTop: '7px 0' }}>
               <Link to='/ecommerceDashboard/orderTracking' style={{ textDecoration: 'none', color: '#c5225f', fontSize: '14px', fontWeight: 'bold',marginRight:'10%' }}>Order Tracking</Link>
               <Link to='/ecommerceDashboard/faq' style={{ textDecoration: 'none', color: '#c5225f', fontSize: '14px', fontWeight: 'bold' }}>FAQ</Link>
             </Box>
           </Box>
         </AppBar>
-      </Box>
     </React.Fragment>
   );
 };

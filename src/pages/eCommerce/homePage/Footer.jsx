@@ -10,7 +10,6 @@ import {
     ListItem,
     ListItemButton,
     ListItemText,
-    Grid2,
   } from '@mui/material';
   import MailIcon from '@mui/icons-material/Mail';
   import PhoneInTalkIcon from '@mui/icons-material/PhoneInTalk';
@@ -97,12 +96,12 @@ const Footer = () => {
               paddingBottom: '2%',
             }}
           >
-            <Grid2
+            <Grid
               container
               spacing={{ xs: 2, md: 3 }}
               columns={{ xs: 4, sm: 8, md: 12 }}
             >
-              <Grid2 size={{ xs: 2, md: 2.5, sm: 3 }}>
+              <Grid item size={{ xs: 2, md: 2.5, sm: 3 }}>
                 <List>
                   <ListItem>
                     <Typography
@@ -180,8 +179,8 @@ const Footer = () => {
                     </Box>
                   </ListItem>
                 </List>
-              </Grid2>
-              <Grid2 size={{ xs: 2, md: 2.5, sm: 2.5 }}>
+              </Grid>
+              <Grid item size={{ xs: 2, md: 2.5, sm: 2.5 }}>
                 <List >
                   <ListItem disableGutters>
                     <Typography
@@ -219,8 +218,8 @@ const Footer = () => {
                     </ListItem>
                   ))}
                 </List>
-              </Grid2>
-              <Grid2 size={{ xs: 2, md: 2, sm: 2.5 }}>
+              </Grid>
+              <Grid item size={{ xs: 2, md: 2, sm: 2.5 }}>
                 <List >
                   <ListItem disableGutters >
                     <Typography
@@ -258,8 +257,8 @@ const Footer = () => {
                     </ListItem>
                   ))}
                 </List>
-              </Grid2>
-              <Grid2 size={{ xs: 2, md: 2, sm: 3 }}>
+              </Grid>
+              <Grid item size={{ xs: 2, md: 2, sm: 3 }}>
                 <List>
                   <ListItem disableGutters >
                     <Typography
@@ -297,8 +296,8 @@ const Footer = () => {
                     </ListItem>
                   ))}
                 </List>
-              </Grid2>
-              <Grid2 size={{ xs: 2, md: 2, sm: 2.5 }}>
+              </Grid>
+              <Grid item size={{ xs: 2, md: 2, sm: 2.5 }}>
                 <List>
                   <ListItem sx={{ paddingLeft: '0px' }}>
                     <Typography
@@ -399,8 +398,8 @@ const Footer = () => {
                     </Box>
                   </Box>
                 </List>
-              </Grid2>
-            </Grid2>
+              </Grid>
+            </Grid>
           </Box>
           <Box sx={{ display: 'flex',width: '97%', margin:'2%',justifyContent:'space-between'}}>
             <Box sx={{ width: '50%' }}>

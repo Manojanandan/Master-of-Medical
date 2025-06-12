@@ -7,7 +7,7 @@ import AddIcon from '@mui/icons-material/Add';
 const ProductCard = ({offer,image,badge,title,rating,price,onClick}) => {
   return (
     <React.Fragment>
-        <Box sx={{height:'auto',width:'300px',border:'solid 1.5px #2424',borderRadius:'10px'}}>
+        <Box sx={{height:'auto',width:'300px',border:'solid 1.5px #2424',borderRadius:'10px',marginBottom:'1%'}}>
           <Box sx={{height:'auto',width:'80%',margin:'6% 8% 2%',}}>
             <Box sx={{width:'50px',padding:'3px 10px',borderRadius:'20px',backgroundColor:'#c5225f',color:'#fff',textAlign:'center'}}>
               <Typography variant='p' sx={{fontWeight:'bold',fontSize:'12px'}}>{offer}</Typography>

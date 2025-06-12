@@ -1,4 +1,4 @@
-import { Box, Paper } from '@mui/material'
+import { Box } from '@mui/material'
 import React from 'react'
 import TitleSection from '../../../components/e_commerceComponents/TitleSection'
 
@@ -34,23 +34,56 @@ const FeatureBrands = () => {
         {
             image: "https://mir-s3-cdn-cf.behance.net/projects/404/5429e8163700417.Y3JvcCw0MDA5LDMxMzUsMCwyODc.jpg",
         },
-        
-    ]
+        {
+            image: "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/logo-aboutus.png?1207",
+        },
+    ];
+
     return (
         <React.Fragment>
-            <Box sx={{ height: 'auto', width: '100%', margin: '2% 0', }}>
+            <Box sx={{ height: 'auto', width: '100%', margin: '2% 0 1%', }}>
                 <TitleSection title={"Feature Brands"} subTitle={"Check Out Our Latest Brands"} />
-                <Box sx={{ display: 'flex', justifyContent: 'space-around', margin: '2% 3%', width: '95%',  }}>
-                    {brandList?.map((e, i) => {
-                        return (
-                            <Box sx={{ width: '100px', height: '100px', borderRadius: '50%', boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px' }}>
-                                <img style={{ margin: '22% 10%' }} height='50px' width='80px' src={e?.image} alt={e?.image} />
+                <Box sx={{
+                    overflowX: 'auto',
+                    overflowY: 'hidden',
+                    padding: '25px 0 10px',
+                    width: '100%',
+                }}>
+                    <Box sx={{
+                        display: 'flex',
+                        flexWrap: 'nowrap',
+                        gap: '2%',
+                        paddingLeft: '3%',
+                        paddingRight: '3%',
+                        width: 'max-content',
+                    }}>
+                        {brandList?.map((e, i) => (
+                            <Box
+                                key={i}
+                                sx={{
+                                    flex: '0 0 auto',
+                                    width: '100px',
+                                    height: '100px',
+                                    borderRadius: '50%',
+                                    boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    backgroundColor: '#fff',
+                                }}
+                            >
+                                <img
+                                    src={e?.image}
+                                    alt={`Brand ${i}`}
+                                    style={{ height: '50px', width: '80px', objectFit: 'contain' }}
+                                />
                             </Box>
-                        )
-                    })}
+                        ))}
+                    </Box>
                 </Box>
             </Box>
         </React.Fragment>
     )
 }
-export default FeatureBrands
+
+export default FeatureBrands;

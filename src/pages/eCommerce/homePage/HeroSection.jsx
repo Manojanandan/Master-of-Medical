@@ -31,11 +31,11 @@ const HeroSection = () => {
     ]
     return (
         <React.Fragment>
-            <Box sx={{ height: 'auto', width: '100%' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-around', margin: '3% 3% 1%', width: '95%' }}>
+            <Box sx={{ height: 'auto', width: '100%'}}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-start', margin: '3% 3% 1%', width: '95%',flexWrap:'wrap',gap:'4%' }}>
                     {heroSectionList?.map((e, i) => {
                         return (
-                            <Box sx={{ height: '250px', width: '300px' }}>
+                            <Box sx={{ height: '250px', width: '300px',marginBottom:'1%' }}>
                                 <Stack direction='row' sx={{ height: 'auto', width: '100%' }} spacing={2}>
                                     <Box sx={{ height: '60px', width: '80px', border: 'solid 1px green' }}></Box>
                                     <Box sx={{ height: 'auto', width: '100%' }}>

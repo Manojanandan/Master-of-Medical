@@ -49,10 +49,10 @@ const Arrivals = () => {
     <React.Fragment>
         <Box sx={{height:'auto',width:'100%',margin:'2% 0',}}>
             <TitleSection title={"New Arrivals"} subTitle={"Don't miss this opportunity at a special discount just for this week."} />
-            <Box sx={{display:'flex',justifyContent:'space-around',margin: '1% 3% 1%',width:'95%'}}>
+            <Box sx={{display:'flex',justifyContent:'flex-start',margin: '1% 3% 1%',width:'95%',flexWrap:'wrap',gap:'4%'}}>
                 {arrivalsJson?.map((e,i)=>{
                     return(
-                        <ProductCard offer={e?.offer} image={e?.image} badge={e?.badge} title={e?.title} rating={e?.rating} price={e?.price} onClick={onClick} />
+                        <ProductCard key={i} offer={e?.offer} image={e?.image} badge={e?.badge} title={e?.title} rating={e?.rating} price={e?.price} onClick={onClick} />
                     )
                 })}
             </Box>

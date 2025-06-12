@@ -1,4 +1,4 @@
-import { Box, Button, Checkbox, FormControlLabel, FormGroup, Grid2, Radio, RadioGroup, TextField, Typography } from '@mui/material'
+import { Box, Button, Checkbox, FormControlLabel, FormGroup, Grid, Radio, RadioGroup, TextField, Typography } from '@mui/material'
 import React from 'react'
 import TurnedInNotIcon from '@mui/icons-material/TurnedInNot';
 import { Link } from 'react-router-dom';
@@ -14,59 +14,59 @@ const Checkout = () => {
                 <Box sx={{ height: 'auto', width: '930px', padding: '5px 0' }}>
                     <Typography variant='p' sx={{ fontWeight: 'bold', fontSize: '16px', }}>Billing details</Typography>
                     <Box sx={{ width: '100%', margin: '10px 0 15px', }}>
-                        <Grid2 container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-                            <Grid2 size={6}>
+                        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+                            <Grid item size={6}>
                                 <Typography variant='p' sx={{ marginBottom: '10px' }}>First name *</Typography>
                                 <TextField sx={{ margin: '7px 0' }} fullWidth size='small' />
-                            </Grid2>
-                            <Grid2 size={6} >
+                            </Grid>
+                            <Grid item size={6} >
                                 <Typography variant='p'>Last name *</Typography>
                                 <TextField sx={{ margin: '7px 0' }} fullWidth size='small' />
-                            </Grid2>
-                            <Grid2 size={12}>
+                            </Grid>
+                            <Grid item size={12}>
                                 <Typography variant='p' sx={{ marginBottom: '10px' }}>Company name (optional)</Typography>
                                 <TextField sx={{ margin: '7px 0' }} fullWidth size='small' />
-                            </Grid2>
-                            <Grid2 size={12}>
+                            </Grid>
+                            <Grid item size={12}>
                                 <Typography variant='p' sx={{ marginBottom: '10px' }}>Country / Region *</Typography>
                                 <TextField sx={{ margin: '7px 0' }} fullWidth size='small' />
-                            </Grid2>
-                            <Grid2 size={12}>
+                            </Grid>
+                            <Grid item size={12}>
                                 <Typography variant='p' sx={{ marginBottom: '10px' }}>Street address *</Typography>
                                 <TextField sx={{ margin: '7px 0' }} fullWidth size='small' />
                                 <TextField sx={{ margin: '7px 0' }} fullWidth size='small' />
-                            </Grid2>
-                            <Grid2 size={12}>
+                            </Grid>
+                            <Grid item size={12}>
                                 <Typography variant='p' sx={{ marginBottom: '10px' }}>Town / City *</Typography>
                                 <TextField sx={{ margin: '7px 0' }} fullWidth size='small' />
-                            </Grid2>
-                            <Grid2 size={12}>
+                            </Grid>
+                            <Grid item size={12}>
                                 <Typography variant='p' sx={{ marginBottom: '10px' }}>State *</Typography>
                                 <TextField sx={{ margin: '7px 0' }} fullWidth size='small' />
-                            </Grid2>
-                            <Grid2 size={12}>
+                            </Grid>
+                            <Grid item size={12}>
                                 <Typography variant='p' sx={{ marginBottom: '10px' }}>Zip Code *</Typography>
                                 <TextField sx={{ margin: '7px 0' }} fullWidth size='small' />
-                            </Grid2>
-                            <Grid2 size={12}>
+                            </Grid>
+                            <Grid item size={12}>
                                 <Typography variant='p' sx={{ marginBottom: '10px' }}>Phone *</Typography>
                                 <TextField sx={{ margin: '7px 0' }} fullWidth size='small' />
-                            </Grid2>
-                            <Grid2 size={12}>
+                            </Grid>
+                            <Grid item size={12}>
                                 <Typography variant='p' sx={{ marginBottom: '10px' }}>Email address *</Typography>
                                 <TextField sx={{ margin: '7px 0 5px' }} fullWidth size='small' />
-                            </Grid2>
-                            <Grid2 size={12}>
+                            </Grid>
+                            <Grid item size={12}>
                                 <FormGroup>
                                     <FormControlLabel control={<Checkbox />} label="Create an account?" />
                                     <FormControlLabel sx={{ fontWeight: 'bold' }} control={<Checkbox />} label="Ship to different address?" />
                                 </FormGroup>
-                            </Grid2>
-                            <Grid2 size={12}>
+                            </Grid>
+                            <Grid item size={12}>
                                 <Typography variant='p' sx={{ marginBottom: '10px' }}>Order notes (optional)</Typography>
                                 <TextField sx={{ margin: '7px 0 5px' }} fullWidth size='large' />
-                            </Grid2>
-                        </Grid2>
+                            </Grid>
+                        </Grid>
                     </Box>
                 </Box>
                 <Box sx={{ height: '100%', width: '390px', border: 'solid 1.5px #2424', padding: '10px 12px', backgroundColor: '#fcfcfc', borderRadius: '10px' }}>

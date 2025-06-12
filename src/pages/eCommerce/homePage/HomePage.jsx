@@ -20,8 +20,8 @@ const HomePage = () => {
     arrows: false,
   };
   return (
-    <React.Fragment>
-      <div style={{height:'auto',width:'100%',borderBottom:'solid 1.5px #2424',display:'flex',justifyContent:'space-around',padding:'20px'}}>
+    <>
+      <div style={{height:'auto',width:'100%',borderBottom:'solid 1.5px #2424',display:'flex',justifyContent:'space-around',padding:'20px',flexWrap:'wrap-reverse'}}>
         <Box sx={{height:'500px',width:'25%',border:'solid 1px #2424',borderRadius:'10px',overflowY:'scroll'}}>
           <Sidebar />
         </Box>
@@ -40,7 +40,7 @@ const HomePage = () => {
       <Arrivals />
       <FeatureBrands />
       <BestSeller />
-    </React.Fragment>
+    </>
   )
 }
 
