@@ -6,7 +6,7 @@ import Contact from "./pages/Contact";
 import LandingHomepage from './pages/landing/index.jsx'
 import Login from "./pages/login/Login.jsx";
 import LoginForm from "./pages/login/LoginForm.jsx";
-import Signup from "./pages/login/Signup.jsx";
+import Signup from "./pages/login/Signup/Signup.jsx";
 import Details from "./pages/login/Details.jsx";
 import EcommerceLayout from './pages/eCommerce/Index.jsx'
 import Cart from './pages/eCommerce/cartPage/index.jsx'
