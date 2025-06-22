@@ -20,9 +20,6 @@ const Signup = () => {
     const type = useQuery.get("type")
     const storeVendorDetails = []
 
-    const reducer = useSelector((state) => state.signUpReducer)
-
-
     const [checked, setChecked] = useState(false)
     const [formData, setFormData] = useState({
         email: "", password: "", userName: ""
@@ -74,7 +71,7 @@ const Signup = () => {
                 <Box sx={{ width: '55%', border: 'solid 1.5px #d1cbcb', height: 'auto', margin: '2% auto', backgroundColor: '#d8d1d136', borderRadius: '15px' }}>
                     <Stack direction='column'>
                         <Typography variant='h4' sx={{ margin: '2% auto' }}>Welcome to User</Typography>
-                        <Typography variant='p' sx={{ fontSize: '13px', margin: '0 auto' }}>Already have an account <Link to='/loginform' style={{ fontWeight: 'bold', fontSize: '16px' }}> Log in ?</Link></Typography>
+                        <Typography variant='p' sx={{ fontSize: '13px', margin: '0 auto' }}>Already have an account <Link to={`/loginform?type=${type}`} style={{ fontWeight: 'bold', fontSize: '16px' }}> Log in ?</Link></Typography>
                     </Stack>
                     <Stack direction='column' sx={{ width: '85%', maxWidth: '100%', margin: '5% 7% 0' }} spacing={1}>
                         <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>Email</Typography>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Alert, Backdrop, Box, Button, Checkbox, CircularProgress, Container, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, Stack, TextField, Typography } from '@mui/material'
+import { Alert, Backdrop, Box, Button, Checkbox, CircularProgress, Container, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, Snackbar, Stack, TextField, Typography } from '@mui/material'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { styled } from '@mui/material/styles';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -11,6 +11,7 @@ import PngIcon from '../../assets/PngIcon.png';
 import WordIcon from '../../assets/WordIcon.jpg';
 import JpgIcon from '../../assets/JpgIcon.png';
 import { registerVendor } from './Signup/SignUpReducer';
+import { red } from '@mui/material/colors';
 
 const VisuallyHiddenInput = styled('input')({
     clip: 'rect(0 0 0 0)',
@@ -34,7 +35,9 @@ const Details = () => {
     const reducer = useSelector((state) => state.signUpReducer)
     const loader = reducer.loader;
     const message = reducer.message;
+    const success = reducer.success;
 
+    const [openModal, setOpenModal] = useState(false);
     const [allData, setAlldata] = useState({
         addressLine1: "", addressLine2: "", number: "", city: "", state: "", pincode: "", vendorType: ""
     });
@@ -181,11 +184,22 @@ const Details = () => {
 
             // Append each file individually
             Object.entries(fileData).forEach(([key, file]) => {
-                formData.append('files',file);
+                formData.append('files', file);
             });
 
             dispatch(registerVendor(formData))
+            setOpenModal(true)
+            if (sessionStorage.getItem("jwt")) {
+                navigate("/vendorDashboard")
+            }
 
+        }
+    }
+
+    const handleClose = () => {
+        setOpenModal(false);
+        if (sessionStorage.getItem("jwt")) {
+            navigate("/vendorDashboard")
         }
     }
 
@@ -197,7 +211,16 @@ const Details = () => {
             >
                 <CircularProgress color="secondary" />
             </Backdrop>
-            {message && <Alert severity="success">{message}</Alert>}
+            {message && <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center' }} open={openModal} autoHideDuration={3000} onClose={handleClose}>
+                <Alert
+                    onClose={handleClose}
+                    severity={success ? "success" : "error"}
+                    variant="filled"
+                    sx={{ width: '100%' }}
+                >
+                    {message}
+                </Alert>
+            </Snackbar>}
             <Box sx={{ height: '100%', width: '100%' }}>
                 <Box sx={{ border: 'solid 1.5px #d1cbcb', height: 'auto', margin: '2% auto', backgroundColor: '#d8d1d136', borderRadius: '15px', width: '65%' }}>
                     <Stack direction='column'>
@@ -741,8 +764,8 @@ const Details = () => {
                                                 }}
                                             >
                                                 <FormControlLabel value="manufacturing" control={<Radio />} label="Manufacturing" />
-                                                <FormControlLabel value="OEM" control={<Radio />} label="OEM" />
-                                                <FormControlLabel value="C&F / Super Stockist / Dealer" control={<Radio />} label="C&F / Super Stockist / Dealer's" />
+                                                <FormControlLabel value="oem" control={<Radio />} label="OEM" />
+                                                <FormControlLabel value="dealer" control={<Radio />} label="C&F / Super Stockist / Dealer's" />
                                             </RadioGroup>
                                         </FormControl>
                                     </Grid>

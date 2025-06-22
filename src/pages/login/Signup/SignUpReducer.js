@@ -23,6 +23,7 @@ export const signUpReducer = createSlice({
         },
         loader: false,
         message: "",
+        success: false,
     },
     reducers: {
     },
@@ -44,10 +45,13 @@ export const signUpReducer = createSlice({
                 state.createUser.pincode = action.payload.pincode;
                 state.createUser.country = action.payload.country;
                 state.createUser.type = action.payload.type;
+                state.success = action.payload.success;
                 state.message = "Vendor created successfully";
+                sessionStorage.setItem("jwt", action.payload.accessToken);                
             })
             .addCase(registerVendor.rejected, (state, action) => {
                 state.loader = false;
+                state.success = action.payload.success;
                 state.message = action.error.message;
             });
     }

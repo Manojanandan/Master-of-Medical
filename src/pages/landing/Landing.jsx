@@ -9,60 +9,68 @@ import LandingFeature from '../../components/landingComponents/LandingFeature'
 import LandingConnect from '../../components/landingComponents/LandingConnect'
 import LandingFooter from '../../components/landingComponents/LandingFooter'
 import LandingCallAction from '../../components/landingComponents/LandingCallAction'
+import c1 from '../../assets/c1.jpg'
+import c2 from '../../assets/c2.jpg'
+import c3 from '../../assets/c3.jpg'
+import c4 from '../../assets/c4.jpg'
+import c5 from '../../assets/c5.jpg'
 
 
 const customerLogos = [
   {
-    imagePath0: 'https://appointment.carehospitals.com/Image/Logo.png',
-    imagePath1: 'https://media.telanganatoday.com/wp-content/uploads/2023/09/medicover.jpg',
-    imagePath2: 'https://pbs.twimg.com/profile_images/1427869142913142790/zAJZHxhp_400x400.jpg',
-    imagePath3: 'https://appointment.carehospitals.com/Image/Logo.png',
-    imagePath4: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU4SDQeNowDirEBmRyRiG8YgMFIgzPu0Cn8g&s',
-    imagePath5: 'https://upload.wikimedia.org/wikipedia/en/d/d8/Jaslok_Hospital_Logo.png',
+    imagePath0: c1,
+    imagePath1: c2,
+    imagePath2: c3,
+    imagePath3: c4,
+    imagePath4: c5,
   },
   {
-    imagePath0: 'https://appointment.carehospitals.com/Image/Logo.png',
-    imagePath1: 'https://media.telanganatoday.com/wp-content/uploads/2023/09/medicover.jpg',
-    imagePath2: 'https://pbs.twimg.com/profile_images/1427869142913142790/zAJZHxhp_400x400.jpg',
-    imagePath3: 'https://appointment.carehospitals.com/Image/Logo.png',
-    imagePath4: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU4SDQeNowDirEBmRyRiG8YgMFIgzPu0Cn8g&s',
-    imagePath5: 'https://upload.wikimedia.org/wikipedia/en/d/d8/Jaslok_Hospital_Logo.png',
+    imagePath0: c1,
+    imagePath1: c2,
+    imagePath2: c3,
+    imagePath3: c4,
+    imagePath4: c5,
+  },
+  {
+    imagePath0: c1,
+    imagePath1: c2,
+    imagePath2: c3,
+    imagePath3: c4,
+    imagePath4: c5,
   },
 ]
 
 const brandLogos = [
   {
-    imagePath0: 'https://appointment.carehospitals.com/Image/Logo.png',
-    imagePath1: 'https://media.telanganatoday.com/wp-content/uploads/2023/09/medicover.jpg',
-    imagePath2: 'https://pbs.twimg.com/profile_images/1427869142913142790/zAJZHxhp_400x400.jpg',
-    imagePath3: 'https://appointment.carehospitals.com/Image/Logo.png',
-    imagePath4: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU4SDQeNowDirEBmRyRiG8YgMFIgzPu0Cn8g&s',
-    imagePath5: 'https://upload.wikimedia.org/wikipedia/en/d/d8/Jaslok_Hospital_Logo.png',
+    imagePath0: c1,
+    imagePath1: c2,
+    imagePath2: c3,
+    imagePath3: c4,
+    imagePath4: c5,
   },
   {
-    imagePath0: 'https://appointment.carehospitals.com/Image/Logo.png',
-    imagePath1: 'https://media.telanganatoday.com/wp-content/uploads/2023/09/medicover.jpg',
-    imagePath2: 'https://pbs.twimg.com/profile_images/1427869142913142790/zAJZHxhp_400x400.jpg',
-    imagePath3: 'https://appointment.carehospitals.com/Image/Logo.png',
-    imagePath4: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU4SDQeNowDirEBmRyRiG8YgMFIgzPu0Cn8g&s',
-    imagePath5: 'https://upload.wikimedia.org/wikipedia/en/d/d8/Jaslok_Hospital_Logo.png',
+    imagePath0: c1,
+    imagePath1: c2,
+    imagePath2: c3,
+    imagePath3: c4,
+    imagePath4: c5,
   },
 ]
 
 const Landing = () => {
   return (
     <React.Fragment>
-      <Box style={{ height: '100%', width: "100%", backgroundImage: 'linear-gradient(174.2deg, rgb(255, 244, 228) 7.1%, rgb(240, 246, 238) 67.4%)'}} >
+      <Box style={{ height: 'auto', width: "100%", backgroundColor: '#e2edf3'}} >
         <LandingNavbar />
         <LandingHero />
       </Box>
-      <LandingTitleBanner text="Our Valued Customers" bgColor="#fff" data={customerLogos}  />
+      <LandingTitleBanner text="Our Valuable Customers" bgColor="#fff" data={customerLogos} slider={true}  />
       <LandingCustomer />
-      <LandingTitleBanner text="Our Brand Partners" bgColor="rgb(240, 246, 238)" data={brandLogos} />
+      <LandingTitleBanner text="Our Brand Partners" bgColor="#fff" data={brandLogos} slider={false} />
       <LandingSolution />
-      <LandingCallAction />
       <LandingFeature />
-      <LandingConnect /> 
+      <LandingCallAction />
+      {/* <LandingConnect />  */}
       <LandingFooter />
     </React.Fragment>
   )

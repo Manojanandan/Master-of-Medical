@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import EcommerceHomePage from "./pages/eCommerce/homePage/HomePage.jsx";
 import Products from "./pages/Products";
@@ -16,8 +16,12 @@ import Termsofuse from "./pages/eCommerce/termsCondition/Termsofuse.jsx";
 import PrivacyPolicy from "./pages/eCommerce/privacyPolicy/PrivacyPolicy.jsx";
 import CookiesPolicy from "./pages/eCommerce/cookiesPolicy/CookiesPolicy.jsx";
 import OrderTracking from "./pages/eCommerce/orderTracking/OrderTracking.jsx";
+import VendorLayout from './pages/vendor/dashboard/index.jsx'
+import ProductList from "./pages/vendor/products/ProductList.jsx";
+import ProtectedRoute from "./pages/routes/ProtectedRoute.jsx";
 
 const App = () => {
+
   return (
     <>
       {/* <Navbar /> */}
@@ -29,6 +33,7 @@ const App = () => {
         <Route path="/details" element={<Details />} />
         {/* E-Commerce Route */}
         <Route exact path="/ecommerceDashboard" element={<EcommerceLayout />}>
+          {/* <Route element={<ProtectedRoute />}> */}
           <Route path="/ecommerceDashboard" element={<EcommerceHomePage />} />
           <Route path="/ecommerceDashboard/products" element={<Products />} />
           <Route path="/ecommerceDashboard/contact" element={<Contact />} />
@@ -39,8 +44,16 @@ const App = () => {
           <Route path="/ecommerceDashboard/privacyPolicy" element={<PrivacyPolicy />} />
           <Route path="/ecommerceDashboard/cookiesPolicy" element={<CookiesPolicy />} />
           <Route path="/ecommerceDashboard/orderTracking" element={<OrderTracking />} />
+          {/* </Route> */}
         </Route>
-      </Routes>
+        {/* Vendor Dashboard */}
+        <Route path="/vendorDashboard" element={<VendorLayout />}>
+          <Route element={<ProtectedRoute />}>
+            <Route index element={<ProductList />} />
+            <Route peth="/products" element={<ProductList />} />
+          </Route>
+        </Route>
+    </Routes >
     </>
   );
 };

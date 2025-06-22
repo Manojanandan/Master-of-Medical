@@ -1,11 +1,14 @@
 import React from 'react'
-import {Box, Button, Container, Stack, Typography} from '@mui/material'
+import { Box, Button, Container, Stack, Typography } from '@mui/material'
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import pharmaLogo from '../../assets/pharmaLogo.jpeg'
+import Banner1 from '../../assets/banner1.jpg'
+import Banner2 from '../../assets/banner2.jpg'
+import Banner3 from '../../assets/banner3.jpg'
 import StoreIcon from '@mui/icons-material/Store';
 import { useNavigate } from 'react-router-dom';
+import EastIcon from '@mui/icons-material/East';
 
 const settings = {
     dots: false,
@@ -16,53 +19,89 @@ const settings = {
     autoplay: true,
     autoplaySpeed: 2000,
     arrows: false,
-  };
+};
 
 const LandingHero = () => {
     const navigate = useNavigate()
     return (
         <React.Fragment >
-            <Box id='home' sx={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', height: '100%', width: '90%', margin: '5% auto 0',}}>
-                <Container maxWidth="sm" >
-                    <Typography variant='h3' component='div' sx={{ margin: '0 5%', fontWeight: 'bold', color: '#291175' }}>Supply</Typography>
-                    <Stack direction='row'>
-                        <Typography variant='h3' component='div' sx={{ marginLeft: '5% ', fontWeight: 'bold', color: '#c5225f', lineHeight: '4rem' }}>Health. </Typography>
-                        <Typography variant='h3' component='div' sx={{ fontWeight: 'bold', color: '#291175', lineHeight: '4rem' }}>Care</Typography>
-                    </Stack>
-                    <Stack direction='row' sx={{ margin: '5% 0 0 5%', width: '75%', color: '#7a7a7d' }}>
-                        <Typography variant='p'>Empowering Healthcare through tech-driven platform for end to end medical procurement solutions.</Typography>
-                    </Stack>
-                    <Stack direction='row' sx={{ margin: '5% 0 0 5%', width: '75%', color: '#030303', fontWeight: 'bold' }}>
-                        <Typography variant='p'>What we offer?</Typography>
-                    </Stack>
-                    <Stack direction='row' sx={{ margin: '3% 0 1% 5%', width: '96%' }} spacing={4}>
-                        <Typography variant='p' sx={{ color: '#080808',cursor:'pointer' }}>Buy Medical & Veterinary Supplies </Typography>
-                        <Typography variant='p' sx={{ color: '#8c8787',cursor:'pointer' }}>Buy Equipment </Typography>
-                    </Stack>
-                    <Stack direction='row' sx={{ margin: '3% 0 1% 5%', width: '96%' }} spacing={9}>
-                        <Typography variant='p' sx={{ color: '#8c8787',cursor:'pointer' }}>Asset Lifecycle Management </Typography>
-                        <Typography variant='p' sx={{ color: '#8c8787',cursor:'pointer' }}>Financing Solutions</Typography>
-                    </Stack>
-                    <Stack direction='row' sx={{ margin: '3% 0 1% 5%', width: '96%' }} spacing={7}>
-                        <Typography variant='p' sx={{ color: '#8c8787',cursor:'pointer' }}>Dental Supplies/ Custom Made</Typography>
-                        <Typography variant='p' sx={{ color: '#8c8787',cursor:'pointer' }}>AI for Inventory Management </Typography>
-                    </Stack>
-                    <Stack direction='row' sx={{ margin: '3% 0 4% 5%', width: '96%' }} spacing={9}>
-                        <Typography variant='p' sx={{ color: '#8c8787',cursor:'pointer' }}>Value Procurement Optimizer</Typography>
-                        <Typography variant='p' sx={{ color: '#8c8787',cursor:'pointer' }}>Turnkey Projects </Typography>
-                    </Stack>
-                </Container>
-                <Container maxWidth="sm" sx={{ height:'400px' }}>
-                    <Slider {...settings}>
-                        <div><img src="http://web.archive.org/web/20240720115017im_/https://www.medikabazaar.com/static/images/banner1.png" alt={pharmaLogo} style={{backgroundPosition:'center',backgroundSize:'cover',borderRadius:'10%',height:'400px',width:'100%'}} /></div>
-                        <div><img src="http://web.archive.org/web/20240720115017im_/https://www.medikabazaar.com/static/images/banner1.png" alt={pharmaLogo} style={{backgroundPosition:'center',backgroundSize:'cover',borderRadius:'10%',height:'400px',width:'100%'}} /></div>
-                        <div><img src="http://web.archive.org/web/20240720115017im_/https://www.medikabazaar.com/static/images/banner1.png" alt={pharmaLogo} style={{backgroundPosition:'center',backgroundSize:'cover',borderRadius:'10%',height:'400px',width:'100%'}} /></div>
-                    </Slider>
-                </Container>
-            </Box>
-            <Button onClick={() => navigate('/login')} startIcon={<StoreIcon />} variant='contained' sx={{position:'fixed',bottom:'5%',right:'3%',borderRadius:'15px',background: 'linear-gradient(90deg, rgba(210,138,74,1) 12%, rgba(210,111,148,1) 92%)',textTransform:'capitalize',fontWeight:'bold',padding:'10px 20px',fontSize:'15px',zIndex:'2',cursor:'pointer'}}>Shop now</Button>
+            <Slider {...settings}>
+            <div>
+                <div style={{ height: '700px', width: '90%', margin: '0 auto', }}>
+                    <Box sx={{ height: '600px', width: '100%', marginBottom: '5%', backgroundImage: `url(${Banner1})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', }}>
+                        <Box sx={{ width: '50%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', }}>
+                            <Typography variant='P' component='div' sx={{ margin: '0 5%', fontWeight: 'bold', color: '#00000', fontSize: '2.7rem', textTransform: 'uppercase' }}>REVOLUTIONIZING</Typography>
+                            <Typography variant='p' component='div' sx={{ margin: '0 0 0 5%', fontWeight: 'bold', color: '#00000', fontSize: '2.5rem', textTransform: 'uppercase' }}>HEALTHCARE SUPPLY CHAINS</Typography>
+                            <Stack direction='row' sx={{ margin: '5% 0' }}>
+                                <Typography variant='p' component='div' sx={{ marginLeft: '5% ', fontWeight: 'bold', color: '#00000', fontSize: '1.3rem' }}>Save time, reduce costs, and increase margins with India's fastest-growing B2B medical supply platform.</Typography>
+                            </Stack>
+                            <Stack onClick={() => alert()} direction='row' sx={{ margin: '2% 0 0 5%', width: '48%', borderBottom: 'solid 2px black', fontSize: '1.3rem', fontWeight: 'bold', cursor: 'pointer', textTransform: 'uppercase' }} spacing={2}>
+                                <Typography variant='p' component='div'>EXPLORE TO PRODUCTS</Typography>
+                                <EastIcon sx={{ fontSize: '2rem' }} />
+                            </Stack>
+                        </Box>
+                    </Box>
+                </div>
+            </div>
+            <div>
+                <div style={{ height: '700px', width: '90%', margin: '0 auto', }}>
+                    <Box sx={{ height: '600px', width: '100%', marginBottom: '5%', backgroundImage: `url(${Banner2})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', }}>
+                        <Box sx={{ width: '70%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                            <Typography variant='P' component='div' sx={{ margin: '0 5%', fontWeight: 'bold', color: '#00000', fontSize: '2.7rem', textTransform: 'uppercase' }}>Empowering</Typography>
+                            <Typography variant='p' component='div' sx={{ margin: '0 0 0 5%', fontWeight: 'bold', color: '#00000', fontSize: '2rem', textTransform: 'uppercase' }}>DIGITAL INDIA Through Smart Procurement</Typography>
+                            <Stack direction='row' sx={{ margin: '5% 0  5% 2%', width: '70%' }}>
+                                <Typography variant='p' component='div' sx={{ marginLeft: '5% ', fontWeight: 'bold', color: '#00000', fontSize: '1.3rem' }}>With real-time inventory, instant booking, and verified sellers, M.O.M simplifies medical sourcing for hospitals, clinics, and labs.</Typography>
+                            </Stack>
+                            <Stack onClick={() => alert()} direction='row' sx={{ margin: '0 0 0 5%', width: '17%', borderBottom: 'solid 2px black', fontSize: '1.3rem', fontWeight: 'bold', cursor: 'pointer', textTransform: 'uppercase' }} spacing={2}>
+                                <Typography variant='p' component='div'>Join Now </Typography>
+                                <EastIcon sx={{ fontSize: '2rem' }} />
+                            </Stack>
+                        </Box>
+                    </Box>
+                </div>
+            </div>
+            <div>
+                <div style={{ height: '700px', width: '90%', margin: '0 auto', }}>
+                    <Box sx={{ height: '600px', width: '100%', marginBottom: '5%', backgroundImage: `url(${Banner3})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', }}>
+                        <Box sx={{ width: '70%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', }}>
+                            <Typography variant='P' component='div' sx={{ margin: '0 5%', fontWeight: 'bold', color: '#00000', fontSize: '2.7rem', textTransform: 'uppercase' }}>Direct from Manufacturers.</Typography>
+                            <Typography variant='p' component='div' sx={{ margin: '0 0 0 5%', fontWeight: 'bold', color: '#00000', fontSize: '2rem', textTransform: 'uppercase' }}>Zero Middlemen. Maximum Savings.</Typography>
+                            <Stack direction='row' sx={{ margin: '5% 0' }}>
+                                <Typography variant='p' component='div' sx={{ marginLeft: '5% ', fontWeight: 'bold', color: '#00000', fontSize: '1.3rem', width: '70%' }}>Our mission is simple: streamline healthcare procurement for better pricing, faster logistics, and trusted quality.</Typography>
+                            </Stack>
+                            <Stack onClick={() => alert()} direction='row' sx={{ margin: '0 0 0 5%', width: '23%', borderBottom: 'solid 2px black', fontSize: '1.3rem', fontWeight: 'bold', cursor: 'pointer', textTransform: 'uppercase' }} spacing={2}>
+                                <Typography variant='p' component='div'>Start Saving </Typography>
+                                <EastIcon sx={{ fontSize: '2rem' }} />
+                            </Stack>
+                        </Box>
+                    </Box>
+                </div>
+            </div>
+            </Slider>
+
+            <Button onClick={() => navigate('/login')} startIcon={<StoreIcon />} variant='contained' sx={{ position: 'fixed', bottom: '5%', right: '3%', borderRadius: '15px', background: 'linear-gradient(90deg, rgba(210,138,74,1) 12%, rgba(210,111,148,1) 92%)', textTransform: 'capitalize', fontWeight: 'bold', padding: '10px 20px', fontSize: '15px', zIndex: '2', cursor: 'pointer' }}>Shop now</Button>
         </React.Fragment>
     )
 }
 
 export default LandingHero
+
+
+{/* <Box id='home' sx={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', width: '90%', margin: '5% auto' }}>
+                        <Box sx={{ width: '600px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', margin: '5% 0' }}>
+                            <Typography variant='P' component='div' sx={{ margin: '0 5%', fontWeight: 'bold', color: '#00000', fontSize: '2.5rem' }}>REVOLUTIONIZING</Typography>
+                            <Typography variant='p' component='div' sx={{ margin: '0 0 0 5%', fontWeight: 'bold', color: '#00000', fontSize: '2.3rem' }}>HEALTHCARE SUPPLY CHAINS</Typography>
+                            <Stack direction='row' sx={{ margin: '5% 0' }}>
+                                <Typography variant='p' component='div' sx={{ marginLeft: '5% ', fontWeight: 'bold', color: '#00000', fontSize: '1.3rem' }}>Save time, reduce costs, and increase margins with India's fastest-growing B2B medical supply platform.</Typography>
+                            </Stack>
+                            <Stack direction='row' sx={{ margin: '0% 0 0 5%', width: '52%', borderBottom: 'solid 2px black', fontSize: '1.3rem', fontWeight: 'bold', cursor: 'pointer' }} spacing={2}>
+                                <Typography variant='p' component='div'>EXPLORE TO PRODUCTS</Typography>
+                                <EastIcon sx={{ fontSize: '2rem' }} />
+                            </Stack>
+                        </Box>
+                        <Box sx={{ height: '400px', width: '600px', marginBottom: '5%' }}>
+                            <div >
+                                <img src={Banner1} alt={Banner1} style={{ height: '400px', width: '600px', backgroundPosition: 'center', backgroundSize: 'cover', }} />
+                            </div>
+                        </Box>
+                    </Box> */}

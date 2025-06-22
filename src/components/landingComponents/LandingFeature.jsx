@@ -1,17 +1,19 @@
-import React from 'react'
+import React, { useRef, useState } from 'react'
 import { Box, Button, Container, Stack, Typography } from '@mui/material'
 import Slider from 'react-slick'
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 const settings = {
   dots: false,
-  infinite: true,
+  // infinite: true,
   speed: 800,
   slidesToShow: 1,
   slidesToScroll: 1,
-  autoplay: true,
-  autoplaySpeed: 2000,
+  // autoplay: true,
+  // autoplaySpeed: 2000,
   arrows: false,
 };
 
@@ -19,83 +21,90 @@ const featureData = [
   {
     section0: {
       imagePath: 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJ1Z3N8ZW58MHx8MHx8fDA%3D',
-      title: "News | MBARC",
-      description: "Master of Medical launches MBARC",
-      detail: `7 Sept'22 | 5 min read | 1,220`,
+      title: "Utilizing mobile technology in the field",
+      description: "I think you should be able to to select more than one reason for rating.",
     },
     section1: {
       imagePath: 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJ1Z3N8ZW58MHx8MHx8fDA%3D',
-      title: "News | MBARC",
-      description: "Master of Medical launches MBARC",
-      detail: `7 Sept'22 | 5 min read | 1,220`,
+      title: "Success Story: Businessman in Harlem",
+      description: "I think you should be able to to select more than one reason for rating.",
     },
     section2: {
       imagePath: 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJ1Z3N8ZW58MHx8MHx8fDA%3D',
-      title: "News | MBARC",
-      description: "Master of Medical launches MBARC",
-      detail: `7 Sept'22 | 5 min read | 1,220`,
-    },
-    section3: {
-      imagePath: 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJ1Z3N8ZW58MHx8MHx8fDA%3D',
-      title: "News | MBARC",
-      description: "Master of Medical launches MBARC",
-      detail: `7 Sept'22 | 5 min read | 1,220`,
+      title: "Working from home?Let's get started.",
+      description: "I think you should be able to to select more than one reason for rating.",
     },
   },
   {
     section0: {
-      imagePath: 'https://www.shutterstock.com/image-photo/drug-prescription-treatment-medication-pharmaceutical-260nw-544348294.jpg',
-      title: "News | MBARC",
-      description: "Master of Medical launches MBARC",
-      detail: `7 Sept'22 | 5 min read | 1,220`,
+      imagePath: 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJ1Z3N8ZW58MHx8MHx8fDA%3D',
+      title: "Utilizing mobile technology in the field",
+      description: "I think you should be able to to select more than one reason for rating.",
     },
     section1: {
-      imagePath: 'https://www.shutterstock.com/image-photo/drug-prescription-treatment-medication-pharmaceutical-260nw-544348294.jpg',
-      title: "News | MBARC",
-      description: "Master of Medical launches MBARC",
-      detail: `7 Sept'22 | 5 min read | 1,220`,
+      imagePath: 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJ1Z3N8ZW58MHx8MHx8fDA%3D',
+      title: "Success Story: Businessman in Harlem",
+      description: "I think you should be able to to select more than one reason for rating.",
     },
     section2: {
-      imagePath: 'https://www.shutterstock.com/image-photo/drug-prescription-treatment-medication-pharmaceutical-260nw-544348294.jpg',
-      title: "News | MBARC",
-      description: "Master of Medical launches MBARC",
-      detail: `7 Sept'22 | 5 min read | 1,220`,
+      imagePath: 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJ1Z3N8ZW58MHx8MHx8fDA%3D',
+      title: "Working from home?Let's get started.",
+      description: "I think you should be able to to select more than one reason for rating.",
     },
-    section3: {
-      imagePath: 'https://www.shutterstock.com/image-photo/drug-prescription-treatment-medication-pharmaceutical-260nw-544348294.jpg',
-      title: "News | MBARC",
-      description: "Master of Medical launches MBARC",
-      detail: `7 Sept'22 | 5 min read | 1,220`,
-    },
-  }
+  },
+
 ]
 
 const LandingFeature = () => {
+  const sliderRef = useRef(null);
+    const [current, setCurrent] = useState(0);
+  
+    const handleNext = () => {
+      if (sliderRef.current) {
+        sliderRef.current.slickNext();
+      }
+    };
+  
+    const handlePrev = () => {
+      if (sliderRef.current) {
+        sliderRef.current.slickPrev();
+      }
+    };
+  
+    // Update current slide index on change
+    const sliderSettings = {
+      ...settings,
+      beforeChange: (oldIndex, newIndex) => setCurrent(newIndex),
+    };
+    // Calculate width as a percentage
+    const progressWidth = featureData?.length
+      ? `${((current + 1) / featureData.length) * 100}%`
+      : '0%';
   return (
     <React.Fragment>
-      <Box sx={{ height: '600px', width: '100%' }}>
+      <Box sx={{ height: 'auto', width: '100%',}}>
         <Box sx={{ height: '100%', width: '92%', margin: '3% auto' }}>
-          <Stack direction='row' sx={{ marginBottom: '2%' }}>
-            <Typography variant='p' sx={{ fontWeigh: 'bold', width: '90%', fontSize: '2.5em' }}>Featured Stories</Typography>
-            <Button variant='text' sx={{ fontSize: '16px', fontWeight: 'bold', color: '#c5225f', textTransform: 'capitalize', margin: '1% 0', }}>Explore All</Button>
-          </Stack>
-          <Box sx={{ height: '400px', width: '100%' }}>
-            <Slider {...settings}>
+          <Box sx={{ marginBottom: '2%', textAlign: 'center', width: '50%', margin: '0 auto' }}>
+            <Typography variant='p' sx={{ fontWeigh: 'bold', width: '90%', fontSize: '2.2em' }}>CASE <span style={{ color: '#35bfb3' }}>STUDIES</span></Typography><br />
+            <Typography variant='p' sx={{ fontSize: '1.4rem', fontWeight: 'semi-bold' }}>Our design  services starts and ends with a best-in-class experience strategy that builds brands.</Typography>
+          </Box>
+          <Box sx={{ height: 'auto', width: '90%', margin: '4% auto' }}>
+            <Slider ref={sliderRef} {...sliderSettings}>
               {featureData?.map((e, i) => {
                 return (
                   <div className="slide" key={i}>
-                    <Stack direction="row">
+                    <Stack direction="row" spacing={4}>
                       {/* Mapping through section0 and section1 */}
                       {Object.keys(e).map((sectionKey) => {
                         const section = e[sectionKey]; // Get section0 or section1
 
                         return (
-                          <Box key={sectionKey} sx={{ height: '100%', width: '25%' }}>
+                          <Box key={sectionKey} sx={{ height: '100%', width: '400px' }}>
                             {/* Box for the image */}
                             <Box
                               sx={{
-                                height: '150px',
-                                width: '85%',
+                                height: '200px',
+                                width: '90%',
                                 margin: '4% 5% 3% 5%',
                               }}
                             >
@@ -108,37 +117,35 @@ const LandingFeature = () => {
                             </Box>
 
                             {/* Title */}
-                            <Typography variant="p" sx={{ margin: '0 6%' }}>
-                              {section.title}
-                            </Typography>
+                            <Box sx={{ margin: '0 4%', }}>
+                              <Typography variant="p" sx={{ fontSize: '1.8rem', fontWeight: 'bold', }}>
+                                {section.title}
+                              </Typography>
+                            </Box>
 
                             {/* Description */}
                             <Box sx={{ height: 'auto', width: '87%', margin: '3% auto' }}>
-                              <Typography variant="p" sx={{ fontSize: '18px' }}>
+                              <Typography variant="p" sx={{ fontSize: '20px', }}>
                                 {section.description}
                               </Typography>
                             </Box>
 
-                            {/* Detail */}
-                            <Typography variant="p" sx={{ margin: '0 6%' }}>
-                              {section.detail}
-                            </Typography>
 
                             {/* Button */}
                             <Button
                               variant="outlined"
                               sx={{
                                 textTransform: 'capitalize',
-                                color: '#c5225f',
-                                padding: '4% 6%',
-                                margin: '5% 6% 10% 6%',
+                                color: 'black',
+                                padding: '2% 6%',
+                                margin: '4% 5%',
                                 fontSize: '16px',
                                 fontWeight: 'bold',
-                                border: 'solid 2px #c5225f',
-                                borderRadius: '15px',
+                                border: 'solid 2px black',
+                                borderRadius: '12px',
                               }}
                             >
-                              Read more
+                              Continue Reading
                             </Button>
                           </Box>
                         );
@@ -148,6 +155,28 @@ const LandingFeature = () => {
                 );
               })}
             </Slider>
+          </Box>
+          <Box sx={{ margin: '1% auto', width: '90%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Stack direction='row' spacing={2}>
+              <Box
+                sx={{ height: '40px', width: '40px', border: 'solid 1px #f1f2f7', backgroundColor: '#f1f2f7', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', transition: 'background 0.2s', '&:active': { backgroundColor: '#c5225f', } }}
+                onClick={handlePrev}
+              >
+                <ArrowBackIcon />
+              </Box>
+              <Box
+                sx={{ height: '40px', width: '40px', border: 'solid 1px #f1f2f7', backgroundColor: '#f1f2f7', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', transition: 'background 0.2s', '&:active': { backgroundColor: '#c5225f', }, }}
+                onClick={handleNext}
+              >
+                <ArrowForwardIcon />
+              </Box>
+            </Stack>
+            <Box sx={{ height: '2px', width: '75%', border: 'solid 1.5px #2424' }}>
+              <Box sx={{ height: 'auto', width: progressWidth, border: 'solid 1.5px blue', backgroundColor: '#e2edf3', margin: '-1px', transition: 'width 0.5s ease' }}></Box>
+            </Box>
+
+            <Button variant="outlined" sx={{ outline: 'solid 1.5px black', color: 'black', textTransform: 'capitalize', fontSize: '17px', fontWeight: 'bold', }}>View all </Button>
+
           </Box>
         </Box>
       </Box>
