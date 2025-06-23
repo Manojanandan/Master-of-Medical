@@ -60,7 +60,7 @@ const brandLogos = [
 const Landing = () => {
   return (
     <React.Fragment>
-      <Box style={{ height: 'auto', width: "100%", backgroundColor: '#e2edf3'}} >
+      <Box style={{ height: 'auto', width: "100%", backgroundColor: "#e2edf3"}} >
         <LandingNavbar />
         <LandingHero />
       </Box>

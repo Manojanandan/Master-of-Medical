@@ -41,6 +41,7 @@ const index = () => {
     const handleSettingMenu = (data) => {
         if (data === "Logout") {
             sessionStorage.removeItem("jwt")
+            sessionStorage.removeItem("userType")
             navigate('/')
         }
     }

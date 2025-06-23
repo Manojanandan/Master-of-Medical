@@ -8,3 +8,7 @@ html, body {
   padding: 0;
   overflow-x: hidden;
 }
+:root{
+  --primaryColor: #e2edf3,
+  --secondaryColor: #009e92
+}

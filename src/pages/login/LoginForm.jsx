@@ -91,12 +91,12 @@ const LoginForm = () => {
             </Snackbar>}
             <Box onClick={() => navigate('/signup')} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', width: '90%', gap: '10px', cursor: 'pointer',right:'20px' }}>
                 <WestIcon sx={{ fontSize: '2rem' }} />
-                <Typography variant='p' component='div' sx={{ fontSize: '1.6rem', fontWeight: 'bold', color: 'black' }}>Back to list</Typography>
+                <Typography variant='p' component='div' sx={{ fontSize: '1.6rem', fontWeight: 'bold', color: 'black' }}>Back</Typography>
             </Box>
             <Box sx={{ border: 'solid 1.5px #fff', height: 'auto', margin: '4% auto', backgroundColor: '#fff', borderRadius: '15px', width: '35%' }}>
-                <Box sx={{ margin: '4% auto', width: 'auto', textAlign: 'center' }}>
-                    <Typography variant='p' sx={{ margin: '3% auto 0', fontSize: '1.8rem', }}>Welcome to <span style={{ textTransform: 'capitalize' }}>{type}</span> Login</Typography><br />
-                    <Typography variant='p' sx={{ fontSize: '14px', fontWeight: 'bold' }}>Create a new account? <Link to='/signup' style={{ fontWeight: 'bold', fontSize: '16px', color: '#35bfb3' }}> Sign up</Link></Typography>
+                <Box sx={{ margin: '7% auto 5%', width: 'auto', textAlign: 'center' }}>
+                    <Typography variant='p' sx={{ margin: '5% auto 0', fontSize: '1.8rem', }}>Welcome to <span style={{ textTransform: 'capitalize' }}>{type}</span> Login</Typography><br />
+                    <Typography variant='p' sx={{ fontSize: '14px', fontWeight: 'bold' }}>Create a new account? <Link to='/signup' style={{ fontWeight: 'bold', fontSize: '16px', color: '#009e92',textDecoration:'none',borderBottom:'solid 1.5px #009e92' }}> Sign up</Link></Typography>
                 </Box>
                 <Grid container spacing={2}>
                     <Grid item size={12} sx={{ margin: '5% 7% 0' }}>
@@ -110,11 +110,11 @@ const LoginForm = () => {
                         <TextField fullWidth id="password" size="small" value={allDtata.password} onChange={handleChange} />
                     </Grid>
                     <Grid item size={12} sx={{ margin: '0 7%', fontWeight: 'bold' }}>
-                        <Link to=''>Forgot password</Link>
+                        <Link to='' style={{textDecoration:'none',borderBottom:'solid 1.5px #009e92',color:'#009e92'}}>Forgot password</Link>
                     </Grid>
 
                 </Grid>
-                <Button onClick={createLogin} variant='contained' sx={{ textTransform: 'capitalize', fontSize: '16px', fontWeight: 'bold', padding: '1% 8%', margin: '5% 37% 8%' }}>Login</Button>
+                <Button onClick={createLogin} variant='contained' sx={{ textTransform: 'capitalize', fontSize: '16px', fontWeight: 'bold', padding: '1% 8%', margin: '7% 37% 10%' }}>Login</Button>
 
             </Box>
         </Box>
