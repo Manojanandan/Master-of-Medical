@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Alert, Backdrop, Box, Button, Checkbox, CircularProgress, Container, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, Snackbar, Stack, TextField, Typography } from '@mui/material'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { styled } from '@mui/material/styles';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,7 +11,6 @@ import PngIcon from '../../assets/PngIcon.png';
 import WordIcon from '../../assets/WordIcon.jpg';
 import JpgIcon from '../../assets/JpgIcon.png';
 import { registerVendor } from './Signup/SignUpReducer';
-import { red } from '@mui/material/colors';
 
 const VisuallyHiddenInput = styled('input')({
     clip: 'rect(0 0 0 0)',
@@ -29,8 +28,7 @@ const Details = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const [labelChanges, setLabelChanges] = useState("")
-    const useQuery = new URLSearchParams(useLocation().search)
-    const type = useQuery.get("type")
+    const type = sessionStorage.getItem("userType")
 
     const reducer = useSelector((state) => state.signUpReducer)
     const loader = reducer.loader;
@@ -221,40 +219,44 @@ const Details = () => {
                     {message}
                 </Alert>
             </Snackbar>}
-            <Box sx={{ height: '100%', width: '100%' }}>
-                <Box sx={{ border: 'solid 1.5px #d1cbcb', height: 'auto', margin: '2% auto', backgroundColor: '#d8d1d136', borderRadius: '15px', width: '65%' }}>
+            <Box sx={{ height: '100%', width: '100%',backgroundColor:'#f2f3f5',padding:'4% 0' }}>
+                <Box sx={{ border: 'solid 1.5px #fff', height: 'auto', margin: '0% auto', backgroundColor: '#fff', borderRadius: '15px', width: '65%' }}>
                     <Stack direction='column'>
-                        <Typography variant='h4' sx={{ margin: '2% auto', textTransform: 'capitalize' }}>{type} Details</Typography>
+                        <Typography variant='p' sx={{ margin: '2% auto', textTransform: 'capitalize',fontSize:'2rem' }}>{type} Details</Typography>
                     </Stack>
                     <Box sx={{ width: '95%', margin: '1% auto', }}>
                         <Grid container columnSpacing={2}>
-                            <Grid item size={12} >
+                            <Grid item size={6} >
                                 <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: '1% 0 1%' }}>Name</Typography>
                                 <TextField disabled fullWidth id="name" size="small" value={tempData[0].userName} onChange={handleChange} />
                             </Grid>
+                            <Grid item size={6} >
+                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: '1% 0 1%' }}>Email</Typography>
+                                <TextField disabled fullWidth id="email" size="small" value={tempData[0].email} onChange={handleChange} />
+                            </Grid>
                             <Grid item size={12} >
-                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: '2% 0 1%', }}>Address</Typography>
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '2% 0 1%', }}>Address<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                 {errorMsg.addressLine1Error && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.addressLine1Error}</Typography>}
                                 <TextField value={allData.addressLine1} autoComplete='off' fullWidth id="addressLine1" size="small" sx={{ marginBottom: '1%' }} onChange={handleChange} />
                                 <TextField value={allData.addressLine2} autoComplete='off' fullWidth id="addressLine2" size="small" onChange={handleChange} />
                             </Grid>
                             <Grid item size={6} >
-                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: '3% 0 1%' }}>Contact Number</Typography>
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 1%' }}>Contact Number<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                 {errorMsg.numberError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.numberError}</Typography>}
                                 <TextField value={allData.number} autoComplete='off' fullWidth id="number" size="small" onChange={handleChange} />
                             </Grid>
                             <Grid item size={6} >
-                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: '3% 0 1%' }}>City</Typography>
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 1%' }}>City<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                 {errorMsg.cityError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.cityError}</Typography>}
                                 <TextField value={allData.city} autoComplete='off' fullWidth id="city" size="small" onChange={handleChange} />
                             </Grid>
                             <Grid item size={6} >
-                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: '5% 0 1%' }}>State</Typography>
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '5% 0 1%' }}>State<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                 {errorMsg.stateError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.stateError}</Typography>}
                                 <TextField value={allData.state} autoComplete='off' fullWidth id="state" size="small" onChange={handleChange} />
                             </Grid>
                             <Grid item size={6} >
-                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: '5% 0 1%' }}>Pincode</Typography>
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '5% 0 1%' }}>Pincode<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                 {errorMsg.pincodeError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.pincodeError}</Typography>}
                                 <TextField value={allData.pincode} autoComplete='off' fullWidth id="pincode" size="small" onChange={handleChange} />
                             </Grid>
@@ -749,7 +751,7 @@ const Details = () => {
                             ) : (
                                 <React.Fragment>
                                     <Grid item size={12} >
-                                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: '3% 0 0' }}>Type of vendors</Typography>
+                                        <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 0' }}>Type of vendors<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                         {errorMsg.vendorTypeError &&
                                             <Typography sx={{ color: 'red', fontSize: '14px', marginTop: '5px' }}>{errorMsg.vendorTypeError}</Typography>}
                                         <FormControl>
@@ -762,8 +764,9 @@ const Details = () => {
                                                     setAlldata({ ...allData, vendorType: e.target.value })
                                                     setErrorMsg({ ...errorMsg, vendorTypeError: "" })
                                                 }}
+                                                
                                             >
-                                                <FormControlLabel value="manufacturing" control={<Radio />} label="Manufacturing" />
+                                                <FormControlLabel  value="manufacturing" control={<Radio />} label="Manufacturing" />
                                                 <FormControlLabel value="oem" control={<Radio />} label="OEM" />
                                                 <FormControlLabel value="dealer" control={<Radio />} label="C&F / Super Stockist / Dealer's" />
                                             </RadioGroup>
@@ -1386,7 +1389,7 @@ const Details = () => {
                         </Grid>
                     </Box>
                     <Stack direction='column'>
-                        <Button onClick={handleSubmit} variant='contained' sx={{ width: '400px', margin: '4% auto 4%', borderRadius: '15px', textTransform: 'capitalize', padding: '1%', fontSize: '16px', fontWeight: 'bold' }}>Confirm</Button>
+                        <Button onClick={handleSubmit} variant='contained' sx={{ width: '400px', margin: '4% auto 4%',textTransform: 'capitalize', padding: '1%', fontSize: '18px', fontWeight: 'bold',backgroundColor:'#009e92',borderRadius:'10px' }}>Confirm</Button>
                     </Stack>
                 </Box>
             </Box>

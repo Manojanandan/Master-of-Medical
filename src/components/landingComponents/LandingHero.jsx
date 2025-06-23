@@ -79,7 +79,7 @@ const LandingHero = () => {
             </div>
             </Slider>
 
-            <Button onClick={() => navigate('/login')} startIcon={<StoreIcon />} variant='contained' sx={{ position: 'fixed', bottom: '5%', right: '3%', borderRadius: '15px', background: 'linear-gradient(90deg, rgba(210,138,74,1) 12%, rgba(210,111,148,1) 92%)', textTransform: 'capitalize', fontWeight: 'bold', padding: '10px 20px', fontSize: '15px', zIndex: '2', cursor: 'pointer' }}>Shop now</Button>
+            {/* <Button onClick={() => navigate('/login')} startIcon={<StoreIcon />} variant='contained' sx={{ position: 'fixed', bottom: '5%', right: '3%', borderRadius: '15px', background: 'linear-gradient(90deg, rgba(210,138,74,1) 12%, rgba(210,111,148,1) 92%)', textTransform: 'capitalize', fontWeight: 'bold', padding: '10px 20px', fontSize: '15px', zIndex: '2', cursor: 'pointer' }}>Shop now</Button> */}
         </React.Fragment>
     )
 }

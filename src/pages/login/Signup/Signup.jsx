@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { Box, Button, Checkbox, FormControlLabel, Stack, TextField, Typography } from '@mui/material'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import GoogleIcon from '@mui/icons-material/Google';
 import { useDispatch, useSelector } from 'react-redux';
+import WestIcon from '@mui/icons-material/West';
 
 // Email: basic pattern for most emails
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -16,8 +17,7 @@ const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]
 const Signup = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    const useQuery = new URLSearchParams(useLocation().search)
-    const type = useQuery.get("type")
+    const type = sessionStorage.getItem("userType")
     const storeVendorDetails = []
 
     const [checked, setChecked] = useState(false)
@@ -61,36 +61,41 @@ const Signup = () => {
                 email: formData.email, password: formData.password, userName: formData.userName
             })
             sessionStorage.setItem("tempData",JSON.stringify(storeVendorDetails))
-            navigate(`/details?type=${type}`);
+            navigate(`/details`);
             setFormData({ email: "", password: "", userName: "" })
         }
     }
     return (
         <React.Fragment>
-            <Box sx={{ height: '100%', width: '100%' }}>
-                <Box sx={{ width: '55%', border: 'solid 1.5px #d1cbcb', height: 'auto', margin: '2% auto', backgroundColor: '#d8d1d136', borderRadius: '15px' }}>
+            <Box sx={{ height: '100%', width: '100%',backgroundColor:'#f2f3f5',padding:'3% ' }}>
+                <Box onClick={()=>navigate('/')} sx={{textAlign:'right',display:'flex',justifyContent:'flex-end',alignItems:'center',width:'100%',gap:'10px',cursor:'pointer'}}>
+                    <WestIcon sx={{fontSize:'2rem'}} />
+                    <Typography variant='p' component='div' sx={{fontSize:'1.6rem',fontWeight:'bold',color:'black'}}>Back to list</Typography>
+                </Box>
+                <Box sx={{ width: '55%', height: 'auto', margin: '0 auto', backgroundColor: '#fff', borderRadius: '15px' }}>
                     <Stack direction='column'>
-                        <Typography variant='h4' sx={{ margin: '2% auto' }}>Welcome to User</Typography>
-                        <Typography variant='p' sx={{ fontSize: '13px', margin: '0 auto' }}>Already have an account <Link to={`/loginform?type=${type}`} style={{ fontWeight: 'bold', fontSize: '16px' }}> Log in ?</Link></Typography>
+                        <Typography variant='p' sx={{ margin: '3% auto 0',fontSize:'2rem', }}>Welcome to <span style={{textTransform:'capitalize'}}>{type}</span></Typography>
+                        <Typography variant='p' sx={{ fontSize: '14px', margin: '0 auto',fontWeight:'bold' }}>Already have an account? <Link to={`/loginform`} style={{ fontWeight: 'bold', fontSize: '16px',color:'#35bfb3' }}> Login</Link></Typography>
                     </Stack>
                     <Stack direction='column' sx={{ width: '85%', maxWidth: '100%', margin: '5% 7% 0' }} spacing={1}>
-                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>Email</Typography>
+                        <Typography sx={{ fontSize: '18px', fontWeight: 'bold' }}>Email<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                         {errorMsg.emailError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.emailError}</Typography>}
                         <TextField fullWidth id="email" size="small" autoComplete='off' value={formData.email} onChange={handleChange} /><br />
-                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>User Name</Typography>
+                        <Typography sx={{ fontSize: '18px', fontWeight: 'bold' }}>User Name<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                         {errorMsg.useNameError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.useNameError}</Typography>}
                         <TextField fullWidth id="userName" autoComplete='off' size="small" value={formData.userName} onChange={handleChange} /><br />
-                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>Password</Typography>
+                        <Typography sx={{ fontSize: '18px', fontWeight: 'bold' }}>Password<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                         {errorMsg.passwordError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.passwordError}</Typography>}
                         <TextField fullWidth id="password" autoComplete='off' size="small" value={formData.password} onChange={handleChange} /><br />
                     </Stack>
-                    <Stack direction='column'>
-                        <FormControlLabel control={<Checkbox checked={checked} onClick={(e) => setChecked(e.target.checked)} />} label="i want to receive emails about the product, feature updates,events, and marketing promotions." sx={{ margin: '2% 3% 0', fontSize: '10px', color: '#837c7c', userSelect: 'none' }} />
-                        <Typography variant='p' sx={{ fontSize: '12px', margin: '3% 7%' }}>By creating an account, you agree to the <Link to='/'>Terms of use</Link> and <Link to='/'>Privacy Policy.</Link> </Typography>
+                    <Stack direction='row'>
+                        <FormControlLabel control={<Checkbox checked={checked} onClick={(e) => setChecked(e.target.checked)} />} sx={{ margin: '2% 0% 2% 6%', fontSize: '10px', color: '#837c7c', userSelect: 'none' }} />
+                        <Typography variant='span' sx={{alignItems:'center',margin:'3.5% 0 0',fontWeight:'bold',fontSize:'14px'}} >By creating an account, you agree to the <Link to='/'>Terms of use</Link> and <Link to='/'>Privacy Policy.</Link> </Typography> 
+                        {/* <Typography variant='p' sx={{ fontSize: '12px', margin: '3% 7%' }}>By creating an account, you agree to the <Link to='/'>Terms of use</Link> and <Link to='/'>Privacy Policy.</Link> </Typography> */}
                     </Stack>
                     <Stack direction='column'>
-                        <Button disabled={!checked} onClick={createAccount} variant='outlined' sx={{ width: '85%', margin: '2% auto 0%', borderRadius: '15px', textTransform: 'capitalize', padding: '1%', fontSize: '16px', fontWeight: 'bold' }}>Create an account</Button>
-                        <Button startIcon={<GoogleIcon />} variant='contained' sx={{ width: '85%', margin: '2% auto 4%', borderRadius: '15px', textTransform: 'capitalize', padding: '1%', fontSize: '16px', fontWeight: 'bold' }}>Sign in with google</Button>
+                        <Button disabled={!checked} onClick={createAccount} variant='outlined' sx={{ width: '85%', margin: '2% auto 0%', textTransform: 'capitalize', padding: '1%', fontSize: '16px', fontWeight: 'bold' }}>Create an account</Button>
+                        <Button startIcon={<GoogleIcon />} variant='contained' sx={{ width: '85%', margin: '2% auto 6%', textTransform: 'capitalize', padding: '1%', fontSize: '16px', fontWeight: 'bold' }}>Sign in with google</Button>
                     </Stack>
                 </Box>
             </Box>

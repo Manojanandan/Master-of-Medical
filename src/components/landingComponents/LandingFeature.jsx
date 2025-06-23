@@ -5,6 +5,10 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
+import case1 from '../../assets/case1.jpg'
+import case2 from '../../assets/case2.jpg'
+import case3 from '../../assets/case3.jpg'
 
 const settings = {
   dots: false,
@@ -20,38 +24,39 @@ const settings = {
 const featureData = [
   {
     section0: {
-      imagePath: 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJ1Z3N8ZW58MHx8MHx8fDA%3D',
+      imagePath: case1,
       title: "Utilizing mobile technology in the field",
       description: "I think you should be able to to select more than one reason for rating.",
     },
     section1: {
-      imagePath: 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJ1Z3N8ZW58MHx8MHx8fDA%3D',
+      imagePath: case2,
       title: "Success Story: Businessman in Harlem",
       description: "I think you should be able to to select more than one reason for rating.",
     },
     section2: {
-      imagePath: 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJ1Z3N8ZW58MHx8MHx8fDA%3D',
+      imagePath: case3,
       title: "Working from home?Let's get started.",
       description: "I think you should be able to to select more than one reason for rating.",
     },
   },
   {
     section0: {
-      imagePath: 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJ1Z3N8ZW58MHx8MHx8fDA%3D',
+      imagePath: case1,
       title: "Utilizing mobile technology in the field",
       description: "I think you should be able to to select more than one reason for rating.",
     },
     section1: {
-      imagePath: 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJ1Z3N8ZW58MHx8MHx8fDA%3D',
+      imagePath: case2,
       title: "Success Story: Businessman in Harlem",
       description: "I think you should be able to to select more than one reason for rating.",
     },
     section2: {
-      imagePath: 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJ1Z3N8ZW58MHx8MHx8fDA%3D',
+      imagePath: case3,
       title: "Working from home?Let's get started.",
       description: "I think you should be able to to select more than one reason for rating.",
     },
   },
+ 
 
 ]
 
@@ -118,13 +123,13 @@ const LandingFeature = () => {
 
                             {/* Title */}
                             <Box sx={{ margin: '0 4%', }}>
-                              <Typography variant="p" sx={{ fontSize: '1.8rem', fontWeight: 'bold', }}>
+                              <Typography variant="p" sx={{ fontSize: '1.6rem', fontWeight: 'bold', }}>
                                 {section.title}
                               </Typography>
                             </Box>
 
                             {/* Description */}
-                            <Box sx={{ height: 'auto', width: '87%', margin: '3% auto' }}>
+                            <Box sx={{ height: 'auto', width: '87%', margin: '3% 4%' }}>
                               <Typography variant="p" sx={{ fontSize: '20px', }}>
                                 {section.description}
                               </Typography>
@@ -133,16 +138,19 @@ const LandingFeature = () => {
 
                             {/* Button */}
                             <Button
-                              variant="outlined"
+                            startIcon={<HorizontalRuleIcon size="large" />}
+                              variant=""
                               sx={{
                                 textTransform: 'capitalize',
-                                color: 'black',
+                                color: '#02534d',
                                 padding: '2% 6%',
                                 margin: '4% 5%',
                                 fontSize: '16px',
                                 fontWeight: 'bold',
                                 border: 'solid 2px black',
                                 borderRadius: '12px',
+                                outline: 'none',
+                                border:'none'
                               }}
                             >
                               Continue Reading

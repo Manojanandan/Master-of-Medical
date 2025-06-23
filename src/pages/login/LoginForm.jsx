@@ -3,6 +3,7 @@ import { Alert, Backdrop, Box, Button, Checkbox, CircularProgress, Container, Fo
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { loginUser } from './LoginReducer';
 import { useDispatch, useSelector } from 'react-redux';
+import WestIcon from '@mui/icons-material/West';
 
 // Email: basic pattern for most emails
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -14,7 +15,7 @@ const LoginForm = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const useQuery = new URLSearchParams(useLocation().search)
-    const type = useQuery.get("type")
+    const type = sessionStorage.getItem("userType")
 
     const reducer = useSelector((state) => state.loginReducer)
     const { loader, message, success } = reducer
@@ -30,7 +31,7 @@ const LoginForm = () => {
             [e.target.id]: e.target.value
         })
         if (e.target.id === "email") {
-            setErrorMsg({ ...errorMsg, useNameError: "" });
+            setErrorMsg({ ...errorMsg, emailError: "" });
         }
         if (e.target.id === "password") {
             setErrorMsg({ ...errorMsg, passwordError: "" });
@@ -53,7 +54,7 @@ const LoginForm = () => {
                 email: allDtata.email,
                 password: allDtata.password,
             }
-            dispatch(loginUser({data: payload,type}))
+            dispatch(loginUser({ data: payload, type }))
             setOpenModal(true)
             if (sessionStorage.getItem("jwt")) {
                 navigate("/vendorDashboard")
@@ -68,10 +69,10 @@ const LoginForm = () => {
             navigate("/vendorDashboard")
         }
     }
-console.log(message);
+    console.log(message);
 
     return (
-        <React.Fragment>
+        <Box sx={{ height: '100vh', width: '100%', backgroundColor: '#f2f3f5', padding: '4% 0' }}>
             <Backdrop
                 sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
                 open={loader}
@@ -88,33 +89,35 @@ console.log(message);
                     {message}
                 </Alert>
             </Snackbar>}
-            <Box sx={{ height: '100%', width: '100%' }}>
-                <Box sx={{ border: 'solid 1.5px #d1cbcb', height: 'auto', margin: '7% auto', backgroundColor: '#d8d1d136', borderRadius: '15px', width: '40%' }}>
-                    <Grid container spacing={2}>
-                        <Grid item size={6} sx={{ margin: '2% auto' }}>
-                            <Typography variant='h4' >Welcome to Login</Typography>
-                            <Typography variant='p' sx={{ fontSize: '13px', marginLeft: '12%' }}>Create a new account <Link to='/signup' style={{ fontWeight: 'bold', fontSize: '16px' }}> Sign up ?</Link></Typography>
-                        </Grid>
-                        <Grid item size={12} sx={{ margin: '5% 7% 0' }}>
-                            <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>Email</Typography>
-                            {errorMsg.emailError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.emailError}</Typography>}
-                            <TextField fullWidth id="email" size="small" value={allDtata.email} onChange={handleChange} />
-                        </Grid>
-                        <Grid item size={12} sx={{ margin: '1% 7% 0' }}>
-                            <Typography sx={{ fontSize: '16px', fontWeight: 'bold' }}>Password</Typography>
-                            {errorMsg.passwordError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.passwordError}</Typography>}
-                            <TextField fullWidth id="password" size="small" value={allDtata.password} onChange={handleChange} />
-                        </Grid>
-                        <Grid item size={12} sx={{ margin: '0 7%', fontWeight: 'bold' }}>
-                            <Link to=''>Forgot password</Link>
-                        </Grid>
-
-                    </Grid>
-                    <Button onClick={createLogin} variant='contained' sx={{ borderRadius: '15px', textTransform: 'capitalize', fontSize: '16px', fontWeight: 'bold', padding: '1% 8%', margin: '5% 37%' }}>Login</Button>
-
-                </Box>
+            <Box onClick={() => navigate('/signup')} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', width: '90%', gap: '10px', cursor: 'pointer',right:'20px' }}>
+                <WestIcon sx={{ fontSize: '2rem' }} />
+                <Typography variant='p' component='div' sx={{ fontSize: '1.6rem', fontWeight: 'bold', color: 'black' }}>Back to list</Typography>
             </Box>
-        </React.Fragment>
+            <Box sx={{ border: 'solid 1.5px #fff', height: 'auto', margin: '4% auto', backgroundColor: '#fff', borderRadius: '15px', width: '35%' }}>
+                <Box sx={{ margin: '4% auto', width: 'auto', textAlign: 'center' }}>
+                    <Typography variant='p' sx={{ margin: '3% auto 0', fontSize: '1.8rem', }}>Welcome to <span style={{ textTransform: 'capitalize' }}>{type}</span> Login</Typography><br />
+                    <Typography variant='p' sx={{ fontSize: '14px', fontWeight: 'bold' }}>Create a new account? <Link to='/signup' style={{ fontWeight: 'bold', fontSize: '16px', color: '#35bfb3' }}> Sign up</Link></Typography>
+                </Box>
+                <Grid container spacing={2}>
+                    <Grid item size={12} sx={{ margin: '5% 7% 0' }}>
+                        <Typography sx={{ fontSize: '18px', fontWeight: 'bold' }}>Email<span style={{ color: 'red', marginLeft: '5px' }}>*</span></Typography>
+                        {errorMsg.emailError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.emailError}</Typography>}
+                        <TextField fullWidth id="email" size="small" value={allDtata.email} onChange={handleChange} />
+                    </Grid>
+                    <Grid item size={12} sx={{ margin: '1% 7% 0' }}>
+                        <Typography sx={{ fontSize: '18px', fontWeight: 'bold' }}>Password<span style={{ color: 'red', marginLeft: '5px' }}>*</span></Typography>
+                        {errorMsg.passwordError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.passwordError}</Typography>}
+                        <TextField fullWidth id="password" size="small" value={allDtata.password} onChange={handleChange} />
+                    </Grid>
+                    <Grid item size={12} sx={{ margin: '0 7%', fontWeight: 'bold' }}>
+                        <Link to=''>Forgot password</Link>
+                    </Grid>
+
+                </Grid>
+                <Button onClick={createLogin} variant='contained' sx={{ textTransform: 'capitalize', fontSize: '16px', fontWeight: 'bold', padding: '1% 8%', margin: '5% 37% 8%' }}>Login</Button>
+
+            </Box>
+        </Box>
     )
 }
 

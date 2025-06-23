@@ -36,7 +36,7 @@ const LandingSolution = () => {
         <React.Fragment >
             <Box sx={{ height: '600px', width: '100%', textAlign: 'center', display: 'flex', alignItems: 'center', padding: '0 5%', gap: '50px',margin:'2% 0' }} id='solution'>
                 <Box sx={{ width: '600px', textAlign: 'left', padding: '0% 0 10%' }}>
-                    <Typography variant='p' component='div' sx={{ fontSize: '2rem', fontWeight: 'bold', textTransform: 'uppercase' }} >our <span style={{ color: '#35bfb3' }}>  solution</span></Typography>
+                    <Typography variant='p' component='div' sx={{ fontSize: '1.8rem', fontWeight: 'bold', textTransform: 'uppercase' }} >our <span style={{ color: '#35bfb3' }}>  solution</span></Typography>
                     <Typography variant='p' component='div' sx={{ fontSize: '2rem', fontWeight: 'bold', textTransform: 'uppercase', lineHeight: '40px', margin: '10px 0 15px' }}>At master of medical (M.O.M), We're not jsut building a platform</Typography>
                     <Typography variant='p' component='div' sx={{ fontSize: '22px', fontWeight: 'bold' }}> we're solving a real, critical problem in India's healthcare supply chain.</Typography>
                 </Box>
@@ -44,7 +44,7 @@ const LandingSolution = () => {
                     {smallAcor?.map((e, i) => {
                         return (
                             <div style={{borderBottom:'solid 2px black',}}>
-                                <Accordion  expanded={expanded === i} onChange={() => setExpanded(expanded === i ? null : i)} key={i}>
+                                <Accordion  expanded={expanded === i} onChange={() => setExpanded(expanded === i ? null : i)} key={i}  sx={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
                                     <AccordionSummary
                                         expandIcon={expanded === i ? <RemoveIcon sx={{ color: '#000000' }} /> : <AddIcon sx={{ color: '#000000' }} />}
 

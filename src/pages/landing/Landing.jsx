@@ -64,9 +64,9 @@ const Landing = () => {
         <LandingNavbar />
         <LandingHero />
       </Box>
-      <LandingTitleBanner text="Our Valuable Customers" bgColor="#fff" data={customerLogos} slider={true}  />
+      <LandingTitleBanner text="Our Valued" bgColor="#fff" data={customerLogos} slider={true} subText="Customers"  />
       <LandingCustomer />
-      <LandingTitleBanner text="Our Brand Partners" bgColor="#fff" data={brandLogos} slider={false} />
+      <LandingTitleBanner text="Our Brand" bgColor="#fff" data={brandLogos} slider={false} subText="Partners" />
       <LandingSolution />
       <LandingFeature />
       <LandingCallAction />
