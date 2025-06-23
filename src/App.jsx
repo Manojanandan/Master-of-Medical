@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import EcommerceHomePage from "./pages/eCommerce/homePage/HomePage.jsx";
 import Products from "./pages/Products";
+import VendorProducts from "./pages/vendor/pages/Products.jsx";
 import Contact from "./pages/Contact";
 import LandingHomepage from './pages/landing/index.jsx'
 import Login from "./pages/login/Login.jsx";
@@ -17,8 +18,10 @@ import PrivacyPolicy from "./pages/eCommerce/privacyPolicy/PrivacyPolicy.jsx";
 import CookiesPolicy from "./pages/eCommerce/cookiesPolicy/CookiesPolicy.jsx";
 import OrderTracking from "./pages/eCommerce/orderTracking/OrderTracking.jsx";
 import VendorLayout from './pages/vendor/dashboard/index.jsx'
-import ProductList from "./pages/vendor/products/ProductList.jsx";
 import ProtectedRoute from "./pages/routes/ProtectedRoute.jsx";
+import Overview from "./pages/vendor/pages/Overview.jsx";
+import Orders from "./pages/vendor/pages/Orders.jsx";
+import Customers from "./pages/vendor/pages/Customers.jsx";
 
 const App = () => {
 
@@ -49,8 +52,10 @@ const App = () => {
         {/* Vendor Dashboard */}
         <Route path="/vendorDashboard" element={<VendorLayout />}>
           <Route element={<ProtectedRoute />}>
-            <Route index element={<ProductList />} />
-            <Route peth="/products" element={<ProductList />} />
+            <Route index element={<Overview />} />
+            <Route path="products" element={<VendorProducts />} />
+            <Route path="orders" element={<Orders />} />
+            <Route path="customers" element={<Customers />} />
           </Route>
         </Route>
     </Routes >
