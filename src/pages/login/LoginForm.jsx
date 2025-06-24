@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Alert, Backdrop, Box, Button, Checkbox, CircularProgress, Container, FormControlLabel, Grid, Snackbar, Stack, TextField, Typography } from '@mui/material'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { loginUser } from './LoginReducer';
@@ -17,8 +17,7 @@ const LoginForm = () => {
     const useQuery = new URLSearchParams(useLocation().search)
     const type = sessionStorage.getItem("userType")
 
-    const reducer = useSelector((state) => state.loginReducer)
-    const { loader, message, success } = reducer
+    const { loader, message, success } = useSelector((state) => state.loginReducer)
 
     const [openModal, setOpenModal] = useState(false);
     const [allDtata, setAllData] = useState({
@@ -38,6 +37,21 @@ const LoginForm = () => {
         }
     }
 
+    useEffect(() => {
+        if (success) {
+            setOpenModal(true);
+            setTimeout(() => {
+                if (type === 'vendor') {
+                    navigate("/vendorDashboard");
+                } else {
+                    navigate("/ecommerceDashboard");
+                }
+            }, 1000);
+        } else if (message) {
+            setOpenModal(true);
+        }
+    }, [success, message, navigate, type]);
+
     const createLogin = () => {
         if (allDtata.email === "") {
             setErrorMsg({ ...errorMsg, emailError: "Email is required" })
@@ -54,20 +68,19 @@ const LoginForm = () => {
                 email: allDtata.email,
                 password: allDtata.password,
             }
+
             dispatch(loginUser({ data: payload, type }))
             setOpenModal(true)
             if (sessionStorage.getItem("jwt")) {
                 navigate("/vendorDashboard")
             }
             setAllData({ password: "", email: "" })
+
         }
     }
 
     const handleClose = () => {
         setOpenModal(false);
-        if (sessionStorage.getItem("jwt")) {
-            navigate("/vendorDashboard")
-        }
     }
     console.log(message);
 
