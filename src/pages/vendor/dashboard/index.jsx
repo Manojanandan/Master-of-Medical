@@ -19,6 +19,7 @@ const VendorDashboardLayout = () => {
       setMobileOpen(!mobileOpen);
     } else {
       setCollapsed(!collapsed);
+
     }
   };
 

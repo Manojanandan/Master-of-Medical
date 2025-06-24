@@ -5,6 +5,10 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
+import case1 from '../../assets/case1.jpg'
+import case2 from '../../assets/case2.jpg'
+import case3 from '../../assets/case3.jpg'
 
 const settings = {
   dots: false,
@@ -20,38 +24,39 @@ const settings = {
 const featureData = [
   {
     section0: {
-      imagePath: 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJ1Z3N8ZW58MHx8MHx8fDA%3D',
+      imagePath: case1,
       title: "Utilizing mobile technology in the field",
       description: "I think you should be able to to select more than one reason for rating.",
     },
     section1: {
-      imagePath: 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJ1Z3N8ZW58MHx8MHx8fDA%3D',
+      imagePath: case2,
       title: "Success Story: Businessman in Harlem",
       description: "I think you should be able to to select more than one reason for rating.",
     },
     section2: {
-      imagePath: 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJ1Z3N8ZW58MHx8MHx8fDA%3D',
+      imagePath: case3,
       title: "Working from home?Let's get started.",
       description: "I think you should be able to to select more than one reason for rating.",
     },
   },
   {
     section0: {
-      imagePath: 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJ1Z3N8ZW58MHx8MHx8fDA%3D',
+      imagePath: case1,
       title: "Utilizing mobile technology in the field",
       description: "I think you should be able to to select more than one reason for rating.",
     },
     section1: {
-      imagePath: 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJ1Z3N8ZW58MHx8MHx8fDA%3D',
+      imagePath: case2,
       title: "Success Story: Businessman in Harlem",
       description: "I think you should be able to to select more than one reason for rating.",
     },
     section2: {
-      imagePath: 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHJ1Z3N8ZW58MHx8MHx8fDA%3D',
+      imagePath: case3,
       title: "Working from home?Let's get started.",
       description: "I think you should be able to to select more than one reason for rating.",
     },
   },
+ 
 
 ]
 
@@ -84,9 +89,9 @@ const LandingFeature = () => {
     <React.Fragment>
       <Box sx={{ height: 'auto', width: '100%',}}>
         <Box sx={{ height: '100%', width: '92%', margin: '3% auto' }}>
-          <Box sx={{ marginBottom: '2%', textAlign: 'center', width: '50%', margin: '0 auto' }}>
-            <Typography variant='p' sx={{ fontWeigh: 'bold', width: '90%', fontSize: '2.2em' }}>CASE <span style={{ color: '#35bfb3' }}>STUDIES</span></Typography><br />
-            <Typography variant='p' sx={{ fontSize: '1.4rem', fontWeight: 'semi-bold' }}>Our design  services starts and ends with a best-in-class experience strategy that builds brands.</Typography>
+          <Box sx={{ marginBottom: '2%', textAlign: 'center', width: '45%', margin: '0 auto' }}>
+            <Typography variant='p' sx={{ fontWeigh: 'bold', width: '90%', fontSize: '2em' }}>CASE <span style={{ color: '#009e92',fontWeight:'bold' }}>STUDIES</span></Typography><br />
+            <Typography variant='p' sx={{ fontSize: '1.1rem', fontWeight: 'semi-bold' }}>Our design  services starts and ends with a best-in-class experience strategy that builds brands.</Typography>
           </Box>
           <Box sx={{ height: 'auto', width: '90%', margin: '4% auto' }}>
             <Slider ref={sliderRef} {...sliderSettings}>
@@ -118,13 +123,13 @@ const LandingFeature = () => {
 
                             {/* Title */}
                             <Box sx={{ margin: '0 4%', }}>
-                              <Typography variant="p" sx={{ fontSize: '1.8rem', fontWeight: 'bold', }}>
+                              <Typography variant="p" sx={{ fontSize: '1.6rem', fontWeight: 'bold', }}>
                                 {section.title}
                               </Typography>
                             </Box>
 
                             {/* Description */}
-                            <Box sx={{ height: 'auto', width: '87%', margin: '3% auto' }}>
+                            <Box sx={{ height: 'auto', width: '87%', margin: '3% 4%' }}>
                               <Typography variant="p" sx={{ fontSize: '20px', }}>
                                 {section.description}
                               </Typography>
@@ -133,16 +138,19 @@ const LandingFeature = () => {
 
                             {/* Button */}
                             <Button
-                              variant="outlined"
+                            startIcon={<HorizontalRuleIcon size="large" />}
+                              variant=""
                               sx={{
                                 textTransform: 'capitalize',
-                                color: 'black',
+                                color: '#02534d',
                                 padding: '2% 6%',
                                 margin: '4% 5%',
                                 fontSize: '16px',
                                 fontWeight: 'bold',
                                 border: 'solid 2px black',
                                 borderRadius: '12px',
+                                outline: 'none',
+                                border:'none'
                               }}
                             >
                               Continue Reading
@@ -159,20 +167,20 @@ const LandingFeature = () => {
           <Box sx={{ margin: '1% auto', width: '90%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Stack direction='row' spacing={2}>
               <Box
-                sx={{ height: '40px', width: '40px', border: 'solid 1px #f1f2f7', backgroundColor: '#f1f2f7', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', transition: 'background 0.2s', '&:active': { backgroundColor: '#c5225f', } }}
+                sx={{ height: '40px', width: '40px', border: 'solid 1px #f1f2f77d', backgroundColor: '#f1f2f77d', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', transition: 'background 0.2s', '&:hover': { backgroundColor: '#e2edf3', } }}
                 onClick={handlePrev}
               >
                 <ArrowBackIcon />
               </Box>
               <Box
-                sx={{ height: '40px', width: '40px', border: 'solid 1px #f1f2f7', backgroundColor: '#f1f2f7', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', transition: 'background 0.2s', '&:active': { backgroundColor: '#c5225f', }, }}
+                sx={{ height: '40px', width: '40px', border: 'solid 1px #f1f2f77d', backgroundColor: '#f1f2f77d', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', transition: 'background 0.2s', '&:hover': { backgroundColor: '#e2edf3', }, }}
                 onClick={handleNext}
               >
                 <ArrowForwardIcon />
               </Box>
             </Stack>
             <Box sx={{ height: '2px', width: '75%', border: 'solid 1.5px #2424' }}>
-              <Box sx={{ height: 'auto', width: progressWidth, border: 'solid 1.5px blue', backgroundColor: '#e2edf3', margin: '-1px', transition: 'width 0.5s ease' }}></Box>
+              <Box sx={{ height: 'auto', width: progressWidth, border: 'solid 1.5px #1c1c1b', backgroundColor: '#1c1c1b', margin: '-1px', transition: 'width 0.5s ease' }}></Box>
             </Box>
 
             <Button variant="outlined" sx={{ outline: 'solid 1.5px black', color: 'black', textTransform: 'capitalize', fontSize: '17px', fontWeight: 'bold', }}>View all </Button>

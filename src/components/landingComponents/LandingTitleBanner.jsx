@@ -14,7 +14,7 @@ const settings = {
   arrows: false,
 };
 
-const LandingTitleBanner = ({ text, bgColor, data, slider }) => {
+const LandingTitleBanner = ({ text, bgColor, data, slider, subText }) => {
   const sliderRef = useRef(null);
   const [current, setCurrent] = useState(0);
 
@@ -43,51 +43,58 @@ const LandingTitleBanner = ({ text, bgColor, data, slider }) => {
   return (
     <div>
       <Box style={{ height: 'auto', width: '100%', textAlign: 'center', backgroundColor: bgColor, }}>
-        <Typography variant='h4' sx={{ fontWeight: 'bold', padding: '3% 3% 0' }}>{text}</Typography>
-        <Slider ref={sliderRef} {...sliderSettings}>
-          {data?.map((e, i) => (
-            <div className='slide' key={i}>
-              <Stack direction='row' sx={{ padding: '2%', margin: '1% auto', width: '90%', }} spacing={7}>
-                {Object.keys(e).map((key, index) => (
-                  key.startsWith('imagePath') ? (
-                    <img
-                      key={index}
-                      src={e[key]}
-                      alt={key}
-                      height='100%'
-                      width='100%'
-                    />
-                  ) : null
-                ))}
-              </Stack>
-            </div>
-          ))}
-        </Slider>
-        <Box sx={{ margin: '1% auto', width: '90%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Stack direction='row' spacing={2}>
+        <Box sx={{ width: '88%', height: '200px', display: 'flex', justifyContent: '', alignItems: 'center', margin: '3% auto 0' }}>
+          <Box sx={{ width: '300px',textAlign:'left' }}>
+            <Typography variant='p' sx={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '2rem', }}>{text}</Typography><br />
+            <Typography variant='p' sx={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '2rem', color: '#009e92', lineHeight: '22px' }}>{subText}</Typography>
+          </Box>
+          <Box sx={{ width: '80%' }}>
+            <Slider ref={sliderRef} {...sliderSettings}>
+              {data?.map((e, i) => (
+                <div className='slide' key={i}>
+                  <Stack direction='row' sx={{ padding: '2%', width: '90%', }} spacing={7}>
+                    {Object.keys(e).map((key, index) => (
+                      key.startsWith('imagePath') ? (
+                        <img
+                          key={index}
+                          src={e[key]}
+                          alt={key}
+                          height='100%'
+                          width='100%'
+                        />
+                      ) : null
+                    ))}
+                  </Stack>
+                </div>
+              ))}
+            </Slider>
+          </Box>
+        </Box>
+        <Box sx={{ margin: '1% auto', width: '88%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Stack direction='row' spacing={1}>
             <Box
-              sx={{ height: '40px', width: '40px', border: 'solid 1px #f1f2f7', backgroundColor: '#f1f2f7', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', transition: 'background 0.2s', '&:active': { backgroundColor: '#c5225f', } }}
+              sx={{ height: '40px', width: '40px', border: 'solid 1px #f1f2f77d', backgroundColor: '#f1f2f77d', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', transition: 'background 0.2s', '&:hover': { backgroundColor: '#e2edf3', } }}
               onClick={handlePrev}
             >
               <ArrowBackIcon />
             </Box>
             <Box
-              sx={{ height: '40px', width: '40px', border: 'solid 1px #f1f2f7', backgroundColor: '#f1f2f7', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', transition: 'background 0.2s', '&:active': { backgroundColor: '#c5225f', }, }}
+              sx={{ height: '40px', width: '40px', border: 'solid 1px #f1f2f77d', backgroundColor: '#f1f2f77d', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', transition: 'background 0.2s', '&:hover': { backgroundColor: '#e2edf3', }, }}
               onClick={handleNext}
             >
               <ArrowForwardIcon />
             </Box>
           </Stack>
           {slider && <Box sx={{ height: '2px', width: '75%', border: 'solid 1.5px #2424' }}>
-            <Box sx={{ height: 'auto', width: progressWidth, border: 'solid 1.5px blue', backgroundColor: '#e2edf3', margin: '-1px', transition: 'width 0.5s ease' }}></Box>
+            <Box sx={{ height: 'auto', width: progressWidth, border: 'solid 1.5px #1c1c1b', backgroundColor: '#1c1c1b', margin: '-1px', transition: 'width 0.5s ease' }}></Box>
           </Box>
           }
           {slider ?
             <Button variant="outlined" sx={{ outline: 'solid 1.5px black', color: 'black', textTransform: 'capitalize', fontSize: '17px', fontWeight: 'bold', }}>View all customers</Button>
             :
-            <Stack direction='row' spacing={2} sx={{display:'flex',alignItems:'center'}}>
-              <Button color="success" variant="contained" sx={{ color: 'white', textTransform: 'capitalize', fontSize: '17px', fontWeight: 'bold', }}>Explore</Button>
-              <Typography variant='p' sx={{fontSize:'18px',fontWeight:'bold'}}>Trusted by 200+ Brand Partners in Innovation and Grwoth</Typography>
+            <Stack direction='row' spacing={2} sx={{ display: 'flex', alignItems: 'center' }}>
+              <Button variant="contained" sx={{ color: 'white', textTransform: 'capitalize', fontSize: '17px', fontWeight: 'bold',backgroundColor:'#009e92' }}>Explore</Button>
+              <Typography variant='p' sx={{ fontSize: '18px', fontWeight: 'bold' }}>Trusted by 200+ Brand Partners in Innovation and Grwoth</Typography>
             </Stack>
           }
         </Box>

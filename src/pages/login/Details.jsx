@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Alert, Backdrop, Box, Button, Checkbox, CircularProgress, Container, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, Snackbar, Stack, TextField, Typography } from '@mui/material'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { styled } from '@mui/material/styles';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,7 +11,6 @@ import PngIcon from '../../assets/PngIcon.png';
 import WordIcon from '../../assets/WordIcon.jpg';
 import JpgIcon from '../../assets/JpgIcon.png';
 import { registerVendor } from './Signup/SignUpReducer';
-import { red } from '@mui/material/colors';
 
 const VisuallyHiddenInput = styled('input')({
     clip: 'rect(0 0 0 0)',
@@ -29,8 +28,7 @@ const Details = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const [labelChanges, setLabelChanges] = useState("")
-    const useQuery = new URLSearchParams(useLocation().search)
-    const type = useQuery.get("type")
+    const type = sessionStorage.getItem("userType")
 
     const reducer = useSelector((state) => state.signUpReducer)
     const loader = reducer.loader;
@@ -39,9 +37,9 @@ const Details = () => {
 
     const [openModal, setOpenModal] = useState(false);
     const [allData, setAlldata] = useState({
-        addressLine1: "", addressLine2: "", number: "", city: "", state: "", pincode: "", vendorType: ""
+        addressLine1: "", addressLine2: "", number: "", city: "", state: "", pincode: "", vendorType: "", country: ""
     });
-    const [errorMsg, setErrorMsg] = useState({ addressLine1Error: '', numberError: "", cityError: "", stateError: "", pincodeError: "", vendorTypeError: "" });
+    const [errorMsg, setErrorMsg] = useState({ addressLine1Error: '', numberError: "", cityError: "", stateError: "", pincodeError: "", vendorTypeError: "",countryError: "" });
     const [manufacturingImage, setManufacturingImage] = useState({
         mdmLicense: null,
         gst: null,
@@ -109,6 +107,9 @@ const Details = () => {
         if (e.target.id === "pincode") {
             setErrorMsg({ ...errorMsg, pincodeError: "" });
         }
+        if (e.target.id === "country") {
+            setErrorMsg({ ...errorMsg, countryError: "" });
+        }
     }
 
     const handleFileChange = (event, field) => {
@@ -160,11 +161,13 @@ const Details = () => {
             setErrorMsg({ ...errorMsg, stateError: "State is required" });
         } else if (allData.pincode === "") {
             setErrorMsg({ ...errorMsg, pincodeError: "Pincode is required" });
+        } else if (allData.country === "") {
+            setErrorMsg({ ...errorMsg, countryError: "Country is required" });
         } else if (allData.vendorType === "") {
             setErrorMsg({ ...errorMsg, vendorTypeError: "Vendor type is required" });
-        } else {
+        }else {
             setErrorMsg({
-                addressLine1Error: '', numberError: "", cityError: "", stateError: "", pincodeError: "", vendorTypeError: ""
+                addressLine1Error: '', numberError: "", cityError: "", stateError: "", pincodeError: "", vendorTypeError: "",countryError:""
             });
             const formData = new FormData();
             const address = `${allData.addressLine1}, ${allData.addressLine2}`;
@@ -176,7 +179,7 @@ const Details = () => {
             formData.append('name', tempData[0].userName);
             formData.append('email', tempData[0].email);
             formData.append('password', tempData[0].password);
-            formData.append('country', 'India');
+            formData.append('country', allData.country);
             formData.append('type', allData.vendorType);
             const fileData = Object.fromEntries(
                 Object.entries(manufacturingImageFile).filter(([key, value]) => value !== null)
@@ -221,42 +224,52 @@ const Details = () => {
                     {message}
                 </Alert>
             </Snackbar>}
-            <Box sx={{ height: '100%', width: '100%' }}>
-                <Box sx={{ border: 'solid 1.5px #d1cbcb', height: 'auto', margin: '2% auto', backgroundColor: '#d8d1d136', borderRadius: '15px', width: '65%' }}>
+            <Box sx={{ height: '100%', width: '100%',backgroundColor:'#f2f3f5',padding:'4% 0' }}>
+                <Box sx={{ border: 'solid 1.5px #fff', height: 'auto', margin: '0% auto', backgroundColor: '#fff', borderRadius: '15px', width: '65%' }}>
                     <Stack direction='column'>
-                        <Typography variant='h4' sx={{ margin: '2% auto', textTransform: 'capitalize' }}>{type} Details</Typography>
+                        <Typography variant='p' sx={{ margin: '2% auto', textTransform: 'capitalize',fontSize:'2rem' }}>{type} Details</Typography>
                     </Stack>
                     <Box sx={{ width: '95%', margin: '1% auto', }}>
                         <Grid container columnSpacing={2}>
                             <Grid item size={12} >
-                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: '1% 0 1%' }}>Name</Typography>
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '1% 0 1%' }}>Name</Typography>
                                 <TextField disabled fullWidth id="name" size="small" value={tempData[0].userName} onChange={handleChange} />
                             </Grid>
+                            <Grid item size={6} >
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 1%' }}>Email</Typography>
+                                <TextField disabled fullWidth id="email" size="small" value={tempData[0].email} onChange={handleChange} />
+                            </Grid>
+                             <Grid item size={6} >
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 1%' }}>Contact Number<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                {errorMsg.numberError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.numberError}</Typography>}
+                                <TextField value={allData.number} autoComplete='off' fullWidth id="number" size="small" onChange={handleChange} />
+                            </Grid>
                             <Grid item size={12} >
-                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: '2% 0 1%', }}>Address</Typography>
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '2% 0 1%', }}>Address<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                 {errorMsg.addressLine1Error && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.addressLine1Error}</Typography>}
                                 <TextField value={allData.addressLine1} autoComplete='off' fullWidth id="addressLine1" size="small" sx={{ marginBottom: '1%' }} onChange={handleChange} />
                                 <TextField value={allData.addressLine2} autoComplete='off' fullWidth id="addressLine2" size="small" onChange={handleChange} />
                             </Grid>
+                           
                             <Grid item size={6} >
-                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: '3% 0 1%' }}>Contact Number</Typography>
-                                {errorMsg.numberError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.numberError}</Typography>}
-                                <TextField value={allData.number} autoComplete='off' fullWidth id="number" size="small" onChange={handleChange} />
-                            </Grid>
-                            <Grid item size={6} >
-                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: '3% 0 1%' }}>City</Typography>
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 1%' }}>City<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                 {errorMsg.cityError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.cityError}</Typography>}
                                 <TextField value={allData.city} autoComplete='off' fullWidth id="city" size="small" onChange={handleChange} />
                             </Grid>
                             <Grid item size={6} >
-                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: '5% 0 1%' }}>State</Typography>
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '5% 0 1%' }}>State<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                 {errorMsg.stateError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.stateError}</Typography>}
                                 <TextField value={allData.state} autoComplete='off' fullWidth id="state" size="small" onChange={handleChange} />
                             </Grid>
                             <Grid item size={6} >
-                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: '5% 0 1%' }}>Pincode</Typography>
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '5% 0 1%' }}>Pincode<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                 {errorMsg.pincodeError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.pincodeError}</Typography>}
                                 <TextField value={allData.pincode} autoComplete='off' fullWidth id="pincode" size="small" onChange={handleChange} />
+                            </Grid>
+                            <Grid item size={6} >
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '5% 0 1%' }}>Country<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                {errorMsg.countryError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.countryError}</Typography>}
+                                <TextField value={allData.country} autoComplete='off' fullWidth id="country" size="small" onChange={handleChange} />
                             </Grid>
                             {type === "user" ? (
                                 <React.Fragment>
@@ -749,7 +762,7 @@ const Details = () => {
                             ) : (
                                 <React.Fragment>
                                     <Grid item size={12} >
-                                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: '3% 0 0' }}>Type of vendors</Typography>
+                                        <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 0' }}>Type of vendors<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                         {errorMsg.vendorTypeError &&
                                             <Typography sx={{ color: 'red', fontSize: '14px', marginTop: '5px' }}>{errorMsg.vendorTypeError}</Typography>}
                                         <FormControl>
@@ -762,8 +775,9 @@ const Details = () => {
                                                     setAlldata({ ...allData, vendorType: e.target.value })
                                                     setErrorMsg({ ...errorMsg, vendorTypeError: "" })
                                                 }}
+                                                
                                             >
-                                                <FormControlLabel value="manufacturing" control={<Radio />} label="Manufacturing" />
+                                                <FormControlLabel  value="manufacturing" control={<Radio />} label="Manufacturing" />
                                                 <FormControlLabel value="oem" control={<Radio />} label="OEM" />
                                                 <FormControlLabel value="dealer" control={<Radio />} label="C&F / Super Stockist / Dealer's" />
                                             </RadioGroup>
@@ -801,14 +815,14 @@ const Details = () => {
                                                     </div>
                                                     <div>
                                                         {manufacturingImage.mdmLicense && (
-                                                            <div style={{ height: 'auto', width: '90%', marginLeft: '15px', fontSize: '18px', display: 'flex', alignItems: 'center' }}>
-                                                                <img src={imageType?.mdmLicense === "pdf" ? PDFIcon : imageType?.mdmLicense === "docx" ? WordIcon : imageType?.mdmLicense === "png" ? PngIcon : imageType?.mdmLicense === "jpeg" ? JpegIcon : imageType.mdmLicense === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '30px', width: '30px' }} />
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                                                                <img src={imageType?.mdmLicense === "pdf" ? PDFIcon : imageType?.mdmLicense === "docx" ? WordIcon : imageType?.mdmLicense === "png" ? PngIcon : imageType?.mdmLicense === "jpeg" ? JpegIcon : imageType.mdmLicense === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
                                                                 <a
                                                                     href={URL.createObjectURL(manufacturingImageFile.mdmLicense)}
                                                                     download={manufacturingImageFile.mdmLicense.name}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold' }}
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
                                                                 >
                                                                     {manufacturingImageFile.mdmLicense.name}
                                                                 </a>
@@ -847,14 +861,14 @@ const Details = () => {
                                                     </div>
                                                     <div>
                                                         {manufacturingImage.gst && (
-                                                            <div style={{ height: 'auto', width: '90%', marginLeft: '15px', fontSize: '18px', display: 'flex', alignItems: 'center' }}>
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
                                                                 <img src={imageType?.gst === "pdf" ? PDFIcon : imageType?.gst === "docx" ? WordIcon : imageType?.gst === "png" ? PngIcon : imageType?.gst === "jpeg" ? JpegIcon : imageType.gst === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '30px', width: '30px' }} />
                                                                 <a
                                                                     href={URL.createObjectURL(manufacturingImageFile.gst)}
                                                                     download={manufacturingImageFile.gst.name}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold' }}
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
                                                                 >
                                                                     {manufacturingImageFile.gst.name}
                                                                 </a>
@@ -893,14 +907,14 @@ const Details = () => {
                                                     </div>
                                                     <div>
                                                         {manufacturingImage.bis && (
-                                                            <div style={{ height: 'auto', width: '90%', marginLeft: '15px', fontSize: '18px', display: 'flex', alignItems: 'center' }}>
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center',color:'#009e92' }}>
                                                                 <img src={imageType?.bis === "pdf" ? PDFIcon : imageType?.bis === "docx" ? WordIcon : imageType?.bis === "png" ? PngIcon : imageType?.bis === "jpeg" ? JpegIcon : imageType.bis === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '30px', width: '30px' }} />
                                                                 <a
                                                                     href={URL.createObjectURL(manufacturingImageFile.bis)}
                                                                     download={manufacturingImageFile.bis.name}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold' }}
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
                                                                 >
                                                                     {manufacturingImageFile.bis.name}
                                                                 </a>
@@ -939,14 +953,14 @@ const Details = () => {
                                                     </div>
                                                     <div>
                                                         {manufacturingImage.iso && (
-                                                            <div style={{ height: 'auto', width: '90%', marginLeft: '15px', fontSize: '18px', display: 'flex', alignItems: 'center' }}>
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
                                                                 <img src={imageType?.iso === "pdf" ? PDFIcon : imageType?.iso === "docx" ? WordIcon : imageType?.iso === "png" ? PngIcon : imageType?.iso === "jpeg" ? JpegIcon : imageType.iso === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '30px', width: '30px' }} />
                                                                 <a
                                                                     href={URL.createObjectURL(manufacturingImageFile.iso)}
                                                                     download={manufacturingImageFile.iso.name}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold' }}
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
                                                                 >
                                                                     {manufacturingImageFile.iso.name}
                                                                 </a>
@@ -989,14 +1003,14 @@ const Details = () => {
                                                     </div>
                                                     <div>
                                                         {manufacturingImage.loanLicense && (
-                                                            <div style={{ height: 'auto', width: '90%', marginLeft: '15px', fontSize: '18px', display: 'flex', alignItems: 'center' }}>
-                                                                <img src={imageType?.loanLicense === "pdf" ? PDFIcon : imageType?.loanLicense === "docx" ? WordIcon : imageType?.loanLicense === "png" ? PngIcon : imageType?.loanLicense === "jpeg" ? JpegIcon : imageType.loanLicense === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '30px', width: '30px' }} />
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                                                                <img src={imageType?.loanLicense === "pdf" ? PDFIcon : imageType?.loanLicense === "docx" ? WordIcon : imageType?.loanLicense === "png" ? PngIcon : imageType?.loanLicense === "jpeg" ? JpegIcon : imageType.loanLicense === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
                                                                 <a
                                                                     href={URL.createObjectURL(manufacturingImageFile.loanLicense)}
                                                                     download={manufacturingImageFile.loanLicense.name}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold' }}
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
                                                                 >
                                                                     {manufacturingImageFile.loanLicense.name}
                                                                 </a>
@@ -1035,14 +1049,14 @@ const Details = () => {
                                                     </div>
                                                     <div>
                                                         {manufacturingImage.establishmentProof && (
-                                                            <div style={{ height: 'auto', width: '90%', marginLeft: '15px', fontSize: '18px', display: 'flex', alignItems: 'center' }}>
-                                                                <img src={imageType?.establishmentProof === "pdf" ? PDFIcon : imageType?.establishmentProof === "docx" ? WordIcon : imageType?.establishmentProof === "png" ? PngIcon : imageType?.establishmentProof === "jpeg" ? JpegIcon : imageType.establishmentProof === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '30px', width: '30px' }} />
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                                                                <img src={imageType?.establishmentProof === "pdf" ? PDFIcon : imageType?.establishmentProof === "docx" ? WordIcon : imageType?.establishmentProof === "png" ? PngIcon : imageType?.establishmentProof === "jpeg" ? JpegIcon : imageType.establishmentProof === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
                                                                 <a
                                                                     href={URL.createObjectURL(manufacturingImageFile.establishmentProof)}
                                                                     download={manufacturingImageFile.establishmentProof.name}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold' }}
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
                                                                 >
                                                                     {manufacturingImageFile.establishmentProof.name}
                                                                 </a>
@@ -1081,14 +1095,14 @@ const Details = () => {
                                                     </div>
                                                     <div>
                                                         {manufacturingImage.dl && (
-                                                            <div style={{ height: 'auto', width: '90%', marginLeft: '15px', fontSize: '18px', display: 'flex', alignItems: 'center' }}>
-                                                                <img src={imageType?.dl === "pdf" ? PDFIcon : imageType?.dl === "docx" ? WordIcon : imageType?.dl === "png" ? PngIcon : imageType?.dl === "jpeg" ? JpegIcon : imageType.dl === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '30px', width: '30px' }} />
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                                                                <img src={imageType?.dl === "pdf" ? PDFIcon : imageType?.dl === "docx" ? WordIcon : imageType?.dl === "png" ? PngIcon : imageType?.dl === "jpeg" ? JpegIcon : imageType.dl === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
                                                                 <a
                                                                     href={URL.createObjectURL(manufacturingImageFile.dl)}
                                                                     download={manufacturingImageFile.dl.name}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold' }}
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
                                                                 >
                                                                     {manufacturingImageFile.dl.name}
                                                                 </a>
@@ -1127,14 +1141,14 @@ const Details = () => {
                                                     </div>
                                                     <div>
                                                         {manufacturingImage.fda && (
-                                                            <div style={{ height: 'auto', width: '90%', marginLeft: '15px', fontSize: '18px', display: 'flex', alignItems: 'center' }}>
-                                                                <img src={imageType?.fda === "pdf" ? PDFIcon : imageType?.fda === "docx" ? WordIcon : imageType?.fda === "png" ? PngIcon : imageType?.fda === "jpeg" ? JpegIcon : imageType.fda === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '30px', width: '30px' }} />
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                                                                <img src={imageType?.fda === "pdf" ? PDFIcon : imageType?.fda === "docx" ? WordIcon : imageType?.fda === "png" ? PngIcon : imageType?.fda === "jpeg" ? JpegIcon : imageType.fda === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
                                                                 <a
                                                                     href={URL.createObjectURL(manufacturingImageFile.fda)}
                                                                     download={manufacturingImageFile.fda.name}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold' }}
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
                                                                 >
                                                                     {manufacturingImageFile.fda.name}
                                                                 </a>
@@ -1177,14 +1191,14 @@ const Details = () => {
                                                     </div>
                                                     <div>
                                                         {manufacturingImage.cfDL && (
-                                                            <div style={{ height: 'auto', width: '90%', marginLeft: '15px', fontSize: '18px', display: 'flex', alignItems: 'center' }}>
-                                                                <img src={imageType?.cfDL === "pdf" ? PDFIcon : imageType?.cfDL === "docx" ? WordIcon : imageType?.cfDL === "png" ? PngIcon : imageType?.cfDL === "jpeg" ? JpegIcon : imageType.cfDL === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '30px', width: '30px' }} />
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                                                                <img src={imageType?.cfDL === "pdf" ? PDFIcon : imageType?.cfDL === "docx" ? WordIcon : imageType?.cfDL === "png" ? PngIcon : imageType?.cfDL === "jpeg" ? JpegIcon : imageType.cfDL === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
                                                                 <a
                                                                     href={URL.createObjectURL(manufacturingImageFile.cfDL)}
                                                                     download={manufacturingImageFile.cfDL.name}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold' }}
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
                                                                 >
                                                                     {manufacturingImageFile.cfDL.name}
                                                                 </a>
@@ -1223,14 +1237,14 @@ const Details = () => {
                                                     </div>
                                                     <div>
                                                         {manufacturingImage.cfGumasta && (
-                                                            <div style={{ height: 'auto', width: '90%', marginLeft: '15px', fontSize: '18px', display: 'flex', alignItems: 'center' }}>
-                                                                <img src={imageType?.cfGumasta === "pdf" ? PDFIcon : imageType?.cfGumasta === "docx" ? WordIcon : imageType?.cfGumasta === "png" ? PngIcon : imageType?.cfGumasta === "jpeg" ? JpegIcon : imageType.cfGumasta === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '30px', width: '30px' }} />
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                                                                <img src={imageType?.cfGumasta === "pdf" ? PDFIcon : imageType?.cfGumasta === "docx" ? WordIcon : imageType?.cfGumasta === "png" ? PngIcon : imageType?.cfGumasta === "jpeg" ? JpegIcon : imageType.cfGumasta === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
                                                                 <a
                                                                     href={URL.createObjectURL(manufacturingImageFile.cfGumasta)}
                                                                     download={manufacturingImageFile.cfGumasta.name}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold' }}
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
                                                                 >
                                                                     {manufacturingImageFile.cfGumasta.name}
                                                                 </a>
@@ -1269,14 +1283,14 @@ const Details = () => {
                                                     </div>
                                                     <div>
                                                         {manufacturingImage.cfGst && (
-                                                            <div style={{ height: 'auto', width: '90%', marginLeft: '15px', fontSize: '18px', display: 'flex', alignItems: 'center' }}>
-                                                                <img src={imageType?.cfGst === "pdf" ? PDFIcon : imageType?.cfGst === "docx" ? WordIcon : imageType?.cfGst === "png" ? PngIcon : imageType?.cfGst === "jpeg" ? JpegIcon : imageType.cfGst === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '30px', width: '30px' }} />
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                                                                <img src={imageType?.cfGst === "pdf" ? PDFIcon : imageType?.cfGst === "docx" ? WordIcon : imageType?.cfGst === "png" ? PngIcon : imageType?.cfGst === "jpeg" ? JpegIcon : imageType.cfGst === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
                                                                 <a
                                                                     href={URL.createObjectURL(manufacturingImageFile.cfGst)}
                                                                     download={manufacturingImageFile.cfGst.name}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold' }}
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
                                                                 >
                                                                     {manufacturingImageFile.cfGst.name}
                                                                 </a>
@@ -1315,14 +1329,14 @@ const Details = () => {
                                                     </div>
                                                     <div>
                                                         {manufacturingImage.cfEstablishmentProof && (
-                                                            <div style={{ height: 'auto', width: '90%', marginLeft: '15px', fontSize: '18px', display: 'flex', alignItems: 'center' }}>
-                                                                <img src={imageType?.cfEstablishmentProof === "pdf" ? PDFIcon : imageType?.cfEstablishmentProof === "docx" ? WordIcon : imageType?.cfEstablishmentProof === "png" ? PngIcon : imageType?.cfEstablishmentProof === "jpeg" ? JpegIcon : imageType.cfEstablishmentProof === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '30px', width: '30px' }} />
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                                                                <img src={imageType?.cfEstablishmentProof === "pdf" ? PDFIcon : imageType?.cfEstablishmentProof === "docx" ? WordIcon : imageType?.cfEstablishmentProof === "png" ? PngIcon : imageType?.cfEstablishmentProof === "jpeg" ? JpegIcon : imageType.cfEstablishmentProof === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
                                                                 <a
                                                                     href={URL.createObjectURL(manufacturingImageFile.cfEstablishmentProof)}
                                                                     download={manufacturingImageFile.cfEstablishmentProof.name}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold' }}
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
                                                                 >
                                                                     {manufacturingImageFile.cfEstablishmentProof.name}
                                                                 </a>
@@ -1361,14 +1375,14 @@ const Details = () => {
                                                     </div>
                                                     <div>
                                                         {manufacturingImage.cfAuthorization && (
-                                                            <div style={{ height: 'auto', width: '90%', marginLeft: '15px', fontSize: '18px', display: 'flex', alignItems: 'center' }}>
-                                                                <img src={imageType?.cfAuthorization === "pdf" ? PDFIcon : imageType?.cfAuthorization === "docx" ? WordIcon : imageType?.cfAuthorization === "png" ? PngIcon : imageType?.cfAuthorization === "jpeg" ? JpegIcon : imageType.cfAuthorization === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '30px', width: '30px' }} />
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                                                                <img src={imageType?.cfAuthorization === "pdf" ? PDFIcon : imageType?.cfAuthorization === "docx" ? WordIcon : imageType?.cfAuthorization === "png" ? PngIcon : imageType?.cfAuthorization === "jpeg" ? JpegIcon : imageType.cfAuthorization === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
                                                                 <a
                                                                     href={URL.createObjectURL(manufacturingImageFile.cfAuthorization)}
                                                                     download={manufacturingImageFile.cfAuthorization.name}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold' }}
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
                                                                 >
                                                                     {manufacturingImageFile.cfAuthorization.name}
                                                                 </a>
@@ -1386,7 +1400,7 @@ const Details = () => {
                         </Grid>
                     </Box>
                     <Stack direction='column'>
-                        <Button onClick={handleSubmit} variant='contained' sx={{ width: '400px', margin: '4% auto 4%', borderRadius: '15px', textTransform: 'capitalize', padding: '1%', fontSize: '16px', fontWeight: 'bold' }}>Confirm</Button>
+                        <Button onClick={handleSubmit} variant='contained' sx={{ width: '400px', margin: '4% auto 4%',textTransform: 'capitalize', padding: '1%', fontSize: '18px', fontWeight: 'bold',backgroundColor:'#009e92',borderRadius:'10px' }}>Confirm</Button>
                     </Stack>
                 </Box>
             </Box>

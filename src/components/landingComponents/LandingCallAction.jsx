@@ -1,6 +1,7 @@
 import React from 'react'
 import { Box, Button, Stack, Typography } from '@mui/material'
 import AppleIcon from '@mui/icons-material/Apple';
+import mobile from '../../assets/mobile.png'
 
 const LandingCallAction = () => {
   return (
@@ -30,6 +31,9 @@ const LandingCallAction = () => {
             </Box>
           </Stack>
         </Box>
+         <Box sx={{ height: '100%', width: '400px', margin: '2% 7%',backgroundPosition:'center' }}>
+          <img src={mobile} alt={mobile} />
+         </Box>
       </Box>
     </React.Fragment>
   )

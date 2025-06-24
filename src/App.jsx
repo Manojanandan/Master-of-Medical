@@ -5,7 +5,6 @@ import Products from "./pages/Products";
 import VendorProducts from "./pages/vendor/pages/Products.jsx";
 import Contact from "./pages/Contact";
 import LandingHomepage from './pages/landing/index.jsx'
-import Login from "./pages/login/Login.jsx";
 import LoginForm from "./pages/login/LoginForm.jsx";
 import Signup from "./pages/login/Signup/Signup.jsx";
 import Details from "./pages/login/Details.jsx";
@@ -30,7 +29,6 @@ const App = () => {
       {/* <Navbar /> */}
       <Routes>
         <Route path="/" element={<LandingHomepage />} />
-        <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/loginform" element={<LoginForm />} />
         <Route path="/details" element={<Details />} />

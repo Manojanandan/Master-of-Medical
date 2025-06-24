@@ -33,16 +33,16 @@ const LandingCustomer = () => {
         <React.Fragment>
             <Box style={{ height: 'auto', width: '100%', padding: '3% 0 2% 0%',margin: '4% 0 2%', backgroundColor: '#f1f2f7' }}>
                 <Box sx={{ margin: '0 auto 2%', width: '87%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
-                    <Typography variant='p' sx={{ fontWeight: 'bold', fontSize: '2rem' }}>What Our Customers <br /> Have to Say</Typography>
+                    <Typography variant='p' sx={{ fontWeight: 'bold', fontSize: '2rem', textTransform:'uppercase' }}>What Our Customers <br /> Have to Say</Typography>
                     <Stack direction='row' spacing={2}>
                         <Box
-                            sx={{ height: '40px', width: '40px', border: 'solid 1px #2424', backgroundColor: '#2424', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', transition: 'background 0.2s', '&:active': { backgroundColor: '#c5225f', } }}
+                            sx={{ height: '40px', width: '40px', border: 'solid 1px #f1f2f77d', backgroundColor: '#f1f2f77d', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', transition: 'background 0.2s', '&:hover': { backgroundColor: '#e2edf3', } }}
                             onClick={handlePrev}
                         >
                             <ArrowBackIcon />
                         </Box>
                         <Box
-                            sx={{ height: '40px', width: '40px', border: 'solid 1px #2424', backgroundColor: '#2424', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', transition: 'background 0.2s', '&:active': { backgroundColor: '#c5225f', }, }}
+                            sx={{ height: '40px', width: '40px', border: 'solid 1px #f1f2f77d', backgroundColor: '#f1f2f77d', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', transition: 'background 0.2s', '&:hover': { backgroundColor: '#e2edf3', }, }}
                             onClick={handleNext}
                         >
                             <ArrowForwardIcon />
