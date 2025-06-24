@@ -106,7 +106,7 @@ const Overview = () => {
           </Grid>
           <Grid item xs={12} sm={6} lg={3}>
             <StatCard
-              title="Total Products"
+              title="Visitors"
               value={visitorsData.count}
               subtitle={visitorsData.avgTime}
               icon={<PeopleOutline />}

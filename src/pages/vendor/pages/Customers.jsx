@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -12,28 +12,64 @@ import {
   Alert,
   Divider,
   Fab,
+  CircularProgress,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchVendorProfile, updateVendorProfileData, clearError, clearSuccess } from '../reducers/VendorProfileReducer';
+import { getVendorIdFromToken } from '../../../utils/jwtUtils';
 import styles from './Profile.module.css';
 
-const mockProfile = {
-  name: 'John Doe',
-  email: 'john.doe@example.com',
-  phone: '9876543210',
-  address: '123 Main St',
-  city: 'New York',
-  state: 'NY',
-  country: 'USA',
-  postalCode: '10001',
-};
-
 const Profile = () => {
-  const [profile, setProfile] = useState(mockProfile);
+  const dispatch = useDispatch();
+  const { profile, loading, error, success, message } = useSelector((state) => state.vendorProfileReducer);
+  
   const [editMode, setEditMode] = useState(false);
-  const [form, setForm] = useState(mockProfile);
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    state: '',
+    country: '',
+    postalCode: '',
+  });
   const [errors, setErrors] = useState({});
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+
+  // Load profile data on component mount
+  useEffect(() => {
+    const vendorId = getVendorIdFromToken();
+    if (!vendorId) {
+      setSnackbar({ 
+        open: true, 
+        message: 'Authentication error. Please login again.', 
+        severity: 'error' 
+      });
+      return;
+    }
+    dispatch(fetchVendorProfile());
+  }, [dispatch]);
+
+  // Update form when profile data is loaded
+  useEffect(() => {
+    if (profile && Object.keys(profile).length > 0) {
+      setForm(profile);
+    }
+  }, [profile]);
+
+  // Handle success and error messages
+  useEffect(() => {
+    if (success && message) {
+      setSnackbar({ open: true, message, severity: 'success' });
+      dispatch(clearSuccess());
+    } else if (error) {
+      setSnackbar({ open: true, message: error.message || 'An error occurred', severity: 'error' });
+      dispatch(clearError());
+    }
+  }, [success, error, message, dispatch]);
 
   const handleEdit = () => {
     setForm(profile);
@@ -65,18 +101,42 @@ const Profile = () => {
       setSnackbar({ open: true, message: 'Please fix the errors.', severity: 'error' });
       return;
     }
-    setProfile(form);
+    
+    const vendorId = getVendorIdFromToken();
+    if (!vendorId) {
+      setSnackbar({ 
+        open: true, 
+        message: 'Authentication error. Please login again.', 
+        severity: 'error' 
+      });
+      return;
+    }
+    
+    dispatch(updateVendorProfileData(form));
     setEditMode(false);
-    setSnackbar({ open: true, message: 'Profile updated successfully!', severity: 'success' });
+  };
+
+  const handleCancel = () => {
+    setEditMode(false);
+    setForm(profile);
+    setErrors({});
   };
 
   // Helper for label/value display
   const renderField = (label, value, name) => (
     <div className={styles.fieldRow}>
       <div className={styles.fieldLabel}>{label}</div>
-      <div className={styles.fieldValue}>{value}</div>
+      <div className={styles.fieldValue}>{value || 'Not provided'}</div>
     </div>
   );
+
+  if (loading && !profile.name) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ background: '#f7f8fa', minHeight: '100vh', width: '100%', p: { xs: 1, sm: 3 } }}>
@@ -231,16 +291,19 @@ const Profile = () => {
                     variant="outlined"
                     color="inherit"
                     sx={{ mr: 1, fontWeight: 600, borderRadius: 2, px: 4, py: 1.5, fontSize: 18 }}
-                    onClick={() => {
-                      setEditMode(false);
-                      setForm(profile);
-                      setErrors({});
-                    }}
+                    onClick={handleCancel}
+                    disabled={loading}
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" variant="contained" startIcon={<SaveIcon />} sx={{ fontWeight: 600, borderRadius: 2, px: 4, py: 1.5, fontSize: 18, background: '#13bfa6' }}>
-                    Update
+                  <Button 
+                    type="submit" 
+                    variant="contained" 
+                    startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />} 
+                    sx={{ fontWeight: 600, borderRadius: 2, px: 4, py: 1.5, fontSize: 18, background: '#13bfa6' }}
+                    disabled={loading}
+                  >
+                    {loading ? 'Updating...' : 'Update'}
                   </Button>
                 </Box>
               )}
