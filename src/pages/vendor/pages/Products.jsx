@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, Typography, Grid, Button, Pagination, Card, CardContent, CardActions, Link } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ProductCard from '../../../components/e_commerceComponents/ProductCard';
+import { useNavigate } from 'react-router-dom';
 
 // Mock product data
 const mockProducts = [
@@ -40,6 +41,7 @@ const PRODUCTS_PER_PAGE = 12;
 
 const Products = () => {
   const [page, setPage] = useState(1);
+  const navigate = useNavigate();
   const handleChange = (event, value) => setPage(value);
 
   // Pagination logic
@@ -49,7 +51,7 @@ const Products = () => {
   const pageCount = Math.ceil(mockProducts.length / PRODUCTS_PER_PAGE);
 
   return (
-    <Box sx={{ background: '#f6fafd', minHeight: '100vh', p: { xs: 1, sm: 3 }, maxWidth: 1400, mx: 'auto' }}>
+    <Box sx={{ background: '#f7f8fa', minHeight: '100vh', p: { xs: 1, sm: 3 }, maxWidth: 1400, mx: 'auto' }}>
       {/* Add Product Button */}
       <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 3 }}>
         <Button
@@ -65,6 +67,7 @@ const Products = () => {
             boxShadow: 2,
             '&:hover': { background: '#0fa98f' },
           }}
+          onClick={() => navigate('/vendorDashboard/products/add')}
         >
           + Add Product
         </Button>

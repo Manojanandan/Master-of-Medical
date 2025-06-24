@@ -88,6 +88,7 @@ const Overview = () => {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
+      background: '#f7f8fa',
     }}>
       {/* Shared container for stat boxes and table */}
       <Box sx={{ width: '100%', maxWidth: 1200 }}>
@@ -105,7 +106,7 @@ const Overview = () => {
           </Grid>
           <Grid item xs={12} sm={6} lg={3}>
             <StatCard
-              title="Visitors"
+              title="Total Products"
               value={visitorsData.count}
               subtitle={visitorsData.avgTime}
               icon={<PeopleOutline />}
@@ -160,11 +161,13 @@ const Overview = () => {
                         fontSize: { xs: '0.75rem', sm: '0.875rem' }
                       } 
                     }}>
-                      <TableCell>Product name</TableCell>
                       <TableCell align="right">Date</TableCell>
-                      <TableCell align="right">Type</TableCell>
+                      <TableCell>Product name</TableCell>
+
                       <TableCell align="right">Qty</TableCell>
                       <TableCell align="right">Amount</TableCell>
+                      <TableCell align="right">Type</TableCell>
+
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -182,8 +185,12 @@ const Overview = () => {
                           }
                         }}
                       >
-                        <TableCell sx={{ fontWeight: 'bold' }}>{row.name}</TableCell>
                         <TableCell align="right">{row.date}</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>{row.name}</TableCell>
+
+             
+                        <TableCell align="right">{row.qty}</TableCell>
+                        <TableCell align="right" sx={{ fontWeight: 'bold' }}>{row.amount}</TableCell>
                         <TableCell align="right">
                           <Box sx={{
                             display: 'inline-block',
@@ -197,8 +204,6 @@ const Overview = () => {
                             {row.type}
                           </Box>
                         </TableCell>
-                        <TableCell align="right">{row.qty}</TableCell>
-                        <TableCell align="right" sx={{ fontWeight: 'bold' }}>{row.amount}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

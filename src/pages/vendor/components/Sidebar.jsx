@@ -4,10 +4,10 @@ import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, IconBu
 import { Home, ShoppingCart, ListAlt, People, ExitToApp, Menu as MenuIcon, ChevronLeft } from '@mui/icons-material';
 
 const menuItems = [
-  { text: 'Overview', icon: <Home />, path: '/vendorDashboard' },
+  { text: 'Dashboard', icon: <Home />, path: '/vendorDashboard' },
   { text: 'Products', icon: <ShoppingCart />, path: '/vendorDashboard/products' },
   { text: 'Orders', icon: <ListAlt />, path: '/vendorDashboard/orders' },
-  { text: 'Customers', icon: <People />, path: '/vendorDashboard/customers' },
+  { text: 'Profile', icon: <People />, path: '/vendorDashboard/profile' },
 ];
 
 const Sidebar = ({ collapsed, onToggle, isMobile, mobileOpen }) => {
@@ -95,7 +95,14 @@ const Sidebar = ({ collapsed, onToggle, isMobile, mobileOpen }) => {
                 color: 'grey.400',
                 '&:hover': {
                   backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                  color: 'white'
+                  color: 'white',
+                  '& .MuiSvgIcon-root': {
+                    color: 'white',
+                  },
+                },
+                '& .MuiSvgIcon-root': {
+                  color: 'grey.400',
+                  transition: 'color 0.2s',
                 },
               }}
             >
