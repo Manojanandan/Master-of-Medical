@@ -2,6 +2,7 @@ import axios from "axios";
 
 export const instance = axios.create({
     baseURL: 'http://luxcycs.com:5500/',
+    withCredentials: true
 });
 
 // Add request interceptor to dynamically set authorization header
