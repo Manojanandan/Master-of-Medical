@@ -13,6 +13,7 @@ import {
   Divider,
   Fab,
   CircularProgress,
+  Chip,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
@@ -66,7 +67,8 @@ const Profile = () => {
       setSnackbar({ open: true, message, severity: 'success' });
       dispatch(clearSuccess());
     } else if (error) {
-      setSnackbar({ open: true, message: error.message || 'An error occurred', severity: 'error' });
+      const errorMessage = error.message || 'An error occurred';
+      setSnackbar({ open: true, message: errorMessage, severity: 'error' });
       dispatch(clearError());
     }
   }, [success, error, message, dispatch]);
@@ -127,6 +129,21 @@ const Profile = () => {
     <div className={styles.fieldRow}>
       <div className={styles.fieldLabel}>{label}</div>
       <div className={styles.fieldValue}>{value || 'Not provided'}</div>
+    </div>
+  );
+
+  // Helper for status display
+  const renderStatus = (label, value, color = 'default') => (
+    <div className={styles.fieldRow}>
+      <div className={styles.fieldLabel}>{label}</div>
+      <div className={styles.fieldValue}>
+        <Chip 
+          label={value ? 'Active' : 'Inactive'} 
+          color={value ? 'success' : 'error'} 
+          size="small" 
+          variant="outlined"
+        />
+      </div>
     </div>
   );
 
@@ -285,6 +302,19 @@ const Profile = () => {
                   </>
                 )}
               </Box>
+              <Divider sx={{ my: 2 }} />
+              {/* Account Info Section */}
+              {!editMode && (
+                <Box>
+                  <Typography sx={{ fontWeight: 700, fontSize: 18, color: '#13bfa6', mb: 2, letterSpacing: 0.5 }}>Account Info</Typography>
+                  <Divider sx={{ mb: 3 }} />
+                  <div className={styles.fieldGrid}>
+                    {renderField('Vendor Type', profile.type, 'type')}
+                    {renderStatus('Status', profile.isActive)}
+                    {renderField('Vendor ID', profile.id, 'id')}
+                  </div>
+                </Box>
+              )}
               {editMode && (
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
                   <Button

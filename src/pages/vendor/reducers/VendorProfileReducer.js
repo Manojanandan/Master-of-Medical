@@ -7,14 +7,26 @@ export const fetchVendorProfile = createAsyncThunk(
   "vendorProfile/fetchProfile",
   async (_, { rejectWithValue }) => {
     try {
-      const vendorId = getVendorIdFromToken();
+      let vendorId = getVendorIdFromToken();
+      
+      // If vendor ID is not in JWT, try to get it from sessionStorage or other sources
       if (!vendorId) {
-        throw new Error("Vendor ID not found in token");
+        console.warn('Vendor ID not found in JWT token, checking alternative sources...');
+        // You might want to store vendor ID separately in sessionStorage during login
+        vendorId = sessionStorage.getItem('vendorId');
       }
+      
+      if (!vendorId) {
+        throw new Error("Vendor ID not found. Please login again.");
+      }
+      
       const response = await getVendorProfile(vendorId);
-      return response.data;
+      // The API returns { success: true, data: { ...profileData } }
+      return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      console.error('Error fetching vendor profile:', error);
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message || 'Failed to fetch profile';
+      return rejectWithValue({ message: errorMessage });
     }
   }
 );
@@ -24,9 +36,16 @@ export const updateVendorProfileData = createAsyncThunk(
   "vendorProfile/updateProfile",
   async (profileData, { rejectWithValue }) => {
     try {
-      const vendorId = getVendorIdFromToken();
+      let vendorId = getVendorIdFromToken();
+      
+      // If vendor ID is not in JWT, try to get it from sessionStorage or other sources
       if (!vendorId) {
-        throw new Error("Vendor ID not found in token");
+        console.warn('Vendor ID not found in JWT token, checking alternative sources...');
+        vendorId = sessionStorage.getItem('vendorId');
+      }
+      
+      if (!vendorId) {
+        throw new Error("Vendor ID not found. Please login again.");
       }
       
       const updateData = {
@@ -35,9 +54,12 @@ export const updateVendorProfileData = createAsyncThunk(
       };
       
       const response = await updateVendorProfile(updateData);
-      return response.data;
+      // The API returns { success: true, data: { ...updatedProfileData } }
+      return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      console.error('Error updating vendor profile:', error);
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message || 'Failed to update profile';
+      return rejectWithValue({ message: errorMessage });
     }
   }
 );

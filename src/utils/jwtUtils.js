@@ -12,6 +12,7 @@ export const decodeJWT = (token) => {
     
     // Decode the payload (second part)
     const payload = JSON.parse(atob(parts[1]));
+    console.log('JWT Payload:', payload); // Debug log
     return payload;
   } catch (error) {
     console.error('Error decoding JWT:', error);
@@ -39,6 +40,9 @@ export const getVendorIdFromToken = () => {
   
   if (!vendorId) {
     console.warn('No vendor ID found in JWT token payload:', payload);
+    console.log('Available fields in JWT payload:', Object.keys(payload));
+  } else {
+    console.log('Vendor ID extracted from JWT:', vendorId);
   }
   
   return vendorId;

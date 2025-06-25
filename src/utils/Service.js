@@ -18,3 +18,20 @@ export const getVendorProfile = async(vendorId) =>{
 export const updateVendorProfile = async(data) =>{
     return await instance.put('vendor/update-vendor', data)
 }
+
+//product APIs
+export const createProduct = async(data) =>{
+    return await instance.post('product/create-product', data)
+}
+
+export const getAllProducts = async(vendorId) =>{
+    return await instance.get(`product/get-all-product?userId=${vendorId}`)
+}
+
+export const getProductById = async(productId) =>{
+    return await instance.get(`product/get-product/${productId}`)
+}
+
+export const updateProduct = async(productId, data) =>{
+    return await instance.put(`product/update-product/${productId}`, data)
+}

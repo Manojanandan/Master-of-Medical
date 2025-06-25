@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -20,6 +20,9 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import ImageIcon from '@mui/icons-material/Image';
 import DeleteIcon from '@mui/icons-material/Close';
+import { useDispatch, useSelector } from 'react-redux';
+import { createProductData, clearError, clearSuccess } from '../reducers/ProductReducer';
+import { useNavigate } from 'react-router-dom';
 
 const MAX_FILES = 5;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -66,10 +69,50 @@ const AddProduct = () => {
   const [sideEffects, setSideEffects] = useState('');
   const [manufacturer, setManufacturer] = useState('');
   const [files, setFiles] = useState([]);
+  const [thumbnail, setThumbnail] = useState(null);
   const [fileError, setFileError] = useState('');
+  const [thumbnailError, setThumbnailError] = useState('');
   const [formError, setFormError] = useState({});
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
   const fileInputRef = useRef();
+  const thumbnailInputRef = useRef();
+
+  // Redux
+  const dispatch = useDispatch();
+  const { loading, error, success, message } = useSelector((state) => state.productReducer);
+
+  // Navigation
+  const navigate = useNavigate();
+
+  // Handle success and error messages
+  useEffect(() => {
+    if (success && message) {
+      setSnackbar({ open: true, message, severity: 'success' });
+      dispatch(clearSuccess());
+      // Reset form after successful submission
+      setCategory('');
+      setSubcategory('');
+      setProductName('');
+      setPrice('');
+      setPriceLabel('');
+      setDescription('');
+      setShelfLife('');
+      setBrandName('');
+      setExpiresOn('');
+      setCountry('');
+      setHowToUse('');
+      setBenefits('');
+      setSideEffects('');
+      setManufacturer('');
+      setFiles([]);
+      setThumbnail(null);
+      setFormError({});
+    } else if (error) {
+      const errorMessage = error.message || 'An error occurred';
+      setSnackbar({ open: true, message: errorMessage, severity: 'error' });
+      dispatch(clearError());
+    }
+  }, [success, error, message, dispatch]);
 
   // File handling
   const handleFileChange = (e) => {
@@ -104,6 +147,35 @@ const AddProduct = () => {
     setFiles(files.filter((_, i) => i !== idx));
   };
 
+  // Thumbnail handling
+  const handleThumbnailChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type (images only)
+    if (!file.type.startsWith('image/')) {
+      setThumbnailError('Only image files are allowed for thumbnail.');
+      setSnackbar({ open: true, message: 'Only image files are allowed for thumbnail.', severity: 'error' });
+      return;
+    }
+
+    // Validate file size (5MB max)
+    if (file.size > MAX_FILE_SIZE) {
+      setThumbnailError('Thumbnail must be less than 5MB.');
+      setSnackbar({ open: true, message: 'Thumbnail must be less than 5MB.', severity: 'error' });
+      return;
+    }
+
+    setThumbnail(file);
+    setThumbnailError('');
+    e.target.value = '';
+  };
+
+  const handleRemoveThumbnail = () => {
+    setThumbnail(null);
+    setThumbnailError('');
+  };
+
   // Validation
   const validate = () => {
     const errors = {};
@@ -118,7 +190,8 @@ const AddProduct = () => {
     if (!expiresOn) errors.expiresOn = 'Expiry date is required';
     if (!country) errors.country = 'Country is required';
     if (!manufacturer) errors.manufacturer = 'Manufacturer details required';
-    if (files.length === 0) errors.files = 'At least one file is required';
+    if (!thumbnail) errors.thumbnail = 'Thumbnail image is required';
+    if (files.length === 0) errors.files = 'At least one gallery image is required';
     setFormError(errors);
     return Object.keys(errors).length === 0;
   };
@@ -130,8 +203,29 @@ const AddProduct = () => {
       setSnackbar({ open: true, message: 'Please fill all required fields.', severity: 'error' });
       return;
     }
-    // Submit logic here (API call, etc.)
-    setSnackbar({ open: true, message: 'Product added successfully!', severity: 'success' });
+
+    // Prepare product data for Redux
+    const productData = {
+      name: productName,
+      description: description,
+      category: category,
+      subcategory: subcategory,
+      price: price,
+      priceLabel: priceLabel,
+      brandName: brandName,
+      benefits: benefits,
+      expiresOn: expiresOn,
+      shelfLife: shelfLife,
+      country: country,
+      howToUse: howToUse,
+      sideEffects: sideEffects,
+      manufacturer: manufacturer,
+      files: files,
+      thumbnail: thumbnail
+    };
+
+    // Dispatch the action
+    dispatch(createProductData(productData));
   };
 
   const handleCategoryChange = (e) => {
@@ -145,7 +239,11 @@ const AddProduct = () => {
         <Alert severity={snackbar.severity} sx={{ width: '100%' }}>{snackbar.message}</Alert>
       </Snackbar>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <Button startIcon={<ArrowBackIosNewIcon />} sx={{ color: '#222', fontWeight: 600, textTransform: 'uppercase', fontSize: 13, pl: 0 }}>
+        <Button 
+          startIcon={<ArrowBackIosNewIcon />} 
+          sx={{ color: '#222', fontWeight: 600, textTransform: 'uppercase', fontSize: 13, pl: 0 }}
+          onClick={() => navigate('/vendorDashboard/products')}
+        >
           Back
         </Button>
       </Box>
@@ -250,6 +348,49 @@ const AddProduct = () => {
             <TextareaAutosize minRows={2} value={manufacturer} onChange={e => setManufacturer(e.target.value)} style={{ width: '100%', marginBottom: 8, borderRadius: 6, border: '1px solid #e0e0e0', padding: 10, fontFamily: 'inherit', fontSize: 16, background: '#f8fafc' }} />
             {formError.manufacturer && <Typography color="error" fontSize={13}>{formError.manufacturer}</Typography>}
           </Box>
+          {/* Thumbnail Upload */}
+          <Box sx={{ mb: 2 }}>
+            <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Product Thumbnail</InputLabel>
+            <Box
+              sx={{ border: '2px dashed #13bfa6', borderRadius: 3, p: { xs: 4, md: 6 }, textAlign: 'center', background: '#f8fafc', mb: 2, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, minHeight: 120 }}
+              onClick={() => thumbnailInputRef.current.click()}
+              style={{ cursor: 'pointer' }}
+            >
+              <input
+                ref={thumbnailInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/jpg"
+                hidden
+                onChange={handleThumbnailChange}
+              />
+              {thumbnail ? (
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                  <img 
+                    src={URL.createObjectURL(thumbnail)} 
+                    alt="Thumbnail preview" 
+                    style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain', borderRadius: '8px' }} 
+                  />
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                      {thumbnail.name}
+                    </Typography>
+                    <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleRemoveThumbnail(); }}>
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                </Box>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                  <CloudUploadIcon sx={{ fontSize: 40, color: '#13bfa6', mb: 1 }} />
+                  <Typography variant="h6" color="#13bfa6" sx={{ fontWeight: 600, mb: 1 }}>Upload Thumbnail</Typography>
+                  <Button variant="contained" sx={{ background: '#13bfa6', fontWeight: 600 }} onClick={e => { e.stopPropagation(); thumbnailInputRef.current.click(); }}>Browse</Button>
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>Note: Only image files allowed. Max 5MB.</Typography>
+                </Box>
+              )}
+            </Box>
+            {formError.thumbnail && <Typography color="error" fontSize={13}>{formError.thumbnail}</Typography>}
+            {thumbnailError && <Typography color="error" fontSize={13}>{thumbnailError}</Typography>}
+          </Box>
           {/* File Upload */}
           <Box sx={{ mb: 2 }}>
             <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Product Images</InputLabel>
@@ -292,8 +433,13 @@ const AddProduct = () => {
             </Box>
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
-            <Button type="submit" variant="contained" sx={{ background: '#13bfa6', fontWeight: 600, px: 4, py: 1.5, fontSize: 18, borderRadius: 2 }}>
-              + Add Product
+            <Button 
+              type="submit" 
+              variant="contained" 
+              disabled={loading}
+              sx={{ background: '#13bfa6', fontWeight: 600, px: 4, py: 1.5, fontSize: 18, borderRadius: 2 }}
+            >
+              {loading ? 'Adding Product...' : '+ Add Product'}
             </Button>
           </Box>
         </Paper>
