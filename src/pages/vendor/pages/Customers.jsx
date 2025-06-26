@@ -6,13 +6,12 @@ import {
   Button,
   Paper,
   Stack,
-  InputAdornment,
-  IconButton,
   Snackbar,
   Alert,
   Divider,
   Fab,
   CircularProgress,
+  
   Chip,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
@@ -126,124 +125,218 @@ const Profile = () => {
 
   // Helper for label/value display
   const renderField = (label, value, name) => (
-    <div className={styles.fieldRow}>
-      <div className={styles.fieldLabel}>{label}</div>
-      <div className={styles.fieldValue}>{value || 'Not provided'}</div>
-    </div>
+    <Box sx={{ mb: 1 }}>
+      <Typography variant="body2" sx={{ color: '#666', fontWeight: 500, mb: 0.25, fontSize: '0.875rem' }}>
+        {label}
+      </Typography>
+      <Typography variant="body1" sx={{ color: '#333', fontWeight: 400 }}>
+        {value || 'Not provided'}
+      </Typography>
+    </Box>
   );
 
   // Helper for status display
-  const renderStatus = (label, value, color = 'default') => (
-    <div className={styles.fieldRow}>
-      <div className={styles.fieldLabel}>{label}</div>
-      <div className={styles.fieldValue}>
-        <Chip 
-          label={value ? 'Active' : 'Inactive'} 
-          color={value ? 'success' : 'error'} 
-          size="small" 
-          variant="outlined"
-        />
-      </div>
-    </div>
+  const renderStatus = (label, value) => (
+    <Box sx={{ mb: 1 }}>
+      <Typography variant="body2" sx={{ color: '#666', fontWeight: 500, mb: 0.25, fontSize: '0.875rem' }}>
+        {label}
+      </Typography>
+      <Chip 
+        label={value ? 'Active' : 'Inactive'} 
+        color={value ? 'success' : 'error'} 
+        size="small" 
+        variant="outlined"
+        sx={{ 
+          borderRadius: '6px',
+          fontSize: '0.75rem',
+          fontWeight: 500
+        }}
+      />
+    </Box>
   );
 
   if (loading && !profile.name) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-        <CircularProgress />
+        <CircularProgress size={32} />
       </Box>
     );
   }
 
   return (
-    <Box sx={{ background: '#f7f8fa', minHeight: '100vh', width: '100%', p: { xs: 1, sm: 3 } }}>
-      <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+    <Box sx={{ 
+      background: '#fafafa', 
+      minHeight: '100vh', 
+      width: '100%', 
+      p: { xs: 2, sm: 4, md: 6 },
+      maxWidth: '1200px',
+      mx: 'auto'
+    }}>
+      <Snackbar 
+        open={snackbar.open} 
+        autoHideDuration={4000} 
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
         <Alert severity={snackbar.severity} sx={{ width: '100%' }}>{snackbar.message}</Alert>
       </Snackbar>
+      
       <Box sx={{ width: '100%', position: 'relative' }}>
-        <Typography variant="h4" sx={{ fontWeight: 800, mb: 4, fontSize: { xs: 30, sm: 38 }, letterSpacing: 1, color: '#222' }}>Profile</Typography>
-        <Paper sx={{ width: '100%', p: { xs: 3, sm: 5, md: 7 }, borderRadius: 4, boxShadow: 4, background: 'linear-gradient(90deg, #f7f8fa 60%, #e9f5f3 100%)', borderLeft: '6px solid #13bfa6', minHeight: 400, position: 'relative' }}>
+        <Typography 
+          variant="h4" 
+          sx={{ 
+            fontWeight: 600, 
+            mb: 4, 
+            fontSize: { xs: '1.75rem', sm: '2rem' }, 
+            color: '#1a1a1a',
+            letterSpacing: '-0.02em'
+          }}
+        >
+          Profile
+        </Typography>
+        
+        <Paper sx={{ 
+          width: '100%', 
+          p: { xs: 3, sm: 4, md: 5 }, 
+          borderRadius: 2, 
+          boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)', 
+          background: '#ffffff',
+          border: '1px solid #e0e0e0',
+          position: 'relative'
+        }}>
           {/* Floating Edit Button */}
           {!editMode && (
-            <Fab color="primary" size="medium" aria-label="edit" onClick={handleEdit} sx={{ position: 'absolute', top: 24, right: 24, background: '#13bfa6', color: '#fff', boxShadow: 3, '&:hover': { background: '#0fa98f' } }}>
-              <EditIcon />
+            <Fab 
+              color="primary" 
+              size="small" 
+              aria-label="edit" 
+              onClick={handleEdit} 
+              sx={{ 
+                position: 'absolute', 
+                top: 20, 
+                right: 20, 
+                background: '#1976d2', 
+                color: '#fff', 
+                boxShadow: '0 2px 8px rgba(25, 118, 210, 0.3)',
+                '&:hover': { 
+                  background: '#1565c0',
+                  boxShadow: '0 4px 12px rgba(25, 118, 210, 0.4)'
+                }
+              }}
+            >
+              <EditIcon sx={{ fontSize: '1.2rem' }} />
             </Fab>
           )}
+          
           <form onSubmit={handleUpdate} autoComplete="off">
             <Stack spacing={2}>
               {/* Personal Info Section */}
               <Box>
-                <Typography sx={{ fontWeight: 700, fontSize: 18, color: '#13bfa6', mb: 2, letterSpacing: 0.5 }}>Personal Info</Typography>
-                <Divider sx={{ mb: 3 }} />
+                <Typography sx={{ 
+                  fontWeight: 600, 
+                  fontSize: '1.125rem', 
+                  color: '#1976d2', 
+                  mb: 1.5,
+                  letterSpacing: '-0.01em'
+                }}>
+                  Personal Information
+                </Typography>
+                <Divider sx={{ mb: 2, opacity: 0.6 }} />
+                
                 {!editMode ? (
-                  <div className={styles.fieldGrid}>
+                  <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
                     {renderField('Name', profile.name, 'name')}
                     {renderField('Email', profile.email, 'email')}
-                  </div>
+                    {renderField('Phone', profile.phone, 'phone')}
+                  </Box>
                 ) : (
-                  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3}>
+                  <Stack spacing={2}>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+                      <TextField
+                        label="Name"
+                        name="name"
+                        value={form.name}
+                        onChange={handleChange}
+                        fullWidth
+                        error={!!errors.name}
+                        helperText={errors.name}
+                        size="small"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 1,
+                            '&:hover fieldset': {
+                              borderColor: '#1976d2',
+                            },
+                          },
+                        }}
+                      />
+                      <TextField
+                        label="Email"
+                        name="email"
+                        value={form.email}
+                        onChange={handleChange}
+                        fullWidth
+                        error={!!errors.email}
+                        helperText={errors.email}
+                        size="small"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 1,
+                            '&:hover fieldset': {
+                              borderColor: '#1976d2',
+                            },
+                          },
+                        }}
+                      />
+                    </Box>
                     <TextField
-                      label="Name"
-                      name="name"
-                      value={form.name}
+                      label="Phone"
+                      name="phone"
+                      value={form.phone}
                       onChange={handleChange}
                       fullWidth
-                      error={!!errors.name}
-                      helperText={errors.name}
-                      InputLabelProps={{ sx: { fontWeight: 'bold', fontSize: '1.1rem' } }}
-                    />
-                    <TextField
-                      label="Email"
-                      name="email"
-                      value={form.email}
-                      onChange={handleChange}
-                      fullWidth
-                      error={!!errors.email}
-                      helperText={errors.email}
-                      InputLabelProps={{ sx: { fontWeight: 'bold', fontSize: '1.1rem' } }}
+                      error={!!errors.phone}
+                      helperText={errors.phone}
+                      size="small"
+                      sx={{
+                        maxWidth: { sm: '50%' },
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 1,
+                          '&:hover fieldset': {
+                            borderColor: '#1976d2',
+                          },
+                        },
+                      }}
                     />
                   </Stack>
                 )}
-                <Box sx={{ mt: 3 }}>
-                  {!editMode ? (
-                    <div className={styles.fieldGrid}>
-                      {renderField('Phone', profile.phone, 'phone')}
-                    </div>
-                  ) : (
-                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3}>
-                      <TextField
-                        label="Phone"
-                        name="phone"
-                        value={form.phone}
-                        onChange={handleChange}
-                        fullWidth
-                        error={!!errors.phone}
-                        helperText={errors.phone}
-                        InputLabelProps={{ sx: { fontWeight: 'bold', fontSize: '1.1rem' } }}
-                      />
-                    </Stack>
-                  )}
-                </Box>
               </Box>
-              <Divider sx={{ my: 2 }} />
+
               {/* Address Info Section */}
               <Box>
-                <Typography sx={{ fontWeight: 700, fontSize: 18, color: '#13bfa6', mb: 2, letterSpacing: 0.5 }}>Address Info</Typography>
-                <Divider sx={{ mb: 3 }} />
+                <Typography sx={{ 
+                  fontWeight: 600, 
+                  fontSize: '1.125rem', 
+                  color: '#1976d2', 
+                  mb: 1.5,
+                  letterSpacing: '-0.01em'
+                }}>
+                  Address Information
+                </Typography>
+                <Divider sx={{ mb: 2, opacity: 0.6 }} />
+                
                 {!editMode ? (
-                  <div className={styles.fieldGrid}>
-                    {renderField('Address', profile.address, 'address')}
-                    <div className={styles.fieldGrid}>
-                      {renderField('City', profile.city, 'city')}
-                      {renderField('State', profile.state, 'state')}
-                    </div>
-                    <div className={styles.fieldGrid}>
-                      {renderField('Country', profile.country, 'country')}
-                      {renderField('Postal Code', profile.postalCode, 'postalCode')}
-                    </div>
-                  </div>
+                  <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+                    <Box sx={{ gridColumn: { xs: '1', sm: '1 / -1' } }}>
+                      {renderField('Address', profile.address, 'address')}
+                    </Box>
+                    {renderField('City', profile.city, 'city')}
+                    {renderField('State', profile.state, 'state')}
+                    {renderField('Country', profile.country, 'country')}
+                    {renderField('Postal Code', profile.postalCode, 'postalCode')}
+                  </Box>
                 ) : (
-                  <>
+                  <Stack spacing={2}>
                     <TextField
                       label="Address"
                       name="address"
@@ -252,10 +345,17 @@ const Profile = () => {
                       fullWidth
                       error={!!errors.address}
                       helperText={errors.address}
-                      InputLabelProps={{ sx: { fontWeight: 'bold', fontSize: '1.1rem' } }}
-                      sx={{ mb: 3 }}
+                      size="small"
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 1,
+                          '&:hover fieldset': {
+                            borderColor: '#1976d2',
+                          },
+                        },
+                      }}
                     />
-                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3}>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
                       <TextField
                         label="City"
                         name="city"
@@ -264,7 +364,15 @@ const Profile = () => {
                         fullWidth
                         error={!!errors.city}
                         helperText={errors.city}
-                        InputLabelProps={{ sx: { fontWeight: 'bold', fontSize: '1.1rem' } }}
+                        size="small"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 1,
+                            '&:hover fieldset': {
+                              borderColor: '#1976d2',
+                            },
+                          },
+                        }}
                       />
                       <TextField
                         label="State"
@@ -274,10 +382,18 @@ const Profile = () => {
                         fullWidth
                         error={!!errors.state}
                         helperText={errors.state}
-                        InputLabelProps={{ sx: { fontWeight: 'bold', fontSize: '1.1rem' } }}
+                        size="small"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 1,
+                            '&:hover fieldset': {
+                              borderColor: '#1976d2',
+                            },
+                          },
+                        }}
                       />
-                    </Stack>
-                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} sx={{ mt: 3 }}>
+                    </Box>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
                       <TextField
                         label="Country"
                         name="country"
@@ -286,7 +402,15 @@ const Profile = () => {
                         fullWidth
                         error={!!errors.country}
                         helperText={errors.country}
-                        InputLabelProps={{ sx: { fontWeight: 'bold', fontSize: '1.1rem' } }}
+                        size="small"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 1,
+                            '&:hover fieldset': {
+                              borderColor: '#1976d2',
+                            },
+                          },
+                        }}
                       />
                       <TextField
                         label="Postal Code"
@@ -296,44 +420,85 @@ const Profile = () => {
                         fullWidth
                         error={!!errors.postalCode}
                         helperText={errors.postalCode}
-                        InputLabelProps={{ sx: { fontWeight: 'bold', fontSize: '1.1rem' } }}
+                        size="small"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 1,
+                            '&:hover fieldset': {
+                              borderColor: '#1976d2',
+                            },
+                          },
+                        }}
                       />
-                    </Stack>
-                  </>
+                    </Box>
+                  </Stack>
                 )}
               </Box>
-              <Divider sx={{ my: 2 }} />
+
               {/* Account Info Section */}
               {!editMode && (
                 <Box>
-                  <Typography sx={{ fontWeight: 700, fontSize: 18, color: '#13bfa6', mb: 2, letterSpacing: 0.5 }}>Account Info</Typography>
-                  <Divider sx={{ mb: 3 }} />
-                  <div className={styles.fieldGrid}>
+                  <Typography sx={{ 
+                    fontWeight: 600, 
+                    fontSize: '1.125rem', 
+                    color: '#1976d2', 
+                    mb: 1.5,
+                    letterSpacing: '-0.01em'
+                  }}>
+                    Account Information
+                  </Typography>
+                  <Divider sx={{ mb: 2, opacity: 0.6 }} />
+                  <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
                     {renderField('Vendor Type', profile.type, 'type')}
                     {renderStatus('Status', profile.isActive)}
                     {renderField('Vendor ID', profile.id, 'id')}
-                  </div>
+                  </Box>
                 </Box>
               )}
+
+              {/* Action Buttons */}
               {editMode && (
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'flex-end', 
+                  gap: 2,
+                  pt: 1,
+                  borderTop: '1px solid #e0e0e0'
+                }}>
                   <Button
                     variant="outlined"
-                    color="inherit"
-                    sx={{ mr: 1, fontWeight: 600, borderRadius: 2, px: 4, py: 1.5, fontSize: 18 }}
                     onClick={handleCancel}
                     disabled={loading}
+                    sx={{ 
+                      fontWeight: 500, 
+                      borderRadius: 1, 
+                      px: 3, 
+                      py: 1,
+                      textTransform: 'none',
+                      fontSize: '0.875rem'
+                    }}
                   >
                     Cancel
                   </Button>
                   <Button 
                     type="submit" 
                     variant="contained" 
-                    startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />} 
-                    sx={{ fontWeight: 600, borderRadius: 2, px: 4, py: 1.5, fontSize: 18, background: '#13bfa6' }}
+                    startIcon={loading ? <CircularProgress size={16} color="inherit" /> : <SaveIcon />} 
+                    sx={{ 
+                      fontWeight: 500, 
+                      borderRadius: 1, 
+                      px: 3, 
+                      py: 1,
+                      textTransform: 'none',
+                      fontSize: '0.875rem',
+                      background: '#1976d2',
+                      '&:hover': {
+                        background: '#1565c0'
+                      }
+                    }}
                     disabled={loading}
                   >
-                    {loading ? 'Updating...' : 'Update'}
+                    {loading ? 'Saving...' : 'Save Changes'}
                   </Button>
                 </Box>
               )}
