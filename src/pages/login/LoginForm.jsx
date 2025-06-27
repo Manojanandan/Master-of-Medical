@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { Alert, Backdrop, Box, Button, Checkbox, CircularProgress, Container, FormControlLabel, Grid, Snackbar, Stack, TextField, Typography } from '@mui/material'
+import { Alert, Backdrop, Box, Button, Checkbox, CircularProgress, Container, FormControlLabel, Grid, IconButton, InputAdornment, Snackbar, Stack, TextField, Typography } from '@mui/material'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { loginUser } from './LoginReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import WestIcon from '@mui/icons-material/West';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 // Email: basic pattern for most emails
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -24,6 +25,11 @@ const LoginForm = () => {
         email: "", password: ""
     })
     const [errorMsg, setErrorMsg] = useState({ emailError: '', passwordError: "" })
+    const [showPassword, setShowPassword] = useState(false);
+
+    const togglePasswordVisibility = () => {
+        setShowPassword((prev) => !prev);
+    }
     const handleChange = (e) => {
         setAllData({
             ...allDtata,
@@ -102,14 +108,14 @@ const LoginForm = () => {
                     {message}
                 </Alert>
             </Snackbar>}
-            <Box onClick={() => navigate('/signup')} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', width: '90%', gap: '10px', cursor: 'pointer',right:'20px' }}>
+            <Box onClick={() => navigate('/signup')} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', width: '90%', gap: '10px', cursor: 'pointer', right: '20px' }}>
                 <WestIcon sx={{ fontSize: '2rem' }} />
                 <Typography variant='p' component='div' sx={{ fontSize: '1.6rem', fontWeight: 'bold', color: 'black' }}>Back</Typography>
             </Box>
             <Box sx={{ border: 'solid 1.5px #fff', height: 'auto', margin: '4% auto', backgroundColor: '#fff', borderRadius: '15px', width: '35%' }}>
                 <Box sx={{ margin: '7% auto 5%', width: 'auto', textAlign: 'center' }}>
                     <Typography variant='p' sx={{ margin: '5% auto 0', fontSize: '1.8rem', }}>Welcome to <span style={{ textTransform: 'capitalize' }}>{type}</span> Login</Typography><br />
-                    <Typography variant='p' sx={{ fontSize: '14px', fontWeight: 'bold' }}>Create a new account? <Link to='/signup' style={{ fontWeight: 'bold', fontSize: '16px', color: '#009e92',textDecoration:'none',borderBottom:'solid 1.5px #009e92' }}> Sign up</Link></Typography>
+                    <Typography variant='p' sx={{ fontSize: '14px', fontWeight: 'bold' }}>Create a new account? <Link to='/signup' style={{ fontWeight: 'bold', fontSize: '16px', color: '#009e92', textDecoration: 'none', borderBottom: 'solid 1.5px #009e92' }}> Sign up</Link></Typography>
                 </Box>
                 <Grid container spacing={2}>
                     <Grid item size={12} sx={{ margin: '5% 7% 0' }}>
@@ -120,10 +126,18 @@ const LoginForm = () => {
                     <Grid item size={12} sx={{ margin: '1% 7% 0' }}>
                         <Typography sx={{ fontSize: '18px', fontWeight: 'bold' }}>Password<span style={{ color: 'red', marginLeft: '5px' }}>*</span></Typography>
                         {errorMsg.passwordError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.passwordError}</Typography>}
-                        <TextField fullWidth id="password" size="small" value={allDtata.password} onChange={handleChange} />
+                        <TextField fullWidth id="password" size="small" value={allDtata.password} onChange={handleChange} type={showPassword ? 'text' : 'password'} InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton onClick={togglePasswordVisibility} edge="end">
+                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }} />
                     </Grid>
                     <Grid item size={12} sx={{ margin: '0 7%', fontWeight: 'bold' }}>
-                        <Link to='' style={{textDecoration:'none',borderBottom:'solid 1.5px #009e92',color:'#009e92'}}>Forgot password</Link>
+                        <Link to='/forgotpassword' style={{ textDecoration: 'none', borderBottom: 'solid 1.5px #009e92', color: '#009e92' }}>Forgot password</Link>
                     </Grid>
 
                 </Grid>

@@ -23,6 +23,7 @@ import Orders from "./pages/vendor/pages/Orders.jsx";
 import Profile from "./pages/vendor/pages/Customers.jsx";
 import AddProduct from "./pages/vendor/pages/AddProduct.jsx";
 import ProductDetail from "./pages/vendor/pages/ProductDetail.jsx";
+import ForgotPassword from "./pages/login/forgotPassword/ForgotPassword.jsx";
 
 const App = () => {
 
@@ -34,6 +35,7 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/loginform" element={<LoginForm />} />
         <Route path="/details" element={<Details />} />
+        <Route path="/forgotpassword" element={<ForgotPassword />} />
         {/* E-Commerce Route */}
         <Route exact path="/ecommerceDashboard" element={<EcommerceLayout />}>
           {/* <Route element={<ProtectedRoute />}> */}

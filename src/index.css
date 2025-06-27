@@ -1,14 +1,17 @@
-*{
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
-html, body {
+
+html,
+body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
 }
-:root{
+
+:root {
   --primaryColor: #e2edf3,
-  --secondaryColor: #009e92
+    --secondaryColor: #009e92
 }
