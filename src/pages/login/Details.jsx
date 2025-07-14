@@ -10,7 +10,7 @@ import JpegIcon from '../../assets/JpegIcon.png';
 import PngIcon from '../../assets/PngIcon.png';
 import WordIcon from '../../assets/WordIcon.jpg';
 import JpgIcon from '../../assets/JpgIcon.png';
-import { registerVendor } from './Signup/SignUpReducer';
+import { registerVendor, registerCustomer } from './Signup/SignUpReducer';
 
 const VisuallyHiddenInput = styled('input')({
     clip: 'rect(0 0 0 0)',
@@ -85,6 +85,7 @@ const Details = () => {
         cfEstablishmentProof: "",
         cfAuthorization: "",
     })
+    const [featureImage, setFeatureImage] = useState(null);
     const tempData = JSON.parse(sessionStorage.getItem("tempData"));
 
     const handleChange = (e) => {
@@ -140,6 +141,15 @@ const Details = () => {
         }
     };
 
+    const handleUserFileChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            setFeatureImage(URL.createObjectURL(file));
+        } else {
+            setFeatureImage(null);
+        }
+    };
+
     const checkingImageType = (field, file) => {
         if (allData.vendorType === "manufacturing" && file) {
             setImageType({ ...imageType, [field]: file?.name.split('.').pop() })
@@ -163,39 +173,64 @@ const Details = () => {
             setErrorMsg({ ...errorMsg, pincodeError: "Pincode is required" });
         } else if (allData.country === "") {
             setErrorMsg({ ...errorMsg, countryError: "Country is required" });
-        } else if (allData.vendorType === "") {
+        } else if (type === "vendor" && allData.vendorType === "") {
             setErrorMsg({ ...errorMsg, vendorTypeError: "Vendor type is required" });
-        }else {
+        } else {
             setErrorMsg({
                 addressLine1Error: '', numberError: "", cityError: "", stateError: "", pincodeError: "", vendorTypeError: "",countryError:""
             });
-            const formData = new FormData();
-            const address = `${allData.addressLine1}, ${allData.addressLine2}`;
-            formData.append('address', address);
-            formData.append('phone', allData.number);
-            formData.append('city', allData.city);
-            formData.append('state', allData.state);
-            formData.append('postalCode', allData.pincode);
-            formData.append('name', tempData[0].userName);
-            formData.append('email', tempData[0].email);
-            formData.append('password', tempData[0].password);
-            formData.append('country', allData.country);
-            formData.append('type', allData.vendorType);
-            const fileData = Object.fromEntries(
-                Object.entries(manufacturingImageFile).filter(([key, value]) => value !== null)
-            );
+            
+            console.log(type ,"kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk")
+            if (type === "user" || "customer") {
+                // Handle customer creation
+                const customerData = {
+                    name: tempData[0].userName,
+                    email: tempData[0].email,
+                    phone: allData.number,
+                    password: tempData[0].password,
+                    address: `${allData.addressLine1}, ${allData.addressLine2}`,
+                    city: allData.city,
+                    state: allData.state,
+                    country: allData.country,
+                    postalCode: allData.pincode
+                };
+                
+                console.log('Creating customer with data:', customerData);
+                dispatch(registerCustomer(customerData));
+                setOpenModal(true);
+                if (sessionStorage.getItem("jwt")) {
+                    navigate("/ecommerceDashboard");
+                }
+            } else {
+                // Handle vendor creation (existing logic)
+                const formData = new FormData();
+                const address = `${allData.addressLine1}, ${allData.addressLine2}`;
+                formData.append('address', address);
+                formData.append('phone', allData.number);
+                formData.append('city', allData.city);
+                formData.append('state', allData.state);
+                formData.append('postalCode', allData.pincode);
+                formData.append('name', tempData[0].userName);
+                formData.append('email', tempData[0].email);
+                formData.append('password', tempData[0].password);
+                formData.append('country', allData.country);
+                formData.append('type', allData.vendorType);
+                const fileData = Object.fromEntries(
+                    Object.entries(manufacturingImageFile).filter(([key, value]) => value !== null)
+                );
 
-            // Append each file individually
-            Object.entries(fileData).forEach(([key, file]) => {
-                formData.append('files', file);
-            });
+                // Append each file individually
+                Object.entries(fileData).forEach(([key, file]) => {
+                    formData.append('files', file);
+                });
 
-            dispatch(registerVendor(formData))
-            setOpenModal(true)
-            if (sessionStorage.getItem("jwt")) {
-                navigate("/vendorDashboard")
+                console.log('Creating vendor with formData:', formData);
+                dispatch(registerVendor(formData));
+                setOpenModal(true);
+                if (sessionStorage.getItem("jwt")) {
+                    navigate("/vendorDashboard");
+                }
             }
-
         }
     }
 
@@ -314,7 +349,7 @@ const Details = () => {
                                                     <VisuallyHiddenInput
                                                         type="file"
                                                         accept="image/png, image/jpeg" // Restrict file types to PNG and JPEG
-                                                        onChange={handleFileChange}
+                                                        onChange={handleUserFileChange}
                                                     />
                                                 </Button>
                                                 {featureImage && (
@@ -382,7 +417,7 @@ const Details = () => {
                                                     <VisuallyHiddenInput
                                                         type="file"
                                                         accept="image/png, image/jpeg" // Restrict file types to PNG and JPEG
-                                                        onChange={handleFileChange}
+                                                        onChange={handleUserFileChange}
                                                     />
                                                 </Button>
                                                 {featureImage && (

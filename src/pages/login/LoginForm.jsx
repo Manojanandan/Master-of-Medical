@@ -77,9 +77,6 @@ const LoginForm = () => {
 
             dispatch(loginUser({ data: payload, type }))
             setOpenModal(true)
-            if (sessionStorage.getItem("jwt")) {
-                navigate("/vendorDashboard")
-            }
             setAllData({ password: "", email: "" })
 
         }

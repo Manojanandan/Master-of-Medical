@@ -695,3 +695,14 @@ const Products = () => {
 };
 
 export default Products;
+
+
+// approval page(until admin approves profile)
+// category , subcategory (load from api)
+// expiry (date field)
+// country (dropdown)
+// update status in profile , test
+
+// customer
+// signup - error
+// update endpoint from user to customer
