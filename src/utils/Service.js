@@ -35,3 +35,33 @@ export const getProductById = async(productId) =>{
 export const updateProduct = async(productId, data) =>{
     return await instance.put(`product/update-product/${productId}`, data)
 }
+
+// Public product APIs (for e-commerce)
+export const getPublicProducts = async(params = {}) =>{
+    const queryParams = new URLSearchParams();
+    
+    // Add pagination parameters
+    if (params.page) queryParams.append('page', params.page);
+    if (params.limit) queryParams.append('limit', params.limit);
+    
+    // Add filter parameters
+    if (params.category) queryParams.append('category', params.category);
+    if (params.brand) queryParams.append('brand', params.brand);
+    if (params.minPrice) queryParams.append('minPrice', params.minPrice);
+    if (params.maxPrice) queryParams.append('maxPrice', params.maxPrice);
+    
+    // Add search parameter
+    if (params.search) queryParams.append('search', params.search);
+    
+    // Add sort parameter
+    if (params.sort) queryParams.append('sort', params.sort);
+    
+    const queryString = queryParams.toString();
+    const url = queryString ? `product/get-all-product?${queryString}` : 'product/get-all-product';
+    
+    return await instance.get(url)
+}
+
+export const getPublicProductById = async(productId) =>{
+    return await instance.get(`product/get-product/${productId}`)
+}

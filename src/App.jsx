@@ -16,13 +16,14 @@ import Termsofuse from "./pages/eCommerce/termsCondition/Termsofuse.jsx";
 import PrivacyPolicy from "./pages/eCommerce/privacyPolicy/PrivacyPolicy.jsx";
 import CookiesPolicy from "./pages/eCommerce/cookiesPolicy/CookiesPolicy.jsx";
 import OrderTracking from "./pages/eCommerce/orderTracking/OrderTracking.jsx";
+import ProductDetail from "./pages/eCommerce/ProductDetail.jsx";
 import VendorLayout from './pages/vendor/dashboard/index.jsx'
 import ProtectedRoute from "./pages/routes/ProtectedRoute.jsx";
 import Overview from "./pages/vendor/pages/Overview.jsx";
 import Orders from "./pages/vendor/pages/Orders.jsx";
 import Profile from "./pages/vendor/pages/Customers.jsx";
 import AddProduct from "./pages/vendor/pages/AddProduct.jsx";
-import ProductDetail from "./pages/vendor/pages/ProductDetail.jsx";
+import VendorProductDetail from "./pages/vendor/pages/ProductDetail.jsx";
 import ForgotPassword from "./pages/login/forgotPassword/ForgotPassword.jsx";
 
 const App = () => {
@@ -41,6 +42,7 @@ const App = () => {
           {/* <Route element={<ProtectedRoute />}> */}
           <Route path="/ecommerceDashboard" element={<EcommerceHomePage />} />
           <Route path="/ecommerceDashboard/products" element={<Products />} />
+          <Route path="/ecommerceDashboard/product/:id" element={<ProductDetail />} />
           <Route path="/ecommerceDashboard/contact" element={<Contact />} />
           <Route path="/ecommerceDashboard/cart" element={<Cart />} />
           <Route path="/ecommerceDashboard/checkout" element={<Checkout />} />
@@ -57,7 +59,7 @@ const App = () => {
             <Route index element={<Overview />} />
             <Route path="products" element={<VendorProducts />} />
             <Route path="products/add" element={<AddProduct />} />
-            <Route path="products/:id" element={<ProductDetail />} />
+            <Route path="products/:id" element={<VendorProductDetail />} />
             <Route path="orders" element={<Orders />} />
             <Route path="profile" element={<Profile />} />
           </Route>
