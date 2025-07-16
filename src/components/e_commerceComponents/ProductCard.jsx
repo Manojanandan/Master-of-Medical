@@ -7,7 +7,22 @@ import AddIcon from '@mui/icons-material/Add';
 const ProductCard = ({offer,image,badge,title,rating,price,onClick}) => {
   return (
     <React.Fragment>
-        <Box sx={{height:'auto',width:'300px',border:'solid 1.5px #2424',borderRadius:'10px',marginBottom:'1%'}}>
+        <Box 
+          sx={{
+            height:'auto',
+            width:'300px',
+            border:'solid 1.5px #2424',
+            borderRadius:'10px',
+            marginBottom:'1%',
+            cursor: 'pointer',
+            '&:hover': {
+              boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+              transform: 'translateY(-2px)',
+              transition: 'all 0.3s ease'
+            }
+          }}
+          onClick={onClick}
+        >
           <Box sx={{height:'auto',width:'80%',margin:'6% 8% 2%',}}>
             <Box sx={{width:'50px',padding:'3px 10px',borderRadius:'20px',backgroundColor:'#c5225f',color:'#fff',textAlign:'center'}}>
               <Typography variant='p' sx={{fontWeight:'bold',fontSize:'12px'}}>{offer}</Typography>
@@ -23,7 +38,18 @@ const ProductCard = ({offer,image,badge,title,rating,price,onClick}) => {
             </Box>
             <Star rating={rating} />
             <Typography variant='h5' sx={{color:'#c5225f',fontWeight:'bold',marginBottom:'3%'}}>${price}</Typography>
-            <Button endIcon={<AddIcon />} variant='outlined' sx={{width:'80%',borderRadius:'15px',fontWeight:'bold',textTransform:'capitalize'}} onClick={onClick}>Add to cart</Button>
+            <Button 
+              endIcon={<AddIcon />} 
+              variant='outlined' 
+              sx={{width:'80%',borderRadius:'15px',fontWeight:'bold',textTransform:'capitalize'}} 
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent card click when button is clicked
+                // You can add cart functionality here later
+                console.log('Add to cart clicked');
+              }}
+            >
+              Add to cart
+            </Button>
           </Box>
         </Box>
     </React.Fragment>

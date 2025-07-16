@@ -33,6 +33,11 @@ export const getAllProducts = async(vendorId) =>{
     return await instance.get(`product/get-all-product?userId=${vendorId}`)
 }
 
+// Get all products (public endpoint without filters)
+export const getAllProductsPublic = async() =>{
+    return await instance.get('product/get-all-product')
+}
+
 export const getProductById = async(productId) =>{
     return await instance.get(`product/get-product/${productId}`)
 }

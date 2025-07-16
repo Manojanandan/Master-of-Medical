@@ -55,7 +55,7 @@ export const signUpReducer = createSlice({
             })
             .addCase(registerVendor.rejected, (state, action) => {
                 state.loader = false;
-                state.success = action.payload.success;
+                state.success = false;
                 state.message = action.error.message;
             })
             .addCase(registerCustomer.pending, (state) => {
@@ -79,7 +79,7 @@ export const signUpReducer = createSlice({
             })
             .addCase(registerCustomer.rejected, (state, action) => {
                 state.loader = false;
-                state.success = action.payload.success;
+                state.success = false;
                 state.message = action.error.message;
             });
     }

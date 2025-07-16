@@ -53,7 +53,7 @@ const LoginForm = () => {
                     navigate("/ecommerceDashboard");
                 }
             }, 1000);
-        } else if (message) {
+        } else if (message && !success) {
             setOpenModal(true);
         }
     }, [success, message, navigate, type]);

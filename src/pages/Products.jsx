@@ -202,31 +202,21 @@ const Products = () => {
     sort: searchParams.get('sort') || 'newest'
   });
 
-  // Use static data for now
-  const displayProducts = staticProducts;
-  const totalProducts = staticProducts.length;
-  const totalPages = Math.ceil(totalProducts / 12);
+  // Use API data
+  const displayProducts = products.length > 0 ? products : staticProducts;
+  const totalProducts = pagination.total || products.length || staticProducts.length;
+  const totalPages = pagination.totalPages || Math.ceil(totalProducts / 12);
 
   useEffect(() => {
-    console.log('Products page loaded - calling API...');
-    
     // Call the actual API
     dispatch(fetchPublicProducts({
       page: pagination.page,
       limit: pagination.limit,
       ...filters
-    })).then((result) => {
-      console.log('API Response:', result);
-      if (result.payload) {
-        console.log('Products data:', result.payload);
-      }
-    }).catch((error) => {
-      console.error('API Error:', error);
-    });
+    }));
   }, [dispatch, pagination.page, pagination.limit, filters]);
 
   const handleProductClick = (productId) => {
-    console.log('Navigating to product details:', productId);
     navigate(`/ecommerceDashboard/product/${productId}`);
   };
 

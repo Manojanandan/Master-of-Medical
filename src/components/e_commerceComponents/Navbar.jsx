@@ -18,7 +18,7 @@ const Navbar = () => {
               <Box sx={{ height: 'auto', width: '60%',alignItems:'center' }}>
                 <img src={Logo} alt={Logo} width='100%' />
               </Box>
-              <Box sx={{ height: '100%', width: '40%' }}>
+              {/* <Box sx={{ height: '100%', width: '40%' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                   <IconButton sx={{ height: '100%', width: '30%', marginLeft: '7%' }}><LocationOnOutlinedIcon sx={{ fontSize: '2rem', color: '#000' }} /></IconButton>
                   <Box sx={{ height: 'auto', width: '60%', paddingTop: '3%' }}>
@@ -26,7 +26,7 @@ const Navbar = () => {
                     <Typography variant='span' sx={{ fontSize: '14px', fontWeight: 'bold' }}>All</Typography>
                   </Box>
                 </Box>
-              </Box>
+              </Box> */}
             </Box>
             <Box sx={{ height: 'auto', width: '50%' }}>
               <TextField
@@ -59,11 +59,11 @@ const Navbar = () => {
                   <Typography variant='p' sx={{ fontSize: '14px' }}>Account</Typography>
                 </Box>
               </Box>
-              <Box sx={{ height: 'auto', width: '10%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              {/* <Box sx={{ height: 'auto', width: '10%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <Badge badgeContent={4} color="secondary">
                   <FavoriteBorderIcon color="action" sx={{ fontSize: '2rem' }} />
                 </Badge>
-              </Box>
+              </Box> */}
               <Box sx={{ height: 'auto', width: '10%', display: 'flex', justifyContent: 'center', alignItems: 'center',cursor:'pointer' }} onClick={()=>navigate('/ecommerceDashboard/cart')}>
                 <Badge badgeContent={4} color="secondary">
                   <AddShoppingCartIcon color="action" sx={{ fontSize: '2rem' }} />

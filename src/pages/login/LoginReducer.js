@@ -10,7 +10,7 @@ export const loginReducer = createSlice({
     initialState: {
         loginReducer: {
             email: "",
-            passowrd: "",
+            password: "",
         },
         loader: false,
         message: "",
@@ -24,7 +24,7 @@ export const loginReducer = createSlice({
         builder.addCase(loginUser.fulfilled,(state,action)=>{
             state.loader= false
             state.loginReducer.email = action.payload.email
-            state.loginReducer.passowrd = action.payload.passowrd
+            state.loginReducer.password = action.payload.password
             state.success = action.payload.success
             state.message = action.payload.message
             sessionStorage.setItem("jwt", action.payload.accessToken); 
@@ -32,7 +32,7 @@ export const loginReducer = createSlice({
         builder.addCase(loginUser.rejected,(state,action)=>{
             state.loader = false
             state.success = false
-            state.message = action?.error?.message
+            state.message = action.error.message
         })
     }
 })

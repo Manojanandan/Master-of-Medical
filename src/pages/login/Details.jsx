@@ -88,6 +88,20 @@ const Details = () => {
     const [featureImage, setFeatureImage] = useState(null);
     const tempData = JSON.parse(sessionStorage.getItem("tempData"));
 
+    // Add useEffect to track success state changes
+    useEffect(() => {
+        if (success) {
+            const jwt = sessionStorage.getItem("jwt");
+            if (jwt) {
+                if (type === "user" || type === "customer") {
+                    navigate("/ecommerceDashboard");
+                } else if (type === "vendor") {
+                    navigate("/vendorDashboard");
+                }
+            }
+        }
+    }, [success, navigate, type]);
+
     const handleChange = (e) => {
         setAlldata({ ...allData, [e.target.id]: e.target.value })
         if (e.target.id === "addressLine1") {
@@ -180,8 +194,7 @@ const Details = () => {
                 addressLine1Error: '', numberError: "", cityError: "", stateError: "", pincodeError: "", vendorTypeError: "",countryError:""
             });
             
-            console.log(type ,"kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk")
-            if (type === "user" || "customer") {
+            if (type === "user" || type === "customer") {
                 // Handle customer creation
                 const customerData = {
                     name: tempData[0].userName,
@@ -195,14 +208,10 @@ const Details = () => {
                     postalCode: allData.pincode
                 };
                 
-                console.log('Creating customer with data:', customerData);
                 dispatch(registerCustomer(customerData));
                 setOpenModal(true);
-                if (sessionStorage.getItem("jwt")) {
-                    navigate("/ecommerceDashboard");
-                }
             } else {
-                // Handle vendor creation (existing logic)
+                // Handle vendor creation
                 const formData = new FormData();
                 const address = `${allData.addressLine1}, ${allData.addressLine2}`;
                 formData.append('address', address);
@@ -224,21 +233,14 @@ const Details = () => {
                     formData.append('files', file);
                 });
 
-                console.log('Creating vendor with formData:', formData);
                 dispatch(registerVendor(formData));
                 setOpenModal(true);
-                if (sessionStorage.getItem("jwt")) {
-                    navigate("/vendorDashboard");
-                }
             }
         }
     }
 
     const handleClose = () => {
         setOpenModal(false);
-        if (sessionStorage.getItem("jwt")) {
-            navigate("/vendorDashboard")
-        }
     }
 
     return (
