@@ -4,7 +4,22 @@ import AcUnitIcon from '@mui/icons-material/AcUnit';
 import Star from './Star'
 import AddIcon from '@mui/icons-material/Add';
 
-const ProductCard = ({offer,image,badge,title,rating,price,onClick}) => {
+const ProductCard = ({offer,image,badge,title,rating,price,originalPrice,onClick}) => {
+  // Calculate offer percentage if originalPrice is provided
+  const calculateOfferPercentage = () => {
+    if (!originalPrice || !price) return offer || '0%';
+    
+    const original = parseFloat(originalPrice);
+    const current = parseFloat(price);
+    
+    if (original <= current) return offer || '0%';
+    
+    const discount = ((original - current) / original) * 100;
+    return `${Math.round(discount)}%`;
+  };
+
+  const offerPercentage = calculateOfferPercentage();
+
   return (
     <React.Fragment>
         <Box 
@@ -25,7 +40,7 @@ const ProductCard = ({offer,image,badge,title,rating,price,onClick}) => {
         >
           <Box sx={{height:'auto',width:'80%',margin:'6% 8% 2%',}}>
             <Box sx={{width:'50px',padding:'3px 10px',borderRadius:'20px',backgroundColor:'#c5225f',color:'#fff',textAlign:'center'}}>
-              <Typography variant='p' sx={{fontWeight:'bold',fontSize:'12px'}}>{offer}</Typography>
+              <Typography variant='p' sx={{fontWeight:'bold',fontSize:'12px'}}>{offerPercentage}</Typography>
             </Box>
             <Box sx={{height:'80%',width:'70%',margin:'2% auto'}}>
               <img height='100%' width='100%' src={image} alt={image} />
@@ -37,7 +52,14 @@ const ProductCard = ({offer,image,badge,title,rating,price,onClick}) => {
               <Typography variant='body1' sx={{fontWeight:'bold',textTransform:'capitalize',textOverflow:'ellipsis',overflow: 'hidden', display: '-webkit-box',  WebkitLineClamp: 2,WebkitBoxOrient: 'vertical'}}>{title}</Typography>
             </Box>
             <Star rating={rating} />
-            <Typography variant='h5' sx={{color:'#c5225f',fontWeight:'bold',marginBottom:'3%'}}>${price}</Typography>
+            <Box sx={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'3%'}}>
+              <Typography variant='h5' sx={{color:'#c5225f',fontWeight:'bold'}}>${price}</Typography>
+              {originalPrice && parseFloat(originalPrice) > parseFloat(price) && (
+                <Typography variant='span' sx={{color:'#666',fontSize:'14px',fontWeight:'300',textDecoration:'line-through'}}>
+                  ${originalPrice}
+                </Typography>
+              )}
+            </Box>
             <Button 
               endIcon={<AddIcon />} 
               variant='outlined' 

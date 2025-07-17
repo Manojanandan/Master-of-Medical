@@ -72,16 +72,21 @@ const BestSeller = () => {
   // Transform API data to match the expected format - limit to 8 products for best sellers
   const transformedData = bestSellerData
     .slice(0, 8) // Limit to 8 products for best sellers
-    .map(item => ({
-      offer: item.offer || '50%',
-      image: item.image || item.thumbnailImage || "https://www.lifenowhealth.com/cdn/shop/files/Untitled-3_0021_Plantbasedcollagenbuilder.jpg?v=1695386987",
-      badge: item.badge || "best seller",
-      title: item.title || item.name || "Product Title",
-      rating: item.rating || '4.0',
-      price: item.price || '30.00',
-      originalPrice: item.originalPrice || '60.00',
-      description: item.description || "Product description goes here"
-    }));
+    .map(item => {
+      const price = parseFloat(item.price || '30.00');
+      const originalPrice = item.originalPrice ? parseFloat(item.originalPrice) : (price * 1.5);
+      return {
+        offer: item.offer || `${Math.round(((originalPrice - price) / originalPrice) * 100)}%`,
+        image: item.image || item.thumbnailImage || "https://www.lifenowhealth.com/cdn/shop/files/Untitled-3_0021_Plantbasedcollagenbuilder.jpg?v=1695386987",
+        badge: item.badge || "best seller",
+        title: item.title || item.name || "Product Title",
+        rating: item.rating || '4.0',
+        price: price.toFixed(2),
+        originalPrice: originalPrice.toFixed(2),
+        description: item.description || "Product description goes here",
+        id: item.id, // Use the actual ID from API response
+      };
+    });
   
   console.log('Transformed best seller data:', transformedData);
   console.log('Transformed best seller data length:', transformedData.length);
@@ -113,7 +118,7 @@ const BestSeller = () => {
                     transition: 'all 0.3s ease'
                   }
                 }}
-                onClick={() => handleProductClick(product.id || index)}
+                onClick={() => handleProductClick(product.id)}
               >
             <Box sx={{ height: '220px', width: '100%', display: 'flex', padding: '10px 0 0', }}>
               <Box sx={{ height: '100%', width: '50%', padding: '0 2px' }}>
@@ -121,9 +126,7 @@ const BestSeller = () => {
                   <Box sx={{ width: '50px', padding: '0px 10px', borderRadius: '20px', backgroundColor: '#c5225f', color: '#fff', textAlign: 'center' }}>
                         <Typography variant='p' sx={{ fontWeight: 'bold', fontSize: '12px' }}>{product.offer}</Typography>
                   </Box>
-                  <Box sx={{ width: '50px', padding: '0', textAlign: 'center' }}>
-                    <IconButton sx={{ padding: '0' }} ><FavoriteBorderIcon /></IconButton>
-                  </Box>
+           
                 </Box>
                 <Box sx={{ height: '50%', width: '60%', margin: '5% auto' }}>
                       <img height='100%' width='100%' src={product.image} alt={product.title} />
@@ -135,9 +138,16 @@ const BestSeller = () => {
                       <Typography variant='body1' sx={{ fontWeight: 'bold', textTransform: 'capitalize', textOverflow: 'ellipsis', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', fontSize: '13px' }}>{product.title}</Typography>
                 </Box>
                     <Star rating={product.rating} />
-                <Typography variant='h5' sx={{ color: '#c5225f', fontWeight: 'bold', marginBottom: '5%', fontSize: '19px' }}>
-                      ${product.price} <Typography variant='span' sx={{ color: '#242424', fontSize: '14px', fontWeight: '300' }}><strike>${product.originalPrice}</strike></Typography>
-                </Typography>
+                <Box sx={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'5%'}}>
+                  <Typography variant='h5' sx={{ color: '#c5225f', fontWeight: 'bold', fontSize: '19px' }}>
+                    ${product.price}
+                  </Typography>
+                  {product.originalPrice && parseFloat(product.originalPrice) > parseFloat(product.price) && (
+                    <Typography variant='span' sx={{ color: '#666', fontSize: '14px', fontWeight: '300', textDecoration: 'line-through' }}>
+                      ${product.originalPrice}
+                    </Typography>
+                  )}
+                </Box>
                 <Button endIcon={<AddIcon />} variant='outlined' sx={{ width: '100%', borderRadius: '15px', fontWeight: 'bold', textTransform: 'capitalize', margin: '4% 0' }}>Add to cart</Button>
                   </Box>
                 </Box>
@@ -161,7 +171,7 @@ const BestSeller = () => {
                     transition: 'all 0.3s ease'
                   }
                 }}
-                onClick={() => handleProductClick(product.id || (index + 4))}
+                onClick={() => handleProductClick(product.id)}
               >
             <Box sx={{ height: '220px', width: '100%', display: 'flex', padding: '10px 0 0', }}>
               <Box sx={{ height: '100%', width: '50%', padding: '0 2px' }}>
@@ -169,9 +179,7 @@ const BestSeller = () => {
                   <Box sx={{ width: '50px', padding: '0px 10px', borderRadius: '20px', backgroundColor: '#c5225f', color: '#fff', textAlign: 'center' }}>
                         <Typography variant='p' sx={{ fontWeight: 'bold', fontSize: '12px' }}>{product.offer}</Typography>
                   </Box>
-                  <Box sx={{ width: '50px', padding: '0', textAlign: 'center' }}>
-                    <IconButton sx={{ padding: '0' }} ><FavoriteBorderIcon /></IconButton>
-                  </Box>
+              
                 </Box>
                 <Box sx={{ height: '50%', width: '60%', margin: '5% auto' }}>
                       <img height='100%' width='100%' src={product.image} alt={product.title} />
@@ -183,9 +191,16 @@ const BestSeller = () => {
                       <Typography variant='body1' sx={{ fontWeight: 'bold', textTransform: 'capitalize', textOverflow: 'ellipsis', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', fontSize: '13px' }}>{product.title}</Typography>
                 </Box>
                     <Star rating={product.rating} />
-                <Typography variant='h5' sx={{ color: '#c5225f', fontWeight: 'bold', marginBottom: '5%', fontSize: '19px' }}>
-                      ${product.price} <Typography variant='span' sx={{ color: '#242424', fontSize: '14px', fontWeight: '300' }}><strike>${product.originalPrice}</strike></Typography>
-                </Typography>
+                <Box sx={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'5%'}}>
+                  <Typography variant='h5' sx={{ color: '#c5225f', fontWeight: 'bold', fontSize: '19px' }}>
+                    ${product.price}
+                  </Typography>
+                  {product.originalPrice && parseFloat(product.originalPrice) > parseFloat(product.price) && (
+                    <Typography variant='span' sx={{ color: '#666', fontSize: '14px', fontWeight: '300', textDecoration: 'line-through' }}>
+                      ${product.originalPrice}
+                    </Typography>
+                  )}
+                </Box>
                 <Button endIcon={<AddIcon />} variant='outlined' sx={{ width: '100%', borderRadius: '15px', fontWeight: 'bold', textTransform: 'capitalize', margin: '4% 0' }}>Add to cart</Button>
                   </Box>
                 </Box>

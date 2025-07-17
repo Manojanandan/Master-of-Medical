@@ -12,7 +12,11 @@ export const createCustomer = async(data) =>{
 
 //login creation
 export const userLogin = async(data,type) =>{
-    return await  instance.post(`user/login/${type}`,data)
+    if(type === 'user' || type === 'customer'){
+        return await  instance.post(`user/login/customer`,data)
+
+    }
+
 }
 
 //vendor profile APIs
