@@ -61,5 +61,35 @@ export const getUserInfoFromToken = () => {
     email: payload.email,
     name: payload.name,
     role: payload.role || payload.type,
+    status: payload.status || payload.approvalStatus || payload.isApproved,
   };
+};
+
+// Check if user status is pending
+export const isUserStatusPending = () => {
+  const user = getUserInfoFromToken();
+  if (!user) return false;
+  
+  // Also check sessionStorage for additional user data
+  const sessionUserData = sessionStorage.getItem('userData');
+  let additionalData = null;
+  
+  if (sessionUserData) {
+    try {
+      additionalData = JSON.parse(sessionUserData);
+    } catch (error) {
+      console.error('Error parsing session user data:', error);
+    }
+  }
+  
+  // Check status from both sources
+  const status = user.status || additionalData?.status || additionalData?.approvalStatus || additionalData?.isApproved;
+  
+  console.log('User status check:', {
+    userStatus: user.status,
+    additionalStatus: additionalData?.status,
+    finalStatus: status
+  });
+  
+  return status === 'pending' || status === false || status === 'false';
 }; 

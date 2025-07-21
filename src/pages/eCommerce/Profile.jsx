@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import styles from './Profile.module.css';
 import {
   Box,
   List,
@@ -27,7 +28,24 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  ListItemSecondaryAction
+  ListItemSecondaryAction,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TablePagination,
+  InputAdornment,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Tooltip,
+  Fade,
+  Grow,
+  Slide,
+  Zoom
 } from '@mui/material';
 import {
   Person as PersonIcon,
@@ -42,7 +60,14 @@ import {
   Home as HomeIcon,
   Add as AddIcon,
   Delete as DeleteIcon,
-  LocationCity as AddressIcon
+  LocationCity as AddressIcon,
+  Search as SearchIcon,
+  FilterList as FilterIcon,
+  Visibility as ViewIcon,
+  ArrowBack as ArrowBackIcon,
+  ArrowForward as ArrowForwardIcon,
+  FirstPage as FirstPageIcon,
+  LastPage as LastPageIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { getUserInfoFromToken } from '../../utils/jwtUtils';
@@ -52,7 +77,8 @@ import {
   getAllAddresses,
   createAddress,
   updateAddress,
-  deleteAddress
+  deleteAddress,
+  getAllOrders
 } from '../../utils/Service';
 
 const Profile = () => {
@@ -77,6 +103,22 @@ const Profile = () => {
     country: '',
     postalCode: ''
   });
+  
+  // Orders management states
+  const [orders, setOrders] = useState([]);
+  const [fetchingOrders, setFetchingOrders] = useState(false);
+  const [orderPagination, setOrderPagination] = useState({
+    total: 0,
+    page: 1,
+    limit: 10,
+    totalPages: 0
+  });
+  const [orderFilters, setOrderFilters] = useState({
+    status: '',
+    search: ''
+  });
+  const [orderDialogOpen, setOrderDialogOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
   
   const [profileData, setProfileData] = useState({
     id: '',
@@ -156,6 +198,51 @@ const Profile = () => {
     }
   };
 
+  // Fetch orders for customer
+  const fetchOrders = async (customerId, page = 1, filters = {}) => {
+    try {
+      setFetchingOrders(true);
+      console.log('Fetching orders for customer ID:', customerId);
+      console.log('Page:', page);
+      console.log('Filters:', filters);
+      
+      const params = {
+        customerId,
+        page,
+        limit: orderPagination.limit,
+        ...filters
+      };
+      
+      console.log('API params being sent:', params);
+      const response = await getAllOrders(params);
+      console.log('Orders API response:', response);
+      
+      if (response.data && response.data.success) {
+        const ordersData = response.data.data || [];
+        const paginationData = response.data.pagination || {};
+        
+        console.log('Orders data received:', ordersData);
+        console.log('Pagination data:', paginationData);
+        
+        setOrders(ordersData);
+        setOrderPagination({
+          total: paginationData.total || 0,
+          page: paginationData.page || 1,
+          limit: paginationData.limit || 10,
+          totalPages: paginationData.totalPages || 0
+        });
+      } else {
+        console.warn('Failed to fetch orders:', response.data);
+        setOrders([]);
+      }
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      setOrders([]);
+    } finally {
+      setFetchingOrders(false);
+    }
+  };
+
   // Load user data from JWT token (fallback)
   const loadUserDataFromJWT = () => {
     const userInfo = getUserInfoFromToken();
@@ -193,11 +280,26 @@ const Profile = () => {
       console.log('Customer ID found, fetching details:', customerId);
       fetchCustomerDetails(customerId);
       fetchAddresses(customerId);
+      fetchOrders(customerId);
     } else {
       console.warn('No customer ID found in JWT, using fallback data');
       loadUserDataFromJWT();
     }
   }, []);
+
+  // Auto-apply search filter with debounce
+  useEffect(() => {
+    const userInfo = getUserInfoFromToken();
+    const customerId = userInfo?.id || userInfo?._id;
+    
+    if (customerId && orderFilters.search !== undefined) {
+      const timeoutId = setTimeout(() => {
+        fetchOrders(customerId, 1, orderFilters);
+      }, 500); // 500ms delay
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [orderFilters.search]);
 
   const handleInputChange = (field, value) => {
     setProfileData(prev => ({
@@ -372,6 +474,106 @@ const Profile = () => {
     }
   };
 
+  // Order management functions
+  const handleOrderFilterChange = (field, value) => {
+    const newFilters = {
+      ...orderFilters,
+      [field]: value
+    };
+    setOrderFilters(newFilters);
+    
+    // Apply status filter immediately, search will be handled by useEffect
+    if (field === 'status') {
+      const userInfo = getUserInfoFromToken();
+      const customerId = userInfo?.id || userInfo?._id;
+      fetchOrders(customerId, 1, newFilters);
+    }
+  };
+
+  const handleOrderSearch = () => {
+    const userInfo = getUserInfoFromToken();
+    const customerId = userInfo?.id || userInfo?._id;
+    fetchOrders(customerId, 1, orderFilters);
+  };
+
+  // Handle search input with debounce
+  const handleSearchInputChange = (value) => {
+    setOrderFilters(prev => ({
+      ...prev,
+      search: value
+    }));
+  };
+
+  // Apply search with Enter key or button click
+  const handleSearchSubmit = () => {
+    const userInfo = getUserInfoFromToken();
+    const customerId = userInfo?.id || userInfo?._id;
+    fetchOrders(customerId, 1, orderFilters);
+  };
+
+  // Clear all filters
+  const handleClearFilters = () => {
+    const clearedFilters = {
+      status: '',
+      search: ''
+    };
+    setOrderFilters(clearedFilters);
+    
+    const userInfo = getUserInfoFromToken();
+    const customerId = userInfo?.id || userInfo?._id;
+    fetchOrders(customerId, 1, clearedFilters);
+  };
+
+  const handleOrderPageChange = (newPage) => {
+    const userInfo = getUserInfoFromToken();
+    const customerId = userInfo?.id || userInfo?._id;
+    fetchOrders(customerId, newPage, orderFilters);
+  };
+
+  const openOrderDialog = (order) => {
+    setSelectedOrder(order);
+    setOrderDialogOpen(true);
+  };
+
+  const closeOrderDialog = () => {
+    setOrderDialogOpen(false);
+    setSelectedOrder(null);
+  };
+
+  const getStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'pending':
+        return 'warning';
+      case 'confirmed':
+        return 'info';
+      case 'shipped':
+        return 'primary';
+      case 'delivered':
+        return 'success';
+      case 'cancelled':
+        return 'error';
+      default:
+        return 'default';
+    }
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR'
+    }).format(amount);
+  };
+
   const renderProfileContent = () => (
     <Box sx={{ maxWidth: 800, mx: 'auto' }}>
       {fetchingData ? (
@@ -413,6 +615,7 @@ const Profile = () => {
                 startIcon={<EditIcon />}
                 onClick={() => setIsEditing(true)}
                 sx={{ borderRadius: 2, px: 3 }}
+                className={styles.button}
               >
                 Edit Profile
               </Button>
@@ -424,6 +627,7 @@ const Profile = () => {
                   onClick={handleCancel}
                   disabled={loading}
                   sx={{ borderRadius: 2, px: 3 }}
+                  className={styles.button}
                 >
                   Cancel
                 </Button>
@@ -433,6 +637,7 @@ const Profile = () => {
                   onClick={handleSave}
                   disabled={loading}
                   sx={{ borderRadius: 2, px: 3 }}
+                  className={styles.button}
                 >
                   {loading ? 'Saving...' : 'Save Changes'}
                 </Button>
@@ -441,7 +646,8 @@ const Profile = () => {
           </Box>
 
           {/* Profile Form */}
-          <Card sx={{ mb: 3 }}>
+          <Zoom in={true} timeout={800}>
+            <Card sx={{ mb: 3 }} className={styles.card}>
             <CardContent sx={{ p: 4 }}>
               <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
                 <PersonIcon color="primary" />
@@ -456,6 +662,7 @@ const Profile = () => {
                     value={profileData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
                     disabled={!isEditing}
+                    className={styles.inputField}
                     InputProps={{
                       startAdornment: <PersonIcon sx={{ mr: 1, color: 'text.secondary' }} />
                     }}
@@ -500,9 +707,11 @@ const Profile = () => {
               </Grid>
             </CardContent>
           </Card>
+        </Zoom>
 
           {/* Address Information */}
-          <Card>
+          <Zoom in={true} timeout={1000}>
+            <Card className={styles.card}>
             <CardContent sx={{ p: 4 }}>
               <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
                 <HomeIcon color="primary" />
@@ -554,35 +763,270 @@ const Profile = () => {
               </Grid>
             </CardContent>
           </Card>
+        </Zoom>
         </>
       )}
     </Box>
   );
 
   const renderOrdersContent = () => (
-    <Box sx={{ maxWidth: 800, mx: 'auto' }}>
-      <Typography variant="h4" component="h1" sx={{ fontWeight: 600, mb: 3, textAlign: 'center' }}>
+    <Box sx={{ width: '100%' }}>
+      <Typography variant="h4" component="h1" sx={{ fontWeight: 600, mb: 3 }}>
         Order History
       </Typography>
-      
-      <Card>
-        <CardContent sx={{ p: 4, textAlign: 'center' }}>
-          <OrdersIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            No Orders Yet
-          </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-            Your order history will appear here once you make your first purchase.
-          </Typography>
-          <Button 
-            variant="contained" 
-            onClick={() => navigate('/ecommerceDashboard')}
-            sx={{ borderRadius: 2, px: 3 }}
-          >
-            Start Shopping
-          </Button>
+
+      {/* Filters and Search */}
+      <Slide direction="up" in={true} timeout={600}>
+        <Card sx={{ mb: 3 }} className={styles.filterSection}>
+        <CardContent sx={{ p: 3 }}>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                label="Search Orders"
+                placeholder="Search by order ID, product name..."
+                value={orderFilters.search}
+                onChange={(e) => handleSearchInputChange(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSearchSubmit();
+                  }
+                }}
+                className={styles.inputField}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Button
+                        size="small"
+                        onClick={handleSearchSubmit}
+                        disabled={fetchingOrders}
+                        className={styles.button}
+                      >
+                        Search
+                      </Button>
+                    </InputAdornment>
+                  )
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <FormControl fullWidth>
+                <InputLabel>Status Filter</InputLabel>
+                <Select
+                  value={orderFilters.status}
+                  onChange={(e) => handleOrderFilterChange('status', e.target.value)}
+                  label="Status Filter"
+                >
+                  <MenuItem value="">All Status</MenuItem>
+                  <MenuItem value="pending">Pending</MenuItem>
+                  <MenuItem value="confirmed">Confirmed</MenuItem>
+                  <MenuItem value="shipped">Shipped</MenuItem>
+                  <MenuItem value="delivered">Delivered</MenuItem>
+                  <MenuItem value="cancelled">Cancelled</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<FilterIcon />}
+                onClick={handleSearchSubmit}
+                disabled={fetchingOrders}
+                className={styles.button}
+              >
+                Apply Filters
+              </Button>
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <Button
+                fullWidth
+                variant="outlined"
+                color="secondary"
+                onClick={handleClearFilters}
+                disabled={fetchingOrders}
+                className={styles.button}
+              >
+                Clear Filters
+              </Button>
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'right' }}>
+                Total Orders: {orderPagination.total}
+              </Typography>
+            </Grid>
+          </Grid>
         </CardContent>
       </Card>
+      </Slide>
+
+      {/* Orders Table */}
+      <Fade in={true} timeout={800}>
+        <Card className={styles.card}>
+        <CardContent sx={{ p: 0 }}>
+          {fetchingOrders ? (
+            <Box sx={{ textAlign: 'center', py: 8 }}>
+              <CircularProgress size={60} sx={{ mb: 3 }} />
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Loading Orders...
+              </Typography>
+            </Box>
+          ) : orders.length === 0 ? (
+            <Box sx={{ textAlign: 'center', py: 8 }}>
+              <OrdersIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                No Orders Found
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                {orderFilters.search || orderFilters.status 
+                  ? 'No orders match your current filters. Try adjusting your search criteria.'
+                  : 'Your order history will appear here once you make your first purchase.'
+                }
+              </Typography>
+              {!orderFilters.search && !orderFilters.status && (
+                <Button 
+                  variant="contained" 
+                  onClick={() => navigate('/ecommerceDashboard')}
+                  sx={{ borderRadius: 2, px: 3 }}
+                >
+                  Start Shopping
+                </Button>
+              )}
+            </Box>
+          ) : (
+            <>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                      <TableCell sx={{ fontWeight: 600 }}>Order ID</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>Date</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>Products</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>Total Amount</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>Actions</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {orders.map((order, index) => (
+                      <TableRow key={order.id} hover className={styles.tableRow} style={{ animationDelay: `${index * 0.1}s` }}>
+                        <TableCell>
+                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                            #{order.id}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2">
+                            {formatDate(order.createdAt)}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Box>
+                            {order.productInfo?.slice(0, 2).map((product, index) => (
+                              <Typography key={index} variant="body2" sx={{ mb: 0.5 }}>
+                                {product.name} (x{product.quantity})
+                              </Typography>
+                            ))}
+                            {order.productInfo?.length > 2 && (
+                              <Typography variant="body2" color="text.secondary">
+                                +{order.productInfo.length - 2} more items
+                              </Typography>
+                            )}
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            {formatCurrency(order.totalCost)}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            label={order.status}
+                            color={getStatusColor(order.status)}
+                            size="small"
+                            sx={{ textTransform: 'capitalize' }}
+                            className={styles.statusChip}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Tooltip title="View Order Details">
+                            <IconButton
+                              size="small"
+                              onClick={() => openOrderDialog(order)}
+                              sx={{ color: '#1976d2' }}
+                            >
+                              <ViewIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+
+              {/* Pagination */}
+              {orderPagination.totalPages > 1 && (
+                <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    Showing {((orderPagination.page - 1) * orderPagination.limit) + 1} to{' '}
+                    {Math.min(orderPagination.page * orderPagination.limit, orderPagination.total)} of{' '}
+                    {orderPagination.total} orders
+                  </Typography>
+                  
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <IconButton
+                      onClick={() => handleOrderPageChange(1)}
+                      disabled={orderPagination.page === 1}
+                      size="small"
+                      className={styles.paginationButton}
+                    >
+                      <FirstPageIcon />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => handleOrderPageChange(orderPagination.page - 1)}
+                      disabled={orderPagination.page === 1}
+                      size="small"
+                      className={styles.paginationButton}
+                    >
+                      <ArrowBackIcon />
+                    </IconButton>
+                    
+                    <Box sx={{ display: 'flex', alignItems: 'center', px: 2 }}>
+                      <Typography variant="body2">
+                        Page {orderPagination.page} of {orderPagination.totalPages}
+                      </Typography>
+                    </Box>
+                    
+                    <IconButton
+                      onClick={() => handleOrderPageChange(orderPagination.page + 1)}
+                      disabled={orderPagination.page === orderPagination.totalPages}
+                      size="small"
+                      className={styles.paginationButton}
+                    >
+                      <ArrowForwardIcon />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => handleOrderPageChange(orderPagination.totalPages)}
+                      disabled={orderPagination.page === orderPagination.totalPages}
+                      size="small"
+                      className={styles.paginationButton}
+                    >
+                      <LastPageIcon />
+                    </IconButton>
+                  </Box>
+                </Box>
+              )}
+            </>
+          )}
+        </CardContent>
+      </Card>
+      </Fade>
     </Box>
   );
 
@@ -631,8 +1075,8 @@ const Profile = () => {
         </Card>
       ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {addresses.map((address, index) => (
-            <Card key={address.id || address._id || index} sx={{ width: '100%' }}>
+                  {addresses.map((address, index) => (
+          <Card key={address.id || address._id || index} sx={{ width: '100%' }} className={`${styles.card} ${styles.staggerItem}`} style={{ animationDelay: `${index * 0.1}s` }}>
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -644,6 +1088,7 @@ const Profile = () => {
                       size="small"
                       onClick={() => openAddressDialog(address)}
                       sx={{ color: '#1976d2' }}
+                      className={styles.button}
                     >
                       <EditIcon />
                     </IconButton>
@@ -651,6 +1096,7 @@ const Profile = () => {
                       size="small"
                       onClick={() => handleDeleteAddress(address.id || address._id)}
                       sx={{ color: '#d32f2f' }}
+                      className={styles.button}
                     >
                       <DeleteIcon />
                     </IconButton>
@@ -720,10 +1166,11 @@ const Profile = () => {
   );
 
   return (
-    <Box sx={{ backgroundColor: '#f5f5f5', minHeight: 'calc(100vh - 200px)' }}>
+    <Box sx={{ backgroundColor: '#f5f5f5', minHeight: 'calc(100vh - 200px)' }} className={styles.profileContainer}>
       <Container maxWidth="xl" sx={{ py: 4 }}>
         {/* User Info Header */}
-        <Card sx={{ mb: 4, p: 3, textAlign: 'center' }}>
+        <Fade in={true} timeout={800}>
+          <Card sx={{ mb: 4, p: 3, textAlign: 'center' }} className={styles.userInfoCard}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
             <Avatar 
               sx={{ 
@@ -750,11 +1197,13 @@ const Profile = () => {
                 variant="outlined"
               />
             </Box>
-          </Box>
-        </Card>
+                      </Box>
+          </Card>
+        </Fade>
 
         {/* Tabs */}
-        <Card sx={{ mb: 4 }}>
+        <Slide direction="up" in={true} timeout={1000}>
+          <Card sx={{ mb: 4 }} className={styles.tabsCard}>
           <Tabs 
             value={activeTab} 
             onChange={handleTabChange}
@@ -798,13 +1247,16 @@ const Profile = () => {
             />
           </Tabs>
         </Card>
+        </Slide>
 
         {/* Tab Content */}
-        <Box>
-          {activeTab === 0 && renderProfileContent()}
-          {activeTab === 1 && renderOrdersContent()}
-          {activeTab === 2 && renderAddressesContent()}
-        </Box>
+        <Grow in={true} timeout={1200}>
+          <Box className={styles.contentContainer}>
+                      {activeTab === 0 && renderProfileContent()}
+            {activeTab === 1 && renderOrdersContent()}
+            {activeTab === 2 && renderAddressesContent()}
+          </Box>
+        </Grow>
       </Container>
 
       {/* Address Dialog */}
@@ -874,6 +1326,175 @@ const Profile = () => {
           </Button>
           <Button onClick={handleSaveAddress} variant="contained">
             {editingAddress ? 'Update Address' : 'Add Address'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Order Details Dialog */}
+      <Dialog 
+        open={orderDialogOpen} 
+        onClose={closeOrderDialog}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <OrdersIcon color="primary" />
+            Order Details - #{selectedOrder?.id}
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          {selectedOrder && (
+            <Box sx={{ mt: 2 }}>
+              {/* Order Summary */}
+              <Card sx={{ mb: 3 }}>
+                <CardContent>
+                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                    Order Summary
+                  </Typography>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} md={6}>
+                      <Typography variant="body2" color="text.secondary">
+                        Order Date
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                        {formatDate(selectedOrder.createdAt)}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <Typography variant="body2" color="text.secondary">
+                        Status
+                      </Typography>
+                      <Chip
+                        label={selectedOrder.status}
+                        color={getStatusColor(selectedOrder.status)}
+                        sx={{ textTransform: 'capitalize' }}
+                      />
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+
+              {/* Customer Information */}
+              <Card sx={{ mb: 3 }}>
+                <CardContent>
+                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                    Customer Information
+                  </Typography>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} md={6}>
+                      <Typography variant="body2" color="text.secondary">
+                        Name
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                        {selectedOrder.customerInfo?.name}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <Typography variant="body2" color="text.secondary">
+                        Email
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                        {selectedOrder.customerInfo?.email}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Typography variant="body2" color="text.secondary">
+                        Delivery Address
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                        {selectedOrder.customerInfo?.address?.address}, {selectedOrder.customerInfo?.address?.city}, {selectedOrder.customerInfo?.address?.state}, {selectedOrder.customerInfo?.address?.country} - {selectedOrder.customerInfo?.address?.postalCode}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+
+              {/* Products */}
+              <Card sx={{ mb: 3 }}>
+                <CardContent>
+                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                    Products
+                  </Typography>
+                  <TableContainer>
+                    <Table>
+                      <TableHead>
+                        <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                          <TableCell sx={{ fontWeight: 600 }}>Product</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Price</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Quantity</TableCell>
+                          <TableCell sx={{ fontWeight: 600 }}>Total</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {selectedOrder.productInfo?.map((product, index) => (
+                          <TableRow key={index}>
+                            <TableCell>
+                              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                {product.name}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="body2">
+                                {formatCurrency(product.price)}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="body2">
+                                {product.quantity}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                {formatCurrency(product.total)}
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </CardContent>
+              </Card>
+
+              {/* Order Total */}
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                    Order Total
+                  </Typography>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} md={6}>
+                      <Typography variant="body2" color="text.secondary">
+                        Subtotal
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                        {formatCurrency(selectedOrder.subTotal)}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <Typography variant="body2" color="text.secondary">
+                        GST Amount
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                        {formatCurrency(selectedOrder.gstAmount)}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Divider sx={{ my: 2 }} />
+                      <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                        Total Amount: {formatCurrency(selectedOrder.totalCost)}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 3 }}>
+          <Button onClick={closeOrderDialog} variant="outlined">
+            Close
           </Button>
         </DialogActions>
       </Dialog>

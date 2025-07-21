@@ -693,18 +693,18 @@ const Products = () => {
                           );
                         } else {
                           return (
-                            <button
-                              style={{
-                                width: '100%',
-                                padding: '10px 0',
-                                background: '#1976d2',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: 4,
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                marginTop: 12,
-                              }}
+                      <button
+                        style={{
+                          width: '100%',
+                          padding: '10px 0',
+                          background: '#1976d2',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 4,
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          marginTop: 12,
+                        }}
                               disabled={!product.inStock || cartLoading}
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -712,9 +712,9 @@ const Products = () => {
                                   dispatch(addToCart({ productId: product._id, quantity: 1 }));
                                 }
                               }}
-                            >
+                      >
                               {cartLoading ? 'Adding...' : (product.inStock ? 'Add to Cart' : 'Out of Stock')}
-                            </button>
+                      </button>
                           );
                         }
                       })()}

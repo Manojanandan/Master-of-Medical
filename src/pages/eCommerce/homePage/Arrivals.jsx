@@ -137,16 +137,16 @@ const Arrivals = () => {
     console.log('Transformed data:', transformedData);
     console.log('Transformed data length:', transformedData.length);
     
-    return (
-        <React.Fragment>
-            <Box sx={{height:'auto',width:'100%',margin:'2% 0',}}>
-                <TitleSection title={"New Arrivals"} subTitle={"Don't miss this opportunity at a special discount just for this week."} />
-                <Box sx={{display:'flex',justifyContent:'flex-start',margin: '1% 3% 1%',width:'95%',flexWrap:'wrap',gap:'4%'}}>
+  return (
+    <React.Fragment>
+        <Box sx={{height:'auto',width:'100%',margin:'2% 0',}}>
+            <TitleSection title={"New Arrivals"} subTitle={"Don't miss this opportunity at a special discount just for this week."} />
+            <Box sx={{display:'flex',justifyContent:'flex-start',margin: '1% 3% 1%',width:'95%',flexWrap:'wrap',gap:'4%'}}>
                     {loading ? (
                         <div>Loading arrivals...</div>
                     ) : transformedData.length > 0 ? (
                         transformedData?.map((e,i)=>{
-                            return(
+                    return(
                                 <ProductCard 
                                     key={i} 
                                     offer={e?.offer} 
@@ -165,9 +165,9 @@ const Arrivals = () => {
                         <div>No new arrivals available at the moment.</div>
                     )}
                 </Box>
-            </Box>
-        </React.Fragment>
-    )
+        </Box>
+    </React.Fragment>
+  )
 }
 
 export default Arrivals

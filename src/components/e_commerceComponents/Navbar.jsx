@@ -87,11 +87,11 @@ const Navbar = () => {
             </Box>
             <Box sx={{ height: 'auto', width: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <Box sx={{ height: 'auto', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <TextField
+              <TextField
                   placeholder="Search for products..."
-                  variant="outlined"
-                  size="small"
-                  sx={{
+                variant="outlined"
+                size="small"
+                sx={{
                     width: '80%',
                     '& .MuiOutlinedInput-root': {
                       borderRadius: '25px',
@@ -106,15 +106,15 @@ const Navbar = () => {
                         borderColor: 'transparent',
                       },
                     },
-                  }}
-                  InputProps={{
+                }}
+                InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
                         <SearchIcon sx={{ color: '#666' }} />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
+                    </InputAdornment>
+                  ),
+                }}
+              />
               </Box>
             </Box>
             <Box sx={{ height: 'auto', width: '18%', display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>

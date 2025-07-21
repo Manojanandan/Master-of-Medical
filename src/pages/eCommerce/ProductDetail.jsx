@@ -27,7 +27,6 @@ import {
   ShoppingCart,
   Favorite,
   FavoriteBorder,
-  Star,
   LocalShipping,
   Verified,
   ArrowBack,
@@ -39,76 +38,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPublicProductById, clearCurrentProduct } from "../../redux/PublicProductReducer";
 import { getProductById } from "../../utils/Service";
-import { addToCart } from "../../redux/CartReducer";
+import { addToCart, fetchCart, removeFromCart, updateCartItemQuantity } from "../../redux/CartReducer";
 
-// Static product data with more information
-const staticProduct = {
-  _id: "1",
-  name: "Digital Thermometer Professional Grade Medical Device",
-  description: "High-precision digital thermometer for accurate temperature readings. This professional-grade thermometer provides quick and accurate readings in just 10 seconds. Features include large LCD display, fever alarm, memory function, and auto-shutoff for battery conservation.",
-  price: 299,
-  priceLabel: "MRP",
-  brandName: "MediCare",
-  category: "Diagnostic",
-  subCategory: "Temperature Monitoring",
-  thumbnailImage: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop",
-  galleryImages: [
-    "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop",
-    "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=300&fit=crop",
-    "https://images.unsplash.com/photo-1581595219315-a187dd40c322?w=400&h=300&fit=crop"
-  ],
-  rating: 4.5,
-  reviews: 128,
-  inStock: true,
-  fastDelivery: true,
-  verified: true,
-  benefits: [
-    "Quick 10-second reading",
-    "Large LCD display for easy reading",
-    "Fever alarm function",
-    "Memory function for last reading",
-    "Auto-shutoff to save battery",
-    "Waterproof design",
-    "CE certified for accuracy",
-    "Backlit display for low light"
-  ],
-  additionalInformation: {
-    shelfLife: "5 years",
-    country: "India",
-    howToUse: "Place the thermometer under the tongue or in the armpit. Wait for the beep sound indicating completion of reading. For accurate results, ensure the sensor is in proper contact with the body.",
-    sideEffects: "No known side effects when used as directed. This is a non-invasive device that only measures temperature.",
-    manufacturer: "MediCare Industries Ltd.",
-    warranty: "2 years manufacturer warranty",
-    certifications: ["CE", "ISO 13485", "FDA Approved"],
-    packageContents: [
-      "1 Digital Thermometer",
-      "1 Protective Case",
-      "1 User Manual",
-      "1 Battery (CR2032)",
-      "1 Cleaning Cloth"
-    ]
-  },
-  specifications: {
-    "Display": "Large LCD with backlight",
-    "Reading Time": "10 seconds",
-    "Temperature Range": "32°C - 42.9°C",
-    "Accuracy": "±0.1°C",
-    "Battery": "1 x CR2032 (included)",
-    "Auto Shutoff": "Yes (after 10 minutes)",
-    "Memory": "Last reading",
-    "Waterproof": "Yes (IPX4)",
-    "Dimensions": "12.5 x 2.5 x 1.5 cm",
-    "Weight": "15 grams",
-    "Material": "Medical grade plastic",
-    "Sensor Type": "Digital infrared"
-  },
-  shipping: {
-    freeShipping: true,
-    deliveryTime: "2-4 business days",
-    returnPolicy: "30 days return policy",
-    warranty: "2 years manufacturer warranty"
-  }
-};
+
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -116,14 +48,16 @@ const ProductDetail = () => {
   const dispatch = useDispatch();
 
   const { currentProduct, loading, error } = useSelector((state) => state.publicProductReducer);
+  const { cart, loading: cartLoading } = useSelector((state) => state.cartReducer);
   
   // State for API product data
   const [apiProduct, setApiProduct] = useState(null);
   const [apiLoading, setApiLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
+  const [cartMessage, setCartMessage] = useState('');
   
-  // Use API product if available, otherwise fall back to static product
-  const product = apiProduct || currentProduct || staticProduct;
+  // Use API product if available, otherwise fall back to current product
+  const product = apiProduct || currentProduct;
 
   // Safety check for product data
   if (!product) {
@@ -148,16 +82,27 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [localQuantity, setLocalQuantity] = useState(1);
 
   useEffect(() => {
     if (id) {
       dispatch(fetchPublicProductById(id));
     }
+    
+    // Fetch cart data
+    dispatch(fetchCart());
 
     return () => {
       dispatch(clearCurrentProduct());
     };
   }, [dispatch, id]);
+
+  // Reset local quantity when product is not in cart
+  useEffect(() => {
+    if (!isProductInCart()) {
+      setLocalQuantity(1);
+    }
+  }, [cart, product.id]);
 
   // Call the getProductById API and console log response
   useEffect(() => {
@@ -196,47 +141,112 @@ const ProductDetail = () => {
     setSelectedImage(index);
   };
 
-  const handleQuantityChange = (newQuantity) => {
-    if (newQuantity >= 1 && newQuantity <= 10) {
-      setQuantity(newQuantity);
-    }
-  };
+
 
   const handleAddToCart = () => {
-    const productId = product.id || product._id;
+    const productId = product.id;
     if (!productId) {
       console.error('Product ID is required to add to cart');
       return;
     }
     
-    console.log('Adding to cart:', { productId, quantity });
-    dispatch(addToCart({ productId, quantity }));
+    console.log('Adding to cart:', { productId, quantity: localQuantity });
+    dispatch(addToCart({ productId, quantity: localQuantity }))
+      .then((result) => {
+        if (result.meta.requestStatus === 'fulfilled') {
+          setCartMessage('Product added to cart successfully!');
+          setTimeout(() => setCartMessage(''), 3000);
+        } else {
+          setCartMessage('Failed to add product to cart');
+          setTimeout(() => setCartMessage(''), 3000);
+        }
+      });
   };
 
-  const handleBuyNow = () => {
-    console.log('Buy now:', { productId: product.id || product._id, quantity });
-  };
+
 
   const handleWishlist = () => {
     setIsWishlisted(!isWishlisted);
     console.log('Wishlist toggled:', !isWishlisted);
   };
 
+  const handleRemoveFromCart = () => {
+    const productId = product.id;
+    if (!productId) {
+      console.error('Product ID is required to remove from cart');
+      return;
+    }
+    
+    console.log('Removing from cart:', { productId });
+    dispatch(removeFromCart(productId))
+      .then((result) => {
+        if (result.meta.requestStatus === 'fulfilled') {
+          setCartMessage('Product removed from cart successfully!');
+          setTimeout(() => setCartMessage(''), 3000);
+          // Reset local quantity to 1
+          setLocalQuantity(1);
+        } else {
+          setCartMessage('Failed to remove product from cart');
+          setTimeout(() => setCartMessage(''), 3000);
+        }
+      });
+  };
+
+  // Check if product is in cart and get its quantity
+  const getCartItemQuantity = () => {
+    if (!cart || !cart.items) return 0;
+    const productId = product.id;
+    const cartItem = cart.items.find(item => item.productId === productId);
+    return cartItem ? cartItem.quantity : 0;
+  };
+
+  const isProductInCart = () => {
+    return getCartItemQuantity() > 0;
+  };
+
+  // Get current quantity to display (cart quantity or local quantity)
+  const getCurrentQuantity = () => {
+    if (isProductInCart()) {
+      return getCartItemQuantity();
+    }
+    return localQuantity;
+  };
+
+  // Handle quantity change based on whether product is in cart
+  const handleQuantityChange = (newQuantity) => {
+    if (newQuantity >= 1 && newQuantity <= 10) {
+      if (isProductInCart()) {
+                // Update cart quantity
+        const productId = product.id;
+        // Find the cart item ID for this product
+        const cartItem = cart.items.find(item => item.productId === productId);
+        if (cartItem) {
+          dispatch(updateCartItemQuantity({ cartItemId: cartItem._id, quantity: newQuantity }))
+            .then((result) => {
+              if (result.meta.requestStatus === 'fulfilled') {
+                setCartMessage('Cart updated successfully!');
+                setTimeout(() => setCartMessage(''), 3000);
+              } else {
+                setCartMessage('Failed to update cart');
+                setTimeout(() => setCartMessage(''), 3000);
+              }
+            });
+        } else {
+          setCartMessage('Product not found in cart');
+          setTimeout(() => setCartMessage(''), 3000);
+        }
+      } else {
+        // Update local quantity
+        setLocalQuantity(newQuantity);
+      }
+    }
+  };
+
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
 
-  const renderStars = (rating) => {
-    return Array.from({ length: 5 }, (_, index) => (
-      <Star
-        key={index}
-        sx={{
-          fontSize: '1rem',
-          color: index < Math.floor(rating) ? '#ffc107' : '#e0e0e0'
-        }}
-      />
-    ));
-  };
+
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -350,7 +360,7 @@ const ProductDetail = () => {
               overflow: 'auto',
             }}
           >
-            {(product.galleryImage || product.galleryImages || []).map((img, idx) => (
+            {(product.galleryImage || []).map((img, idx) => (
               <Box
                 key={img}
                 onClick={() => setSelectedImage(idx)}
@@ -414,7 +424,7 @@ const ProductDetail = () => {
           >
             <CardMedia
               component="img"
-              image={(product.galleryImage && product.galleryImage[selectedImage]) || (product.galleryImages && product.galleryImages[selectedImage]) || product.thumbnailImage}
+              image={product.galleryImage && product.galleryImage[selectedImage] ? product.galleryImage[selectedImage] : product.thumbnailImage}
               alt={product.name}
               sx={{
                 width: '100%',
@@ -436,25 +446,21 @@ const ProductDetail = () => {
             </Typography>
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-              {product.verified && (
-                <Chip
-                  icon={<Verified />}
-                  label="Verified Seller"
-                  size="small"
-                  sx={{ backgroundColor: 'rgba(76, 175, 80, 0.1)', color: '#4caf50' }}
-                />
-              )}
               <Chip
                 label={product.brandName}
+                size="small"
+                variant="outlined"
+              />
+              <Chip
+                label={product.category}
                 size="small"
                 variant="outlined"
               />
             </Box>
 
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              {renderStars(product.rating)}
-              <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-                {product.rating} ({product.reviews} reviews)
+              <Typography variant="body2" color="text.secondary">
+                Total Orders: {product.totalOrders || 0}
               </Typography>
             </Box>
 
@@ -466,18 +472,15 @@ const ProductDetail = () => {
             </Typography>
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-              {product.fastDelivery && (
-                <Chip
-                  icon={<LocalShipping />}
-                  label="Fast Delivery"
-                  size="small"
-                  sx={{ backgroundColor: 'rgba(33, 150, 243, 0.1)', color: '#1976d2' }}
-                />
-              )}
               <Chip
                 label={product.status === 'approved' ? "In Stock" : "Out of Stock"}
                 size="small"
                 color={product.status === 'approved' ? "success" : "error"}
+              />
+              <Chip
+                label={`Expires: ${product.expiresOn ? new Date(product.expiresOn).toLocaleDateString() : 'N/A'}`}
+                size="small"
+                variant="outlined"
               />
             </Box>
           </Box>
@@ -491,49 +494,92 @@ const ProductDetail = () => {
               <Button
                 variant="outlined"
                 size="small"
-                onClick={() => handleQuantityChange(quantity - 1)}
-                disabled={quantity <= 1}
+                onClick={() => handleQuantityChange(getCurrentQuantity() - 1)}
+                disabled={getCurrentQuantity() <= 1}
               >
                 -
               </Button>
               <Typography variant="h6" sx={{ minWidth: 40, textAlign: 'center' }}>
-                {quantity}
+                {getCurrentQuantity()}
               </Typography>
               <Button
                 variant="outlined"
                 size="small"
-                onClick={() => handleQuantityChange(quantity + 1)}
-                disabled={quantity >= 10}
+                onClick={() => handleQuantityChange(getCurrentQuantity() + 1)}
+                disabled={getCurrentQuantity() >= 10}
               >
                 +
               </Button>
             </Box>
           </Box>
 
+          {/* Cart Message */}
+          {cartMessage && (
+            <Alert 
+              severity={cartMessage.includes('successfully') ? 'success' : 'error'} 
+              sx={{ mb: 2 }}
+              onClose={() => setCartMessage('')}
+            >
+              {cartMessage}
+            </Alert>
+          )}
+
+          {/* Cart Count Display */}
+          {cart && cart.totalItems > 0 && (
+            <Box sx={{ mb: 2, p: 2, bgcolor: 'rgba(25, 118, 210, 0.04)', borderRadius: 2, border: '1px solid rgba(25, 118, 210, 0.2)' }}>
+              <Typography variant="body2" color="primary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <ShoppingCart fontSize="small" />
+                Cart: {cart.totalItems} item{cart.totalItems !== 1 ? 's' : ''} • Total: ₹{cart.totalCost || 0}
+                {isProductInCart() && (
+                  <span style={{ marginLeft: '8px', fontWeight: 'bold' }}>
+                    • This item: {getCartItemQuantity()}
+                  </span>
+                )}
+              </Typography>
+            </Box>
+          )}
+
           {/* Action Buttons */}
           <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-            <Button
-              variant="contained"
-              size="large"
-              startIcon={<ShoppingCart />}
-              onClick={handleAddToCart}
-              disabled={!product.inStock}
-              sx={{ flex: 1 }}
-            >
-              Add to Cart
-            </Button>
+            {isProductInCart() ? (
+              // Product is in cart - show remove button
+              <Button
+                variant="outlined"
+                size="large"
+                color="error"
+                onClick={handleRemoveFromCart}
+                disabled={cartLoading}
+                sx={{ flex: 1 }}
+              >
+                Remove from Cart
+              </Button>
+            ) : (
+              // Product is not in cart - show add button
+              <Button
+                variant="contained"
+                size="large"
+                startIcon={<ShoppingCart />}
+                onClick={handleAddToCart}
+                // disabled={product.status !== 'approved' || cartLoading}
+                sx={{ flex: 1 }}
+              >
+                Add to Cart
+              </Button>
+            )}
           </Box>
 
-          <Button
-            variant="contained"
-            size="large"
-            fullWidth
-            onClick={handleBuyNow}
-            disabled={!product.inStock}
-            sx={{ mb: 3 }}
-          >
-            Buy Now
-          </Button>
+          {/* View Cart Button - Show when product is in cart */}
+          {isProductInCart() && (
+            <Button
+              variant="outlined"
+              size="large"
+              fullWidth
+              onClick={() => navigate('/ecommerceDashboard/cart')}
+              sx={{ mb: 2 }}
+            >
+              View Cart ({cart.totalItems} items)
+            </Button>
+          )}
 
 
 
@@ -552,16 +598,16 @@ const ProductDetail = () => {
             Key Benefits
           </Typography>
           {Array.isArray(product.benefits) ? (
-            <List dense>
-              {product.benefits.map((benefit, index) => (
-                <ListItem key={index} sx={{ py: 0.5 }}>
-                  <ListItemIcon sx={{ minWidth: 32 }}>
-                    <CheckCircle color="success" fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary={benefit} />
-                </ListItem>
-              ))}
-            </List>
+          <List dense>
+            {product.benefits.map((benefit, index) => (
+              <ListItem key={index} sx={{ py: 0.5 }}>
+                <ListItemIcon sx={{ minWidth: 32 }}>
+                  <CheckCircle color="success" fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary={benefit} />
+              </ListItem>
+            ))}
+          </List>
           ) : (
             <Typography variant="body1" sx={{ mb: 2 }}>
               {product.benefits}
