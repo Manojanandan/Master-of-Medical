@@ -138,7 +138,9 @@ const Checkout = () => {
           name: item.Product.name,
           price: parseFloat(item.Product.price),
           quantity: item.quantity,
-          total: parseFloat(item.Product.price) * item.quantity
+          subTotal: parseFloat(item.Product.price) * item.quantity,
+          gst: parseFloat(subTotal) * 0.18,  
+          total: parseFloat(subTotal) + parseFloat(gstAmount)
         })),
         subTotal: subTotal,
         gstAmount: gstAmount,
