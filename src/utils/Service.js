@@ -38,8 +38,16 @@ export const getAllProducts = async(vendorId) =>{
 }
 
 // Get all products (public endpoint without filters)
-export const getAllProductsPublic = async() =>{
-    return await instance.get('product/get-all-product')
+export const getAllProductsPublic = async(params = {}) =>{
+    const queryParams = new URLSearchParams();
+    
+    // Add newArrival parameter if provided
+    if (params.newArrival !== undefined) queryParams.append('newArrival', params.newArrival);
+    
+    const queryString = queryParams.toString();
+    const url = queryString ? `product/get-all-product?${queryString}` : 'product/get-all-product';
+    
+    return await instance.get(url)
 }
 
 export const getProductById = async(productId) =>{

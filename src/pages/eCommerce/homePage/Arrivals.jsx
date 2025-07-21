@@ -33,7 +33,7 @@ const Arrivals = () => {
         const fetchArrivalsData = async () => {
             try {
                 console.log('Fetching arrivals data from API...');
-                const response = await getAllProductsPublic();
+                const response = await getAllProductsPublic({ newArrival: true });
                 console.log('Arrivals API Response:', response);
                 console.log('Arrivals API Response Data:', response.data);
                 console.log('Response data type:', typeof response.data);
