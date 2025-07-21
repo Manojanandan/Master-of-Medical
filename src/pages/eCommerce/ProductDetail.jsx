@@ -38,6 +38,8 @@ import {
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPublicProductById, clearCurrentProduct } from "../../redux/PublicProductReducer";
+import { getProductById } from "../../utils/Service";
+import { addToCart } from "../../redux/CartReducer";
 
 // Static product data with more information
 const staticProduct = {
@@ -114,7 +116,32 @@ const ProductDetail = () => {
   const dispatch = useDispatch();
 
   const { currentProduct, loading, error } = useSelector((state) => state.publicProductReducer);
-  const product = staticProduct;
+  
+  // State for API product data
+  const [apiProduct, setApiProduct] = useState(null);
+  const [apiLoading, setApiLoading] = useState(false);
+  const [apiError, setApiError] = useState(null);
+  
+  // Use API product if available, otherwise fall back to static product
+  const product = apiProduct || currentProduct || staticProduct;
+
+  // Safety check for product data
+  if (!product) {
+    return (
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Button
+          startIcon={<ArrowBack />}
+          onClick={() => navigate('/ecommerceDashboard')}
+          sx={{ mb: 3, color: 'text.secondary' }}
+        >
+          Back to Products
+        </Button>
+        <Alert severity="error" sx={{ mb: 3 }}>
+          Product not found
+        </Alert>
+      </Container>
+    );
+  }
 
   // Local state
   const [selectedImage, setSelectedImage] = useState(0);
@@ -123,13 +150,47 @@ const ProductDetail = () => {
   const [isWishlisted, setIsWishlisted] = useState(false);
 
   useEffect(() => {
-    console.log('Product detail page loaded for ID:', id);
-    console.log('Using static product data:', product);
+    if (id) {
+      dispatch(fetchPublicProductById(id));
+    }
 
     return () => {
       dispatch(clearCurrentProduct());
     };
   }, [dispatch, id]);
+
+  // Call the getProductById API and console log response
+  useEffect(() => {
+    const fetchProductById = async () => {
+      if (id) {
+        try {
+          setApiLoading(true);
+          setApiError(null);
+          console.log('Calling getProductById API with ID:', id);
+          const response = await getProductById(id);
+          console.log('getProductById API Response:', response);
+          console.log('getProductById API Response Data:', response.data);
+          
+          // Extract the actual product data from the nested response structure
+          if (response.data && response.data.success && response.data.data) {
+            const productData = response.data.data;
+            console.log('Extracted product data:', productData);
+            setApiProduct(productData);
+          } else {
+            console.error('Invalid API response structure:', response.data);
+            setApiError(new Error('Invalid API response structure'));
+          }
+        } catch (error) {
+          console.error('Error calling getProductById API:', error);
+          setApiError(error);
+        } finally {
+          setApiLoading(false);
+        }
+      }
+    };
+
+    fetchProductById();
+  }, [id]);
 
   const handleImageChange = (index) => {
     setSelectedImage(index);
@@ -142,11 +203,18 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = () => {
-    console.log('Adding to cart:', { productId: product._id, quantity });
+    const productId = product.id || product._id;
+    if (!productId) {
+      console.error('Product ID is required to add to cart');
+      return;
+    }
+    
+    console.log('Adding to cart:', { productId, quantity });
+    dispatch(addToCart({ productId, quantity }));
   };
 
   const handleBuyNow = () => {
-    console.log('Buy now:', { productId: product._id, quantity });
+    console.log('Buy now:', { productId: product.id || product._id, quantity });
   };
 
   const handleWishlist = () => {
@@ -173,7 +241,25 @@ const ProductDetail = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  if (loading) {
+  // Helper function to parse additionalInformation JSON string
+  const getParsedAdditionalInfo = () => {
+    if (!product.additionalInformation) return {};
+    
+    if (typeof product.additionalInformation === 'string') {
+      try {
+        return JSON.parse(product.additionalInformation);
+      } catch (error) {
+        console.error('Error parsing additionalInformation:', error);
+        return {};
+      }
+    }
+    
+    return product.additionalInformation;
+  };
+
+  const parsedAdditionalInfo = getParsedAdditionalInfo();
+
+  if (loading || apiLoading) { // Combine loading states
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Grid container spacing={4}>
@@ -199,11 +285,18 @@ const ProductDetail = () => {
     );
   }
 
-  if (error) {
+  if (error || apiError) { // Combine error states
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Button
+          startIcon={<ArrowBack />}
+          onClick={() => navigate('/ecommerceDashboard')}
+          sx={{ mb: 3, color: 'text.secondary' }}
+        >
+          Back to Products
+        </Button>
         <Alert severity="error" sx={{ mb: 3 }}>
-          {error.message}
+          {error?.message || apiError?.message || 'Failed to load product details'}
         </Alert>
       </Container>
     );
@@ -214,7 +307,7 @@ const ProductDetail = () => {
       {/* Back to Products Button */}
       <Button
         startIcon={<ArrowBack />}
-        onClick={() => navigate('/products')}
+        onClick={() => navigate('/ecommerceDashboard')}
         sx={{ mb: 3, color: 'text.secondary' }}
       >
         Back to Products
@@ -257,7 +350,7 @@ const ProductDetail = () => {
               overflow: 'auto',
             }}
           >
-            {product.galleryImages.map((img, idx) => (
+            {(product.galleryImage || product.galleryImages || []).map((img, idx) => (
               <Box
                 key={img}
                 onClick={() => setSelectedImage(idx)}
@@ -321,7 +414,7 @@ const ProductDetail = () => {
           >
             <CardMedia
               component="img"
-              image={product.galleryImages[selectedImage]}
+              image={(product.galleryImage && product.galleryImage[selectedImage]) || (product.galleryImages && product.galleryImages[selectedImage]) || product.thumbnailImage}
               alt={product.name}
               sx={{
                 width: '100%',
@@ -369,7 +462,7 @@ const ProductDetail = () => {
               ₹{product.price}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              {product.priceLabel}
+              {product.priceLable || product.priceLabel}
             </Typography>
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
@@ -382,9 +475,9 @@ const ProductDetail = () => {
                 />
               )}
               <Chip
-                label={product.inStock ? "In Stock" : "Out of Stock"}
+                label={product.status === 'approved' ? "In Stock" : "Out of Stock"}
                 size="small"
-                color={product.inStock ? "success" : "error"}
+                color={product.status === 'approved' ? "success" : "error"}
               />
             </Box>
           </Box>
@@ -429,14 +522,6 @@ const ProductDetail = () => {
             >
               Add to Cart
             </Button>
-            <Button
-              variant="outlined"
-              size="large"
-              onClick={handleWishlist}
-              sx={{ minWidth: 56 }}
-            >
-              {isWishlisted ? <Favorite color="error" /> : <FavoriteBorder />}
-            </Button>
           </Box>
 
           <Button
@@ -461,21 +546,27 @@ const ProductDetail = () => {
         {product.description}
       </Typography>
       {/* Benefits */}
-      {product.benefits && product.benefits.length > 0 && (
+      {product.benefits && (
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" sx={{ mb: 2 }}>
             Key Benefits
           </Typography>
-          <List dense>
-            {product.benefits.map((benefit, index) => (
-              <ListItem key={index} sx={{ py: 0.5 }}>
-                <ListItemIcon sx={{ minWidth: 32 }}>
-                  <CheckCircle color="success" fontSize="small" />
-                </ListItemIcon>
-                <ListItemText primary={benefit} />
-              </ListItem>
-            ))}
-          </List>
+          {Array.isArray(product.benefits) ? (
+            <List dense>
+              {product.benefits.map((benefit, index) => (
+                <ListItem key={index} sx={{ py: 0.5 }}>
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    <CheckCircle color="success" fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary={benefit} />
+                </ListItem>
+              ))}
+            </List>
+          ) : (
+            <Typography variant="body1" sx={{ mb: 2 }}>
+              {product.benefits}
+            </Typography>
+          )}
         </Box>
       )}
 
@@ -489,22 +580,22 @@ const ProductDetail = () => {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
               <LocalShipping color="primary" fontSize="small" />
               <Typography variant="body2">
-                {product.shipping.freeShipping ? 'Free Shipping' : 'Shipping charges apply'}
+                {product?.shipping?.freeShipping ? 'Free Shipping' : 'Shipping charges apply'}
               </Typography>
             </Box>
             <Typography variant="body2" color="text.secondary">
-              Delivery: {product.shipping.deliveryTime}
+              Delivery: {product.shipping?.deliveryTime}
             </Typography>
           </Grid>
           <Grid item xs={12} sm={6}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
               <Security color="primary" fontSize="small" />
               <Typography variant="body2">
-                {product.shipping.returnPolicy}
+                {product.shipping?.returnPolicy}
               </Typography>
             </Box>
             <Typography variant="body2" color="text.secondary">
-              Warranty: {product.shipping.warranty}
+              Warranty: {product.shipping?.warranty}
             </Typography>
           </Grid>
         </Grid>
@@ -521,7 +612,7 @@ const ProductDetail = () => {
         <Paper sx={{ p: 3 }}>
           {activeTab === 0 && (
             <Grid container spacing={2}>
-              {Object.entries(product.specifications).map(([key, value]) => (
+              {product?.specifications && Object.entries(product.specifications).map(([key, value]) => (
                 <Grid item xs={12} sm={6} key={key}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 1 }}>
                     <Typography variant="body2" color="text.secondary">
@@ -533,12 +624,19 @@ const ProductDetail = () => {
                   </Box>
                 </Grid>
               ))}
+              {!product?.specifications && (
+                <Grid item xs={12}>
+                  <Typography variant="body2" color="text.secondary">
+                    Specifications not available for this product.
+                  </Typography>
+                </Grid>
+              )}
             </Grid>
           )}
 
           {activeTab === 1 && (
             <Typography variant="body1">
-              {product.additionalInformation?.howToUse || "Usage instructions not available."}
+              {parsedAdditionalInfo['How to Use'] || parsedAdditionalInfo.howToUse || "Usage instructions not available."}
             </Typography>
           )}
 
@@ -550,20 +648,20 @@ const ProductDetail = () => {
                 </Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" color="text.secondary">Shelf Life:</Typography>
-                    <Typography variant="body2">{product.additionalInformation?.shelfLife}</Typography>
+                    <Typography variant="body2" color="text.secondary">Expires On:</Typography>
+                    <Typography variant="body2">{product.expiresOn || 'Not specified'}</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" color="text.secondary">Country:</Typography>
-                    <Typography variant="body2">{product.additionalInformation?.country}</Typography>
+                    <Typography variant="body2" color="text.secondary">Category:</Typography>
+                    <Typography variant="body2">{product.category}</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" color="text.secondary">Manufacturer:</Typography>
-                    <Typography variant="body2">{product.additionalInformation?.manufacturer}</Typography>
+                    <Typography variant="body2" color="text.secondary">Sub Category:</Typography>
+                    <Typography variant="body2">{product.subCategory}</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" color="text.secondary">Warranty:</Typography>
-                    <Typography variant="body2">{product.additionalInformation?.warranty}</Typography>
+                    <Typography variant="body2" color="text.secondary">Status:</Typography>
+                    <Typography variant="body2">{product.status}</Typography>
                   </Box>
                 </Box>
               </Grid>
@@ -572,18 +670,8 @@ const ProductDetail = () => {
                   Safety Information
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {product.additionalInformation?.sideEffects || "No known side effects when used as directed."}
+                  {parsedAdditionalInfo['Side Effects'] || parsedAdditionalInfo.sideEffects || "No known side effects when used as directed."}
                 </Typography>
-                <Box sx={{ mt: 2 }}>
-                  <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                    Certifications:
-                  </Typography>
-                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                    {product.additionalInformation?.certifications?.map((cert, index) => (
-                      <Chip key={index} label={cert} size="small" variant="outlined" />
-                    ))}
-                  </Box>
-                </Box>
               </Grid>
             </Grid>
           )}
@@ -594,7 +682,7 @@ const ProductDetail = () => {
                 What's Included
               </Typography>
               <List>
-                {product.additionalInformation?.packageContents?.map((item, index) => (
+                {parsedAdditionalInfo?.packageContents?.map((item, index) => (
                   <ListItem key={index} sx={{ py: 0.5 }}>
                     <ListItemIcon sx={{ minWidth: 32 }}>
                       <CheckCircle color="success" fontSize="small" />

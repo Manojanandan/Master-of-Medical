@@ -36,7 +36,7 @@ const HomePage = () => {
           </Slider>
         </Box>
       </div>
-      <HeroSection />
+      {/* <HeroSection /> */}
       <Arrivals />
       <FeatureBrands />
       <BestSeller />

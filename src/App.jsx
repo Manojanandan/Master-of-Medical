@@ -17,6 +17,7 @@ import PrivacyPolicy from "./pages/eCommerce/privacyPolicy/PrivacyPolicy.jsx";
 import CookiesPolicy from "./pages/eCommerce/cookiesPolicy/CookiesPolicy.jsx";
 import OrderTracking from "./pages/eCommerce/orderTracking/OrderTracking.jsx";
 import ProductDetail from "./pages/eCommerce/ProductDetail.jsx";
+import CustomerProfile from "./pages/eCommerce/Profile.jsx";
 import VendorLayout from './pages/vendor/dashboard/index.jsx'
 import ProtectedRoute from "./pages/routes/ProtectedRoute.jsx";
 import Overview from "./pages/vendor/pages/Overview.jsx";
@@ -25,6 +26,7 @@ import Profile from "./pages/vendor/pages/Customers.jsx";
 import AddProduct from "./pages/vendor/pages/AddProduct.jsx";
 import VendorProductDetail from "./pages/vendor/pages/ProductDetail.jsx";
 import ForgotPassword from "./pages/login/forgotPassword/ForgotPassword.jsx";
+import ThankYou from "./pages/eCommerce/ThankYou.jsx";
 
 const App = () => {
 
@@ -34,6 +36,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<LandingHomepage />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<LoginForm />} />
         <Route path="/loginform" element={<LoginForm />} />
         <Route path="/details" element={<Details />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
@@ -46,11 +49,13 @@ const App = () => {
           <Route path="/ecommerceDashboard/contact" element={<Contact />} />
           <Route path="/ecommerceDashboard/cart" element={<Cart />} />
           <Route path="/ecommerceDashboard/checkout" element={<Checkout />} />
+          <Route path="/ecommerceDashboard/profile" element={<CustomerProfile />} />
           <Route path="/ecommerceDashboard/faq" element={<FAQ />} />
           <Route path="/ecommerceDashboard/termsofuse" element={<Termsofuse />} />
           <Route path="/ecommerceDashboard/privacyPolicy" element={<PrivacyPolicy />} />
           <Route path="/ecommerceDashboard/cookiesPolicy" element={<CookiesPolicy />} />
           <Route path="/ecommerceDashboard/orderTracking" element={<OrderTracking />} />
+          <Route path="/ecommerceDashboard/thank-you" element={<ThankYou />} />
           {/* </Route> */}
         </Route>
         {/* Vendor Dashboard */}

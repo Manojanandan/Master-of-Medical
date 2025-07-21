@@ -1,121 +1,406 @@
-import { Box, Button, Checkbox, FormControlLabel, FormGroup, Grid, Radio, RadioGroup, TextField, Typography } from '@mui/material'
-import React from 'react'
-import TurnedInNotIcon from '@mui/icons-material/TurnedInNot';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getCart, clearCart, deleteCartItem } from '../../../utils/Service';
+import { getAllAddresses, createOrder } from '../../../utils/Service';
+import { getUserInfoFromToken } from '../../../utils/jwtUtils';
+import './Checkout.css';
 
 const Checkout = () => {
-    return (
-        <React.Fragment>
-            <Box sx={{ height: '70px', width: '95%', margin: '10px auto', display: 'flex', justifyContent: 'space-around', alignItems: 'center', backgroundColor: '#f7f7f7', borderRadius: '10px' }}>
-                <TurnedInNotIcon sx={{ color: 'red', marginLeft: '10px' }} />
-                <TextField fullWidth id="couponCode" size='small' sx={{ margin: '0 1%' }} placeholder='Have a coupon ? Click here to enter your code' />
-            </Box>
-            <Box sx={{ height: 'auto', width: '95%', margin: '2% auto', display: 'flex', justifyContent: 'space-between', }}>
-                <Box sx={{ height: 'auto', width: '930px', padding: '5px 0' }}>
-                    <Typography variant='p' sx={{ fontWeight: 'bold', fontSize: '16px', }}>Billing details</Typography>
-                    <Box sx={{ width: '100%', margin: '10px 0 15px', }}>
-                        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-                            <Grid item size={6}>
-                                <Typography variant='p' sx={{ marginBottom: '10px' }}>First name *</Typography>
-                                <TextField sx={{ margin: '7px 0' }} fullWidth size='small' />
-                            </Grid>
-                            <Grid item size={6} >
-                                <Typography variant='p'>Last name *</Typography>
-                                <TextField sx={{ margin: '7px 0' }} fullWidth size='small' />
-                            </Grid>
-                            <Grid item size={12}>
-                                <Typography variant='p' sx={{ marginBottom: '10px' }}>Company name (optional)</Typography>
-                                <TextField sx={{ margin: '7px 0' }} fullWidth size='small' />
-                            </Grid>
-                            <Grid item size={12}>
-                                <Typography variant='p' sx={{ marginBottom: '10px' }}>Country / Region *</Typography>
-                                <TextField sx={{ margin: '7px 0' }} fullWidth size='small' />
-                            </Grid>
-                            <Grid item size={12}>
-                                <Typography variant='p' sx={{ marginBottom: '10px' }}>Street address *</Typography>
-                                <TextField sx={{ margin: '7px 0' }} fullWidth size='small' />
-                                <TextField sx={{ margin: '7px 0' }} fullWidth size='small' />
-                            </Grid>
-                            <Grid item size={12}>
-                                <Typography variant='p' sx={{ marginBottom: '10px' }}>Town / City *</Typography>
-                                <TextField sx={{ margin: '7px 0' }} fullWidth size='small' />
-                            </Grid>
-                            <Grid item size={12}>
-                                <Typography variant='p' sx={{ marginBottom: '10px' }}>State *</Typography>
-                                <TextField sx={{ margin: '7px 0' }} fullWidth size='small' />
-                            </Grid>
-                            <Grid item size={12}>
-                                <Typography variant='p' sx={{ marginBottom: '10px' }}>Zip Code *</Typography>
-                                <TextField sx={{ margin: '7px 0' }} fullWidth size='small' />
-                            </Grid>
-                            <Grid item size={12}>
-                                <Typography variant='p' sx={{ marginBottom: '10px' }}>Phone *</Typography>
-                                <TextField sx={{ margin: '7px 0' }} fullWidth size='small' />
-                            </Grid>
-                            <Grid item size={12}>
-                                <Typography variant='p' sx={{ marginBottom: '10px' }}>Email address *</Typography>
-                                <TextField sx={{ margin: '7px 0 5px' }} fullWidth size='small' />
-                            </Grid>
-                            <Grid item size={12}>
-                                <FormGroup>
-                                    <FormControlLabel control={<Checkbox />} label="Create an account?" />
-                                    <FormControlLabel sx={{ fontWeight: 'bold' }} control={<Checkbox />} label="Ship to different address?" />
-                                </FormGroup>
-                            </Grid>
-                            <Grid item size={12}>
-                                <Typography variant='p' sx={{ marginBottom: '10px' }}>Order notes (optional)</Typography>
-                                <TextField sx={{ margin: '7px 0 5px' }} fullWidth size='large' />
-                            </Grid>
-                        </Grid>
-                    </Box>
-                </Box>
-                <Box sx={{ height: '100%', width: '390px', border: 'solid 1.5px #2424', padding: '10px 12px', backgroundColor: '#fcfcfc', borderRadius: '10px' }}>
-                    <Typography variant='p' sx={{ fontWeight: 'bold', fontSize: '20px' }}>Your Order</Typography>
-                    <Box sx={{ height: '35px', width: '100%', borderBottom: 'solid 1.5px #2424', margin: '8px 0 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography variant='p' sx={{ fontSize: '18px', color: '#a7adb7' }}>Product</Typography>
-                        <Typography variant='p' sx={{ fontSize: '18px', color: '#a7adb7' }}>Subtotal</Typography>
-                    </Box>
-                    <Box sx={{ height: 'auto', width: '100%', borderBottom: 'solid 1.5px #2424', margin: '10px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Box sx={{ width: '290px', height: 'auto', marginBottom: '8px' }}>Optimum Nutrition (ON) Micronised Creatine Monohydrate for Performance Support * 1</Box>
-                        <Typography variant='p' sx={{ fontSize: '22px', }}>$0.89</Typography>
-                    </Box>
-                    <Box sx={{ height: '35px', width: '100%', borderBottom: 'solid 1.5px #2424', margin: '5px 0 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography variant='p' sx={{ fontSize: '18px', color: '#a7adb7' }}>Subtotal</Typography>
-                        <Typography variant='p' sx={{ fontSize: '22px', }}>$0.89</Typography>
-                    </Box>
-                    <Box sx={{ height: 'auto', width: '100%', borderBottom: 'solid 1.5px #2424', margin: '5px 0 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography variant='p' sx={{ fontSize: '18px', color: '#a7adb7' }}>Shipping :</Typography>
-                        <Box sx={{ height: '80px', width: '200px', }}>
-                            <Typography variant='p' sx={{ fontSize: '20px' }}>Flat rate : $15.00</Typography>
-                            <Radio value="a" name="radioButtons" sx={{ marginTop: '-5px' }} />
-                            <Typography variant='p' sx={{ fontSize: '20px', paddingRight: '21%' }}>Local pickup</Typography>
-                            <Radio value="b" name="radioButtons" sx={{ marginTop: '-5px' }} />
-                        </Box>
-                    </Box>
-                    <Box sx={{ height: '35px', width: '100%', borderBottom: 'solid 1.5px #2424', margin: '5px 0 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography variant='p' sx={{ fontSize: '18px', color: '#a7adb7' }}>Total</Typography>
-                        <Typography variant='p' sx={{ fontSize: '22px', fontWeight: 'bold' }}>$0.89</Typography>
-                    </Box>
-                    <Box sx={{ height: 'auto', width: '100%', margin: '5px 0 10px',  }}>
-                        <RadioGroup  row  name="transferButton" >
-                            <FormControlLabel value="DBT" control={<Radio />} label="Direct Bank Transfer" />
-                        </RadioGroup>
-                        <Typography variant='p' sx={{fontSize:'17px',color:'#a7adb7'}}>Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order will not be shipped untill  the funds have cleared in our account.</Typography>
-                        <RadioGroup name="paymentsButton" sx={{margin:'12px 0'}}>
-                            <FormControlLabel value="CP" control={<Radio />} label="Check Payments" />
-                            <FormControlLabel value="CD" control={<Radio />} label="Cash On Delivery" />
-                        </RadioGroup>
-                        <Typography variant='p' sx={{fontSize:'17px',color:'#a7adb7'}}>Your personal data will be used to process your order,support  your experience thoughout this website, and for other purposes described with <Link to="" sx={{color:'blue !important'}}>privacy policy.</Link></Typography>
-                        <FormGroup sx={{margin:'12px 0'}}>
-                            <FormControlLabel control={<Checkbox />} label="I have read and agree to the website" />
-                            <Link to="" style={{textDecoration:'none'}}>terms and conditions *</Link>
-                        </FormGroup>
-                        <Button variant='contained' sx={{textAlign:'center',margin:'10px 0',width:'100%',textTransform:'capitalize',fontSize:'18px'}}>place your order</Button>
-                    </Box>
-                </Box>
-            </Box>
-        </React.Fragment>
-    )
-}
+  const navigate = useNavigate();
+  
+  // State management
+  const [cart, setCart] = useState(null);
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState(null); // No address selected initially
+  const [termsAccepted, setTermsAccepted] = useState(false); // Terms not accepted initially
+  const [loading, setLoading] = useState(true);
+  const [orderLoading, setOrderLoading] = useState(false);
+  const [clearingCart, setClearingCart] = useState(false);
+  const [error, setError] = useState('');
+  
+  // Get user info from token
+  const user = getUserInfoFromToken();
+  const userId = user?.id;
+  
+  // Also check localStorage as fallback
+  const localToken = localStorage.getItem('token');
+  const localUser = localToken ? JSON.parse(atob(localToken.split('.')[1])) : null;
+  const finalUserId = userId || localUser?.id || localUser?._id;
 
-export default Checkout
+  // Calculate totals
+  const subTotal = cart?.reduce((total, item) => total + (parseFloat(item.Product.price) * item.quantity), 0) || 0;
+  const gstAmount = subTotal * 0.18; // 18% GST
+  const totalCost = subTotal + gstAmount;
+
+  // Check if order can be placed
+  const canPlaceOrder = selectedAddress && termsAccepted && !orderLoading;
+
+  useEffect(() => {
+    if (!finalUserId) {
+      setError('Please login to continue');
+      setLoading(false);
+      return;
+    }
+    
+    fetchData();
+  }, [finalUserId]);
+
+  // Debug selectedAddress changes
+  useEffect(() => {
+    console.log('Selected address changed:', selectedAddress);
+  }, [selectedAddress]);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch cart data
+      const cartResponse = await getCart(finalUserId);
+      console.log('Cart response:', cartResponse.data);
+      if (cartResponse.data.success) {
+        setCart(cartResponse.data.data);
+      }
+      
+      // Fetch addresses
+      const addressesResponse = await getAllAddresses({ customerId: finalUserId });
+      console.log('Addresses response:', addressesResponse.data);
+      if (addressesResponse.data.success) {
+        console.log('Addresses loaded:', addressesResponse.data.data);
+        setAddresses(addressesResponse.data.data);
+      }
+      
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setError('Failed to load checkout data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddressSelect = (address) => {
+    console.log('Address selected:', address);
+    setSelectedAddress(address);
+  };
+
+  const handleTermsChange = (event) => {
+    setTermsAccepted(event.target.checked);
+  };
+
+  const clearUserCart = async () => {
+    setClearingCart(true);
+    try {
+      // Try bulk cart clear first
+      await clearCart(finalUserId);
+      console.log('Cart cleared successfully using bulk clear');
+    } catch (bulkError) {
+      console.log('Bulk clear failed, trying individual item deletion');
+      
+      // Fallback: Clear cart items individually
+      if (cart && cart.length > 0) {
+        try {
+          const deletePromises = cart.map(item => deleteCartItem(item.id));
+          await Promise.all(deletePromises);
+          console.log('Cart cleared successfully using individual deletion');
+        } catch (individualError) {
+          console.error('Failed to clear cart items individually:', individualError);
+        }
+      }
+    } finally {
+      setClearingCart(false);
+    }
+  };
+
+  const handleConfirmOrder = async () => {
+    if (!selectedAddress) {
+      setError('Please select a delivery address');
+      return;
+    }
+    
+    if (!termsAccepted) {
+      setError('Please accept the terms and conditions');
+      return;
+    }
+
+    try {
+      setOrderLoading(true);
+      setError('');
+
+      const orderData = {
+        customerId: finalUserId,
+        customerInfo: {
+          name: user?.name || localUser?.name || 'Customer',
+          email: user?.email || localUser?.email || '',
+          phone: user?.phone || localUser?.phone || '',
+          address: selectedAddress
+        },
+        productInfo: cart.map(item => ({
+          productId: item.Product.id,
+          name: item.Product.name,
+          price: parseFloat(item.Product.price),
+          quantity: item.quantity,
+          total: parseFloat(item.Product.price) * item.quantity
+        })),
+        subTotal: subTotal,
+        gstAmount: gstAmount,
+        totalCost: totalCost,
+        status: 'pending'
+      };
+
+      const response = await createOrder(orderData);
+      
+      if (response.data.success) {
+        // Clear the cart after successful order
+        await clearUserCart();
+        
+        // Navigate to thank you page
+        navigate('/ecommerceDashboard/thank-you');
+      } else {
+        setError('Failed to place order. Please try again.');
+      }
+      
+    } catch (error) {
+      console.error('Error creating order:', error);
+      setError('Failed to place order. Please try again.');
+    } finally {
+      setOrderLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="checkout-loading">
+        <div className="loading-spinner"></div>
+        <h3>Loading checkout details...</h3>
+      </div>
+    );
+  }
+
+  if (!finalUserId) {
+    return (
+      <div className="checkout-error">
+        <div className="error-message">
+          <h3>Please login to continue with checkout</h3>
+          <button className="btn-primary" onClick={() => navigate('/login')}>
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!cart || cart.length === 0) {
+    return (
+      <div className="checkout-error">
+        <div className="error-message">
+          <h3>Your cart is empty</h3>
+          <button className="btn-primary" onClick={() => navigate('/ecommerceDashboard')}>
+            Continue Shopping
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="checkout-container">
+      {/* Header */}
+      <div className="checkout-header">
+        <h1>Checkout</h1>
+        
+        {/* Progress Steps */}
+        <div className="progress-steps">
+          <div className="step completed">
+            <div className="step-icon">🛒</div>
+            <span>Cart</span>
+          </div>
+          <div className="step active">
+            <div className="step-icon">🚚</div>
+            <span>Shipping</span>
+          </div>
+          <div className="step">
+            <div className="step-icon">💳</div>
+            <span>Payment</span>
+          </div>
+        </div>
+      </div>
+
+      {error && (
+        <div className="error-alert">
+          {error}
+        </div>
+      )}
+
+      <div className="checkout-content">
+        {/* Left Column - Address Selection & Payment */}
+        <div className="checkout-left">
+          {/* Address Selection */}
+          <div className="checkout-section">
+            <div className="section-header">
+              <span className="section-icon">📍</span>
+              <h2>Delivery Address</h2>
+            </div>
+            
+            <div className="section-content">
+              {addresses.length === 0 ? (
+                <div className="empty-addresses">
+                  <div className="empty-icon">📍</div>
+                  <h3>No addresses found</h3>
+                  <p>Please add an address to continue with checkout.</p>
+                  <button 
+                    className="btn-secondary" 
+                    onClick={() => navigate('/ecommerceDashboard/profile')}
+                  >
+                    Add Address
+                  </button>
+                </div>
+              ) : (
+                <div className="address-list">
+                  {addresses.map((address, index) => (
+                    <div 
+                      key={address._id || address.id}
+                      className={`address-card ${selectedAddress?._id === address._id || selectedAddress?.id === address.id ? 'selected' : ''}`}
+                      onClick={() => handleAddressSelect(address)}
+                    >
+                      <div className="address-radio">
+                        <input 
+                          type="radio" 
+                          name="address" 
+                          value={address._id || address.id}
+                          checked={selectedAddress?._id === address._id || selectedAddress?.id === address.id}
+                          onChange={() => handleAddressSelect(address)}
+                        />
+                      </div>
+                      <div className="address-content">
+                        <div className="address-header">
+                          <h4>Address {index + 1}</h4>
+                          {selectedAddress?._id === address._id || selectedAddress?.id === address.id && (
+                            <span className="selected-badge">Selected</span>
+                          )}
+                        </div>
+                        <p className="address-line">{address.address}</p>
+                        <p className="address-city">{address.city}, {address.state}</p>
+                        <p className="address-country">{address.country} - {address.postalCode}</p>
+                      </div>
+                      {selectedAddress?._id === address._id || selectedAddress?.id === address.id && (
+                        <div className="address-check">✓</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Payment Method */}
+          <div className="checkout-section">
+            <div className="section-header">
+              <span className="section-icon">💳</span>
+              <h2>Payment Method</h2>
+            </div>
+            
+            <div className="section-content">
+              <div className="payment-option">
+                <input 
+                  type="radio" 
+                  name="payment" 
+                  value="cod" 
+                  defaultChecked 
+                  readOnly
+                />
+                <div className="payment-content">
+                  <h4>Cash on Delivery</h4>
+                  <p>Pay with cash when your order is delivered</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column - Order Summary */}
+        <div className="checkout-right">
+          <div className="order-summary">
+            <div className="section-header">
+              <span className="section-icon">🛒</span>
+              <h2>Order Summary</h2>
+            </div>
+            
+            <div className="section-content">
+              {/* Cart Items */}
+              <div className="cart-items">
+                {cart?.map((item, index) => (
+                  <div key={item.id} className="cart-item">
+                    <div className="item-header">
+                      <h4 className="item-name">{item.Product.name}</h4>
+                      <span className="item-price">₹{(parseFloat(item.Product.price) * item.quantity).toFixed(2)}</span>
+                    </div>
+                    <div className="item-details">
+                      <span className="item-quantity">Qty: {item.quantity}</span>
+                      <span className="item-unit-price">₹{parseFloat(item.Product.price).toFixed(2)} each</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="price-breakdown">
+                <div className="price-row">
+                  <span>Subtotal:</span>
+                  <span>₹{subTotal.toFixed(2)}</span>
+                </div>
+                <div className="price-row">
+                  <span>GST (18%):</span>
+                  <span>₹{gstAmount.toFixed(2)}</span>
+                </div>
+                <div className="price-row total">
+                  <span>Total:</span>
+                  <span>₹{totalCost.toFixed(2)}</span>
+                </div>
+              </div>
+
+              {/* Terms and Conditions */}
+              <div className="terms-section">
+                <label className="terms-checkbox">
+                  <input 
+                    type="checkbox" 
+                    checked={termsAccepted}
+                    onChange={handleTermsChange}
+                  />
+                  <span>I agree to the <a href="#" className="terms-link">terms and conditions</a></span>
+                </label>
+              </div>
+
+              {/* Place Order Button */}
+              <button
+                className={`place-order-btn ${canPlaceOrder ? 'enabled' : 'disabled'}`}
+                onClick={handleConfirmOrder}
+                disabled={!canPlaceOrder || clearingCart}
+              >
+                              {orderLoading ? (
+                <>
+                  <div className="loading-spinner-small"></div>
+                  <span>Processing Order...</span>
+                </>
+              ) : clearingCart ? (
+                <>
+                  <div className="loading-spinner-small"></div>
+                  <span>Clearing Cart...</span>
+                </>
+              ) : (
+                `Place Order - ₹${totalCost.toFixed(2)}`
+              )}
+              </button>
+              
+              {!canPlaceOrder && (
+                <p className="order-hint">
+                  {!selectedAddress ? 'Please select a delivery address' : 
+                   !termsAccepted ? 'Please accept the terms and conditions' : ''}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Checkout;

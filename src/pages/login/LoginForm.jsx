@@ -53,7 +53,7 @@ const LoginForm = () => {
                     navigate("/ecommerceDashboard");
                 }
             }, 1000);
-        } else if (message) {
+        } else if (message && !success) {
             setOpenModal(true);
         }
     }, [success, message, navigate, type]);
@@ -77,9 +77,6 @@ const LoginForm = () => {
 
             dispatch(loginUser({ data: payload, type }))
             setOpenModal(true)
-            if (sessionStorage.getItem("jwt")) {
-                navigate("/vendorDashboard")
-            }
             setAllData({ password: "", email: "" })
 
         }
