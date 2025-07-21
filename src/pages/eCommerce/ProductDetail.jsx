@@ -39,6 +39,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPublicProductById, clearCurrentProduct } from "../../redux/PublicProductReducer";
 import { getProductById } from "../../utils/Service";
+import { addToCart } from "../../redux/CartReducer";
 
 // Static product data with more information
 const staticProduct = {
@@ -202,7 +203,14 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = () => {
-    console.log('Adding to cart:', { productId: product.id || product._id, quantity });
+    const productId = product.id || product._id;
+    if (!productId) {
+      console.error('Product ID is required to add to cart');
+      return;
+    }
+    
+    console.log('Adding to cart:', { productId, quantity });
+    dispatch(addToCart({ productId, quantity }));
   };
 
   const handleBuyNow = () => {

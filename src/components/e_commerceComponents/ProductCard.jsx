@@ -1,10 +1,31 @@
 import React from 'react'
-import { Box, Button, Typography } from '@mui/material'
+import { Box, Button, Typography, IconButton } from '@mui/material'
 import AcUnitIcon from '@mui/icons-material/AcUnit';
 import Star from './Star'
 import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+import { useDispatch, useSelector } from 'react-redux';
+import { addToCart, updateCartItemQuantity, removeFromCart } from '../../redux/CartReducer';
 
-const ProductCard = ({offer,image,badge,title,rating,price,originalPrice,onClick}) => {
+const ProductCard = ({offer,image,badge,title,rating,price,originalPrice,id,onClick}) => {
+  const dispatch = useDispatch();
+  const { loading, items } = useSelector((state) => state.cartReducer);
+
+  // Check if this product is already in the cart
+  const cartItem = items.find(item => item.productId === id);
+  const isInCart = !!cartItem;
+  const currentQuantity = cartItem?.quantity || 0;
+
+  // Debug logging
+  console.log(`ProductCard ${id} - Cart state:`, {
+    productId: id,
+    cartItems: items.length,
+    isInCart,
+    currentQuantity,
+    loading,
+    cartItem
+  });
+
   // Calculate offer percentage if originalPrice is provided
   const calculateOfferPercentage = () => {
     if (!originalPrice || !price) return offer || '0%';
@@ -19,6 +40,42 @@ const ProductCard = ({offer,image,badge,title,rating,price,originalPrice,onClick
   };
 
   const offerPercentage = calculateOfferPercentage();
+
+  const handleAddToCart = (e) => {
+    e.stopPropagation(); // Prevent card click when button is clicked
+    
+    if (!id) {
+      console.error('Product ID is required to add to cart');
+      return;
+    }
+
+    console.log('Adding to cart:', { productId: id, quantity: 1 });
+    dispatch(addToCart({ productId: id, quantity: 1 }));
+  };
+
+  const handleIncreaseQuantity = (e) => {
+    e.stopPropagation();
+    if (cartItem) {
+      const newQuantity = currentQuantity + 1;
+      console.log('Increasing quantity:', { cartItemId: cartItem._id, newQuantity });
+      dispatch(updateCartItemQuantity({ cartItemId: cartItem._id, quantity: newQuantity }));
+    }
+  };
+
+  const handleDecreaseQuantity = (e) => {
+    e.stopPropagation();
+    if (cartItem) {
+      const newQuantity = currentQuantity - 1;
+      if (newQuantity <= 0) {
+        // Remove item from cart if quantity becomes 0
+        console.log('Removing item from cart:', cartItem._id);
+        dispatch(removeFromCart(cartItem._id));
+      } else {
+        console.log('Decreasing quantity:', { cartItemId: cartItem._id, newQuantity });
+        dispatch(updateCartItemQuantity({ cartItemId: cartItem._id, quantity: newQuantity }));
+      }
+    }
+  };
 
   return (
     <React.Fragment>
@@ -60,18 +117,71 @@ const ProductCard = ({offer,image,badge,title,rating,price,originalPrice,onClick
                 </Typography>
               )}
             </Box>
-            <Button 
-              endIcon={<AddIcon />} 
-              variant='outlined' 
-              sx={{width:'80%',borderRadius:'15px',fontWeight:'bold',textTransform:'capitalize'}} 
-              onClick={(e) => {
-                e.stopPropagation(); // Prevent card click when button is clicked
-                // You can add cart functionality here later
-                console.log('Add to cart clicked');
-              }}
-            >
-              Add to cart
-            </Button>
+            
+            {isInCart ? (
+              // Show quantity controls if product is in cart
+              <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                width: '80%',
+                margin: '0 auto'
+              }}>
+                <IconButton 
+                  size="small" 
+                  onClick={handleDecreaseQuantity}
+                  disabled={loading}
+                  sx={{
+                    border: '1px solid #c5225f',
+                    color: '#c5225f',
+                    '&:hover': {
+                      backgroundColor: '#c5225f',
+                      color: 'white'
+                    }
+                  }}
+                >
+                  <RemoveIcon />
+                </IconButton>
+                <Typography 
+                  variant="h6" 
+                  sx={{
+                    minWidth: '30px',
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                    color: '#c5225f'
+                  }}
+                >
+                  {currentQuantity}
+                </Typography>
+                <IconButton 
+                  size="small" 
+                  onClick={handleIncreaseQuantity}
+                  disabled={loading}
+                  sx={{
+                    border: '1px solid #c5225f',
+                    color: '#c5225f',
+                    '&:hover': {
+                      backgroundColor: '#c5225f',
+                      color: 'white'
+                    }
+                  }}
+                >
+                  <AddIcon />
+                </IconButton>
+              </Box>
+            ) : (
+              // Show "Add to cart" button if product is not in cart
+              <Button 
+                endIcon={<AddIcon />} 
+                variant='outlined' 
+                disabled={loading}
+                sx={{width:'80%',borderRadius:'15px',fontWeight:'bold',textTransform:'capitalize'}} 
+                onClick={handleAddToCart}
+              >
+                {loading ? 'Adding...' : 'Add to cart'}
+              </Button>
+            )}
           </Box>
         </Box>
     </React.Fragment>

@@ -42,6 +42,7 @@ import {
   updatePagination, 
   clearFilters 
 } from "../redux/PublicProductReducer";
+import { addToCart, fetchCart, updateCartItemQuantity, removeFromCart } from "../redux/CartReducer";
 
 // Static data for demonstration
 const staticProducts = [
@@ -191,6 +192,8 @@ const Products = () => {
     loading, 
     error 
   } = useSelector((state) => state.publicProductReducer);
+  
+  const { items: cartItems, loading: cartLoading } = useSelector((state) => state.cartReducer);
 
   // Local state
   const [showFilters, setShowFilters] = useState(false);
@@ -215,6 +218,12 @@ const Products = () => {
       ...filters
     }));
   }, [dispatch, pagination.page, pagination.limit, filters]);
+
+  // Fetch cart data when component mounts
+  useEffect(() => {
+    console.log('Fetching cart data in Products component...');
+    dispatch(fetchCart());
+  }, [dispatch]);
 
   const handleProductClick = (productId) => {
     navigate(`/ecommerceDashboard/product/${productId}`);
@@ -600,22 +609,115 @@ const Products = () => {
                     </div>
                     {/* Add your price, rating, chips, and button here as needed */}
                     <div style={{ marginTop: 'auto' }}>
-                      <button
-                        style={{
-                          width: '100%',
-                          padding: '10px 0',
-                          background: '#1976d2',
-                          color: '#fff',
-                          border: 'none',
-                          borderRadius: 4,
-                          fontWeight: 600,
-                          cursor: 'pointer',
-                          marginTop: 12,
-                        }}
-                        disabled={!product.inStock}
-                      >
-                        {product.inStock ? 'Add to Cart' : 'Out of Stock'}
-                      </button>
+                      {(() => {
+                        const cartItem = cartItems.find(item => item.productId === product._id);
+                        const isInCart = !!cartItem;
+                        const currentQuantity = cartItem?.quantity || 0;
+
+                        const handleIncreaseQuantity = (e) => {
+                          e.stopPropagation();
+                          if (cartItem) {
+                            const newQuantity = currentQuantity + 1;
+                            dispatch(updateCartItemQuantity({ cartItemId: cartItem._id, quantity: newQuantity }));
+                          }
+                        };
+
+                        const handleDecreaseQuantity = (e) => {
+                          e.stopPropagation();
+                          if (cartItem) {
+                            const newQuantity = currentQuantity - 1;
+                            if (newQuantity <= 0) {
+                              dispatch(removeFromCart(cartItem._id));
+                            } else {
+                              dispatch(updateCartItemQuantity({ cartItemId: cartItem._id, quantity: newQuantity }));
+                            }
+                          }
+                        };
+
+                        if (isInCart) {
+                          return (
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '10px',
+                              marginTop: 12,
+                            }}>
+                              <button
+                                style={{
+                                  width: 36,
+                                  height: 36,
+                                  background: '#1976d2',
+                                  color: '#fff',
+                                  border: 'none',
+                                  borderRadius: '50%',
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                }}
+                                onClick={handleDecreaseQuantity}
+                                disabled={cartLoading}
+                              >
+                                -
+                              </button>
+                              <span style={{
+                                fontWeight: 600,
+                                fontSize: 16,
+                                minWidth: 30,
+                                textAlign: 'center',
+                              }}>
+                                {currentQuantity}
+                              </span>
+                              <button
+                                style={{
+                                  width: 36,
+                                  height: 36,
+                                  background: '#1976d2',
+                                  color: '#fff',
+                                  border: 'none',
+                                  borderRadius: '50%',
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                }}
+                                onClick={handleIncreaseQuantity}
+                                disabled={cartLoading}
+                              >
+                                +
+                              </button>
+                            </div>
+                          );
+                        } else {
+                          return (
+                            <button
+                              style={{
+                                width: '100%',
+                                padding: '10px 0',
+                                background: '#1976d2',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: 4,
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                                marginTop: 12,
+                              }}
+                              disabled={!product.inStock || cartLoading}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (product.inStock) {
+                                  dispatch(addToCart({ productId: product._id, quantity: 1 }));
+                                }
+                              }}
+                            >
+                              {cartLoading ? 'Adding...' : (product.inStock ? 'Add to Cart' : 'Out of Stock')}
+                            </button>
+                          );
+                        }
+                      })()}
                     </div>
                   </div>
                 </div>

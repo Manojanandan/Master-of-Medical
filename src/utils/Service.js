@@ -79,3 +79,72 @@ export const getPublicProducts = async(params = {}) =>{
 export const getPublicProductById = async(productId) =>{
     return await instance.get(`product/get-product/${productId}`)
 }
+
+// Cart APIs
+export const getCart = async(cartId) =>{
+    return await instance.get(`cart/get-cart/${cartId}`)
+}
+
+export const addCartItem = async(cartData) =>{
+    return await instance.post('cart/add-cart-item', cartData)
+}
+
+export const updateCartItem = async(cartItemId, quantity) =>{
+    return await instance.put(`cart/update-cart-item/${cartItemId}`, { quantity })
+}
+
+export const deleteCartItem = async(cartItemId) =>{
+    return await instance.delete(`cart/delete-cart-item/${cartItemId}`)
+}
+
+export const clearCart = async(cartId) =>{
+    return await instance.delete(`cart/clear-cart/${cartId}`)
+}
+
+// Customer APIs
+export const updateCustomer = async(customerData) =>{
+    return await instance.put('customer/update-customer', customerData)
+}
+
+export const getCustomerById = async(customerId) =>{
+    return await instance.get(`customer/get-customer/${customerId}`)
+}
+
+// Address APIs
+export const getAllAddresses = async(params = {}) =>{
+    const queryParams = new URLSearchParams();
+    
+    // Add query parameters
+    if (params.city) queryParams.append('city', params.city);
+    if (params.state) queryParams.append('state', params.state);
+    if (params.country) queryParams.append('country', params.country);
+    if (params.customerId) queryParams.append('customerId', params.customerId);
+    if (params.page) queryParams.append('page', params.page);
+    if (params.limit) queryParams.append('limit', params.limit);
+    
+    const queryString = queryParams.toString();
+    const url = queryString ? `address/get-all-address?${queryString}` : 'address/get-all-address';
+    
+    return await instance.get(url)
+}
+
+export const getAddressById = async(addressId) =>{
+    return await instance.get(`address/get-address/${addressId}`)
+}
+
+export const createAddress = async(addressData) =>{
+    return await instance.post('address/create-address', addressData)
+}
+
+export const updateAddress = async(addressData) =>{
+    return await instance.put('address/update-address', addressData)
+}
+
+export const deleteAddress = async(addressId) =>{
+    return await instance.delete(`address/delete-address/${addressId}`)
+}
+
+// Order APIs
+export const createOrder = async(orderData) =>{
+    return await instance.post('order/create-order', orderData)
+}

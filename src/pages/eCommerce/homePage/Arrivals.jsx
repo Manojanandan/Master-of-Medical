@@ -4,9 +4,12 @@ import { Box } from '@mui/material'
 import ProductCard from '../../../components/e_commerceComponents/ProductCard'
 import { getAllProductsPublic } from '../../../utils/Service'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { fetchCart } from '../../../redux/CartReducer'
 
 const Arrivals = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [arrivalsData, setArrivalsData] = React.useState([]);
     const [loading, setLoading] = React.useState(true);
     
@@ -18,6 +21,12 @@ const Arrivals = () => {
     const handleProductClick = (productId) => {
         navigate(`/ecommerceDashboard/product/${productId}`);
     };
+    
+    // Fetch cart data when component mounts
+    React.useEffect(() => {
+        console.log('Fetching cart data in Arrivals component...');
+        dispatch(fetchCart());
+    }, [dispatch]);
     
     // Fetch arrivals data from API
     React.useEffect(() => {
@@ -147,6 +156,7 @@ const Arrivals = () => {
                                     rating={e?.rating} 
                                     price={e?.price} 
                                     originalPrice={e?.originalPrice}
+                                    id={e?.id}
                                     onClick={() => handleProductClick(e.id)} 
                                 />
                             )
