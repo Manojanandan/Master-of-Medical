@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import styles from './Profile.module.css';
 import {
   Box,
   List,
@@ -40,7 +41,11 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Tooltip
+  Tooltip,
+  Fade,
+  Grow,
+  Slide,
+  Zoom
 } from '@mui/material';
 import {
   Person as PersonIcon,
@@ -610,6 +615,7 @@ const Profile = () => {
                 startIcon={<EditIcon />}
                 onClick={() => setIsEditing(true)}
                 sx={{ borderRadius: 2, px: 3 }}
+                className={styles.button}
               >
                 Edit Profile
               </Button>
@@ -621,6 +627,7 @@ const Profile = () => {
                   onClick={handleCancel}
                   disabled={loading}
                   sx={{ borderRadius: 2, px: 3 }}
+                  className={styles.button}
                 >
                   Cancel
                 </Button>
@@ -630,6 +637,7 @@ const Profile = () => {
                   onClick={handleSave}
                   disabled={loading}
                   sx={{ borderRadius: 2, px: 3 }}
+                  className={styles.button}
                 >
                   {loading ? 'Saving...' : 'Save Changes'}
                 </Button>
@@ -638,7 +646,8 @@ const Profile = () => {
           </Box>
 
           {/* Profile Form */}
-          <Card sx={{ mb: 3 }}>
+          <Zoom in={true} timeout={800}>
+            <Card sx={{ mb: 3 }} className={styles.card}>
             <CardContent sx={{ p: 4 }}>
               <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
                 <PersonIcon color="primary" />
@@ -653,6 +662,7 @@ const Profile = () => {
                     value={profileData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
                     disabled={!isEditing}
+                    className={styles.inputField}
                     InputProps={{
                       startAdornment: <PersonIcon sx={{ mr: 1, color: 'text.secondary' }} />
                     }}
@@ -697,9 +707,11 @@ const Profile = () => {
               </Grid>
             </CardContent>
           </Card>
+        </Zoom>
 
           {/* Address Information */}
-          <Card>
+          <Zoom in={true} timeout={1000}>
+            <Card className={styles.card}>
             <CardContent sx={{ p: 4 }}>
               <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
                 <HomeIcon color="primary" />
@@ -751,6 +763,7 @@ const Profile = () => {
               </Grid>
             </CardContent>
           </Card>
+        </Zoom>
         </>
       )}
     </Box>
@@ -763,7 +776,8 @@ const Profile = () => {
       </Typography>
 
       {/* Filters and Search */}
-      <Card sx={{ mb: 3 }}>
+      <Slide direction="up" in={true} timeout={600}>
+        <Card sx={{ mb: 3 }} className={styles.filterSection}>
         <CardContent sx={{ p: 3 }}>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} md={4}>
@@ -778,6 +792,7 @@ const Profile = () => {
                     handleSearchSubmit();
                   }
                 }}
+                className={styles.inputField}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -790,6 +805,7 @@ const Profile = () => {
                         size="small"
                         onClick={handleSearchSubmit}
                         disabled={fetchingOrders}
+                        className={styles.button}
                       >
                         Search
                       </Button>
@@ -822,6 +838,7 @@ const Profile = () => {
                 startIcon={<FilterIcon />}
                 onClick={handleSearchSubmit}
                 disabled={fetchingOrders}
+                className={styles.button}
               >
                 Apply Filters
               </Button>
@@ -833,6 +850,7 @@ const Profile = () => {
                 color="secondary"
                 onClick={handleClearFilters}
                 disabled={fetchingOrders}
+                className={styles.button}
               >
                 Clear Filters
               </Button>
@@ -845,9 +863,11 @@ const Profile = () => {
           </Grid>
         </CardContent>
       </Card>
+      </Slide>
 
       {/* Orders Table */}
-      <Card>
+      <Fade in={true} timeout={800}>
+        <Card className={styles.card}>
         <CardContent sx={{ p: 0 }}>
           {fetchingOrders ? (
             <Box sx={{ textAlign: 'center', py: 8 }}>
@@ -893,8 +913,8 @@ const Profile = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {orders.map((order) => (
-                      <TableRow key={order.id} hover>
+                    {orders.map((order, index) => (
+                      <TableRow key={order.id} hover className={styles.tableRow} style={{ animationDelay: `${index * 0.1}s` }}>
                         <TableCell>
                           <Typography variant="body2" sx={{ fontWeight: 500 }}>
                             #{order.id}
@@ -930,6 +950,7 @@ const Profile = () => {
                             color={getStatusColor(order.status)}
                             size="small"
                             sx={{ textTransform: 'capitalize' }}
+                            className={styles.statusChip}
                           />
                         </TableCell>
                         <TableCell>
@@ -963,6 +984,7 @@ const Profile = () => {
                       onClick={() => handleOrderPageChange(1)}
                       disabled={orderPagination.page === 1}
                       size="small"
+                      className={styles.paginationButton}
                     >
                       <FirstPageIcon />
                     </IconButton>
@@ -970,6 +992,7 @@ const Profile = () => {
                       onClick={() => handleOrderPageChange(orderPagination.page - 1)}
                       disabled={orderPagination.page === 1}
                       size="small"
+                      className={styles.paginationButton}
                     >
                       <ArrowBackIcon />
                     </IconButton>
@@ -984,6 +1007,7 @@ const Profile = () => {
                       onClick={() => handleOrderPageChange(orderPagination.page + 1)}
                       disabled={orderPagination.page === orderPagination.totalPages}
                       size="small"
+                      className={styles.paginationButton}
                     >
                       <ArrowForwardIcon />
                     </IconButton>
@@ -991,6 +1015,7 @@ const Profile = () => {
                       onClick={() => handleOrderPageChange(orderPagination.totalPages)}
                       disabled={orderPagination.page === orderPagination.totalPages}
                       size="small"
+                      className={styles.paginationButton}
                     >
                       <LastPageIcon />
                     </IconButton>
@@ -1001,6 +1026,7 @@ const Profile = () => {
           )}
         </CardContent>
       </Card>
+      </Fade>
     </Box>
   );
 
@@ -1049,8 +1075,8 @@ const Profile = () => {
         </Card>
       ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {addresses.map((address, index) => (
-            <Card key={address.id || address._id || index} sx={{ width: '100%' }}>
+                  {addresses.map((address, index) => (
+          <Card key={address.id || address._id || index} sx={{ width: '100%' }} className={`${styles.card} ${styles.staggerItem}`} style={{ animationDelay: `${index * 0.1}s` }}>
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -1062,6 +1088,7 @@ const Profile = () => {
                       size="small"
                       onClick={() => openAddressDialog(address)}
                       sx={{ color: '#1976d2' }}
+                      className={styles.button}
                     >
                       <EditIcon />
                     </IconButton>
@@ -1069,6 +1096,7 @@ const Profile = () => {
                       size="small"
                       onClick={() => handleDeleteAddress(address.id || address._id)}
                       sx={{ color: '#d32f2f' }}
+                      className={styles.button}
                     >
                       <DeleteIcon />
                     </IconButton>
@@ -1138,10 +1166,11 @@ const Profile = () => {
   );
 
   return (
-    <Box sx={{ backgroundColor: '#f5f5f5', minHeight: 'calc(100vh - 200px)' }}>
+    <Box sx={{ backgroundColor: '#f5f5f5', minHeight: 'calc(100vh - 200px)' }} className={styles.profileContainer}>
       <Container maxWidth="xl" sx={{ py: 4 }}>
         {/* User Info Header */}
-        <Card sx={{ mb: 4, p: 3, textAlign: 'center' }}>
+        <Fade in={true} timeout={800}>
+          <Card sx={{ mb: 4, p: 3, textAlign: 'center' }} className={styles.userInfoCard}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
             <Avatar 
               sx={{ 
@@ -1168,11 +1197,13 @@ const Profile = () => {
                 variant="outlined"
               />
             </Box>
-          </Box>
-        </Card>
+                      </Box>
+          </Card>
+        </Fade>
 
         {/* Tabs */}
-        <Card sx={{ mb: 4 }}>
+        <Slide direction="up" in={true} timeout={1000}>
+          <Card sx={{ mb: 4 }} className={styles.tabsCard}>
           <Tabs 
             value={activeTab} 
             onChange={handleTabChange}
@@ -1216,13 +1247,16 @@ const Profile = () => {
             />
           </Tabs>
         </Card>
+        </Slide>
 
         {/* Tab Content */}
-        <Box>
-          {activeTab === 0 && renderProfileContent()}
-          {activeTab === 1 && renderOrdersContent()}
-          {activeTab === 2 && renderAddressesContent()}
-        </Box>
+        <Grow in={true} timeout={1200}>
+          <Box className={styles.contentContainer}>
+                      {activeTab === 0 && renderProfileContent()}
+            {activeTab === 1 && renderOrdersContent()}
+            {activeTab === 2 && renderAddressesContent()}
+          </Box>
+        </Grow>
       </Container>
 
       {/* Address Dialog */}
