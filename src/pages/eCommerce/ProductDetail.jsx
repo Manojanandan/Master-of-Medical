@@ -552,16 +552,16 @@ const ProductDetail = () => {
             Key Benefits
           </Typography>
           {Array.isArray(product.benefits) ? (
-            <List dense>
-              {product.benefits.map((benefit, index) => (
-                <ListItem key={index} sx={{ py: 0.5 }}>
-                  <ListItemIcon sx={{ minWidth: 32 }}>
-                    <CheckCircle color="success" fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary={benefit} />
-                </ListItem>
-              ))}
-            </List>
+          <List dense>
+            {product.benefits.map((benefit, index) => (
+              <ListItem key={index} sx={{ py: 0.5 }}>
+                <ListItemIcon sx={{ minWidth: 32 }}>
+                  <CheckCircle color="success" fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary={benefit} />
+              </ListItem>
+            ))}
+          </List>
           ) : (
             <Typography variant="body1" sx={{ mb: 2 }}>
               {product.benefits}

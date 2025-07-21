@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
+import StatusCheck from "./components/StatusCheck";
 import EcommerceHomePage from "./pages/eCommerce/homePage/HomePage.jsx";
 import Products from "./pages/Products";
 import VendorProducts from "./pages/vendor/pages/Products.jsx";
@@ -32,6 +33,7 @@ const App = () => {
 
   return (
     <>
+      <StatusCheck />
       {/* <Navbar /> */}
       <Routes>
         <Route path="/" element={<LandingHomepage />} />

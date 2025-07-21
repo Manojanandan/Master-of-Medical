@@ -148,3 +148,23 @@ export const deleteAddress = async(addressId) =>{
 export const createOrder = async(orderData) =>{
     return await instance.post('order/create-order', orderData)
 }
+
+export const getAllOrders = async(params = {}) =>{
+    const queryParams = new URLSearchParams();
+    
+    console.log('getAllOrders called with params:', params);
+    
+    // Add query parameters
+    if (params.status) queryParams.append('status', params.status);
+    if (params.customerId) queryParams.append('customerId', params.customerId);
+    if (params.page) queryParams.append('page', params.page);
+    if (params.limit) queryParams.append('limit', params.limit);
+    if (params.search) queryParams.append('search', params.search);
+    
+    const queryString = queryParams.toString();
+    const url = queryString ? `order/get-all-orders?${queryString}` : 'order/get-all-orders';
+    
+    console.log('getAllOrders URL:', url);
+    
+    return await instance.get(url)
+}

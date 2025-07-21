@@ -85,7 +85,6 @@ const LoginForm = () => {
     const handleClose = () => {
         setOpenModal(false);
     }
-    console.log(message);
 
     return (
         <Box sx={{ height: '100vh', width: '100%', backgroundColor: '#f2f3f5', padding: '4% 0' }}>
