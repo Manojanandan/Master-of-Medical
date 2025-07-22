@@ -68,7 +68,7 @@ export const getPublicProducts = async(params = {}) =>{
     
     // Add filter parameters
     if (params.category) queryParams.append('category', params.category);
-    if (params.brand) queryParams.append('brand', params.brand);
+    if (params.brand) queryParams.append('brandName', params.brand); // API expects brandName
     if (params.minPrice) queryParams.append('minPrice', params.minPrice);
     if (params.maxPrice) queryParams.append('maxPrice', params.maxPrice);
     

@@ -17,19 +17,17 @@ import {
   Chip, 
   Skeleton,
   Alert,
-  IconButton,
   InputAdornment,
   Slider,
   Divider,
   Paper
 } from "@mui/material";
+import ProductCard from "../components/e_commerceComponents/ProductCard";
 import { 
   Search, 
   FilterList, 
   Clear, 
   ShoppingCart,
-  Favorite,
-  FavoriteBorder,
   Star,
   LocalShipping,
   Verified
@@ -44,132 +42,9 @@ import {
 } from "../redux/PublicProductReducer";
 import { addToCart, fetchCart, updateCartItemQuantity, removeFromCart } from "../redux/CartReducer";
 
-// Static data for demonstration
-const staticProducts = [
-  {
-    _id: "1",
-    name: "Digital Thermometer Professional Grade Medical Device",
-    description: "High-precision digital thermometer for with advanced features and professional accuracy",
-    price: 299,
-    priceLabel: "MRP",
-    brandName: "MediCare",
-    category: "Diagnostic",
-    thumbnailImage: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop",
-    rating: 4.5,
-    reviews: 128,
-    inStock: true,
-    fastDelivery: true,
-    verified: true
-  },
-  {
-    _id: "2",
-    name: "Blood Pressure Monitor Automatic Digital",
-    description: "Automatic digital blood pressure monitor with detection and memory function",
-    price: 1299,
-    priceLabel: "MRP",
-    brandName: "HealthGuard",
-    category: "Diagnostic",
-    thumbnailImage: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=300&fit=crop",
-    rating: 4.3,
-    reviews: 89,
-    inStock: true,
-    fastDelivery: false,
-    verified: true
-  },
-  {
-    _id: "3",
-    name: "Pulse Oximeter Finger Clip",
-    description: "Finger pulse oximeter for measuring oxygen saturation levels with instant readings",
-    price: 599,
-    priceLabel: "MRP",
-    brandName: "OxyCare",
-    category: "Diagnostic",
-    thumbnailImage: "https://images.unsplash.com/photo-1581595219315-a187dd40c322?w=400&h=300&fit=crop",
-    rating: 4.7,
-    reviews: 156,
-    inStock: true,
-    fastDelivery: true,
-    verified: true
-  },
-  {
-    _id: "4",
-    name: "Stethoscope Professional Medical",
-    description: "Professional grade stethoscope for medical professionals with superior acoustic performance",
-    price: 899,
-    priceLabel: "MRP",
-    brandName: "MediPro",
-    category: "Diagnostic",
-    thumbnailImage: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop",
-    rating: 4.6,
-    reviews: 203,
-    inStock: true,
-    fastDelivery: true,
-    verified: true
-  },
-  {
-    _id: "5",
-    name: "Glucometer Blood Glucose Monitor",
-    description: "Digital blood glucose monitoring system with test strips and memory function",
-    price: 799,
-    priceLabel: "MRP",
-    brandName: "SugarCheck",
-    category: "Diagnostic",
-    thumbnailImage: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=300&fit=crop",
-    rating: 4.4,
-    reviews: 167,
-    inStock: false,
-    fastDelivery: false,
-    verified: true
-  },
-  {
-    _id: "6",
-    name: "First Aid Kit Comprehensive Emergency",
-    description: "Comprehensive first aid kit for emergency situations with all essential medical supplies",
-    price: 449,
-    priceLabel: "MRP",
-    brandName: "SafetyFirst",
-    category: "Emergency",
-    thumbnailImage: "https://images.unsplash.com/photo-1581595219315-a187dd40c322?w=400&h=300&fit=crop",
-    rating: 4.8,
-    reviews: 234,
-    inStock: true,
-    fastDelivery: true,
-    verified: true
-  },
-  {
-    _id: "7",
-    name: "Surgical Mask Disposable Medical",
-    description: "High-quality disposable surgical masks for medical professionals and general use",
-    price: 199,
-    priceLabel: "MRP",
-    brandName: "MediCare",
-    category: "Surgical",
-    thumbnailImage: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop",
-    rating: 4.2,
-    reviews: 89,
-    inStock: true,
-    fastDelivery: true,
-    verified: true
-  },
-  {
-    _id: "8",
-    name: "Dental Mirror Professional",
-    description: "Professional dental mirror for dental examinations and procedures",
-    price: 349,
-    priceLabel: "MRP",
-    brandName: "DentalPro",
-    category: "Dental",
-    thumbnailImage: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=300&fit=crop",
-    rating: 4.1,
-    reviews: 67,
-    inStock: true,
-    fastDelivery: false,
-    verified: true
-  }
-];
 
-const categories = ["All", "Diagnostic", "Emergency", "Surgical", "Pharmaceutical", "Dental"];
-const brands = ["All", "MediCare", "HealthGuard", "OxyCare", "MediPro", "SugarCheck", "SafetyFirst", "DentalPro"];
+const categories = ["All", "Surgical", "Medicine", "Equipment"];
+const brands = ["All", "Sharpedge", "HealPlus", "BPGuard", "AccuListen"];
 const sortOptions = [
   { value: "newest", label: "Newest First" },
   { value: "oldest", label: "Oldest First" },
@@ -206,10 +81,10 @@ const Products = () => {
   });
 
   // Use API data
-  const displayProducts = products.length > 0 ? products : staticProducts;
-  const totalProducts = pagination.total || products.length || staticProducts.length;
+  const displayProducts = products;
+  const totalProducts = pagination.total || products.length;
   const totalPages = pagination.totalPages || Math.ceil(totalProducts / 12);
-
+  
   useEffect(() => {
     // Call the actual API
     dispatch(fetchPublicProducts({
@@ -228,6 +103,8 @@ const Products = () => {
   const handleProductClick = (productId) => {
     navigate(`/ecommerceDashboard/product/${productId}`);
   };
+
+
 
   const handleSearch = (event) => {
     const value = event.target.value;
@@ -258,8 +135,9 @@ const Products = () => {
     }
     setSearchParams(newParams);
     
-    // Dispatch filter update
-    dispatch(updateFilters({ [filterType]: value }));
+    // Dispatch filter update - send empty string for "All" to clear the filter
+    const filterValue = value === 'All' ? '' : value;
+    dispatch(updateFilters({ [filterType]: filterValue }));
   };
 
   const handlePriceRangeChange = (event, newValue) => {
@@ -495,291 +373,123 @@ const Products = () => {
         </Grid>
       ) : (
         <>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-              gap: '24px',
-              width: '100%',
-            }}
-          >
-            {displayProducts.map((product) => {
-              const [wishlisted, setWishlisted] = React.useState(false);
-              return (
-                <div
-                  key={product._id}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    background: '#fff',
-                    borderRadius: 8,
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                    height: '100%',
-                    minWidth: 0,
-                    position: 'relative',
-                    cursor: 'pointer',
-                    transition: 'box-shadow 0.2s',
-                  }}
-                  onClick={() => handleProductClick(product._id)}
-                >
-                  <div
-                    style={{
-                      width: '100%',
-                      height: 180,
-                      minHeight: 180,
-                      maxHeight: 180,
-                      overflow: 'hidden',
-                      borderTopLeftRadius: 8,
-                      borderTopRightRadius: 8,
-                      position: 'relative',
-                    }}
-                  >
-                    <img
-                      src={product.thumbnailImage}
-                      alt={product.name}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        display: 'block',
-                      }}
-                    />
-                    <button
-                      onClick={e => {
-                        e.stopPropagation();
-                        setWishlisted(w => !w);
-                      }}
-                      style={{
-                        position: 'absolute',
-                        top: 10,
-                        right: 10,
-                        background: 'rgba(255,255,255,0.9)',
-                        border: 'none',
-                        borderRadius: '50%',
-                        width: 36,
-                        height: 36,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                        boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-                        zIndex: 2,
-                      }}
-                      aria-label="Add to wishlist"
-                    >
-                      {wishlisted ? (
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="#e53935" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                      ) : (
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e53935" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M12.1 8.64l-.1.1-.11-.11C10.14 6.6 7.1 7.24 5.6 9.28c-1.5 2.04-0.44 5.12 3.4 8.36l1.1.99 1.1-.99c3.84-3.24 4.9-6.32 3.4-8.36-1.5-2.04-4.54-2.68-6.4-.64z"/></svg>
-                      )}
-                    </button>
-                  </div>
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: 16 }}>
-                    <div
-                      style={{
-                        fontWeight: 600,
-                        fontSize: 18,
-                        marginBottom: 8,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        minHeight: '2.6em',
-                        maxHeight: '2.6em',
-                      }}
-                    >
-                      {product.name}
-                    </div>
-                    <div
-                      style={{
-                        color: '#666',
-                        fontSize: 14,
-                        marginBottom: 8,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        minHeight: '2.8em',
-                        maxHeight: '2.8em',
-                      }}
-                    >
-                      {product.description}
-                    </div>
-                    {/* Add your price, rating, chips, and button here as needed */}
-                    <div style={{ marginTop: 'auto' }}>
-                      {(() => {
-                        const cartItem = cartItems.find(item => item.productId === product._id);
-                        const isInCart = !!cartItem;
-                        const currentQuantity = cartItem?.quantity || 0;
+          {displayProducts && displayProducts.length > 0 ? (
+            <Box sx={{
+              display: 'flex',
+              justifyContent: 'flex-start',
+              margin: '1% 3% 1%',
+              width: '95%',
+              flexWrap: 'wrap',
+              gap: '4%'
+            }}>
+              {displayProducts.map((product) => {
+                // Try to find the product ID from various possible field names
+                const productId = product._id || product.id || product.productId || product.product_id;
+                
+                if (!productId) {
+                  console.error('No product ID found for product:', product);
+                  return null; // Skip this product if no ID is found
+                }
+                
+                // Transform product data to match ProductCard expected format based on actual API structure
+                const transformedProduct = {
+                  offer: product.offer || '70%',
+                  image: product.thumbnailImage || product.image || "https://via.placeholder.com/300x200?text=No+Image",
+                  badge: product.badge || product.category?.toLowerCase() || "new arrival",
+                  title: product.name || product.title || "Product Title",
+                  rating: product.rating || '4.0',
+                  price: product.price || '30.00',
+                  originalPrice: product.originalPrice || (parseFloat(product.price || '30.00') * 1.5).toFixed(2),
+                  id: productId,
+                };
 
-                        const handleIncreaseQuantity = (e) => {
-                          e.stopPropagation();
-                          if (cartItem) {
-                            const newQuantity = currentQuantity + 1;
-                            dispatch(updateCartItemQuantity({ cartItemId: cartItem._id, quantity: newQuantity }));
-                          }
-                        };
-
-                        const handleDecreaseQuantity = (e) => {
-                          e.stopPropagation();
-                          if (cartItem) {
-                            const newQuantity = currentQuantity - 1;
-                            if (newQuantity <= 0) {
-                              dispatch(removeFromCart(cartItem._id));
-                            } else {
-                              dispatch(updateCartItemQuantity({ cartItemId: cartItem._id, quantity: newQuantity }));
-                            }
-                          }
-                        };
-
-                        if (isInCart) {
-                          return (
-                            <div style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              gap: '10px',
-                              marginTop: 12,
-                            }}>
-                              <button
-                                style={{
-                                  width: 36,
-                                  height: 36,
-                                  background: '#1976d2',
-                                  color: '#fff',
-                                  border: 'none',
-                                  borderRadius: '50%',
-                                  fontWeight: 600,
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                }}
-                                onClick={handleDecreaseQuantity}
-                                disabled={cartLoading}
-                              >
-                                -
-                              </button>
-                              <span style={{
-                                fontWeight: 600,
-                                fontSize: 16,
-                                minWidth: 30,
-                                textAlign: 'center',
-                              }}>
-                                {currentQuantity}
-                              </span>
-                              <button
-                                style={{
-                                  width: 36,
-                                  height: 36,
-                                  background: '#1976d2',
-                                  color: '#fff',
-                                  border: 'none',
-                                  borderRadius: '50%',
-                                  fontWeight: 600,
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                }}
-                                onClick={handleIncreaseQuantity}
-                                disabled={cartLoading}
-                              >
-                                +
-                              </button>
-                            </div>
-                          );
-                        } else {
-                          return (
-                      <button
-                        style={{
-                          width: '100%',
-                          padding: '10px 0',
-                          background: '#1976d2',
-                          color: '#fff',
-                          border: 'none',
-                          borderRadius: 4,
-                          fontWeight: 600,
-                          cursor: 'pointer',
-                          marginTop: 12,
-                        }}
-                              disabled={!product.inStock || cartLoading}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (product.inStock) {
-                                  dispatch(addToCart({ productId: product._id, quantity: 1 }));
-                                }
-                              }}
-                      >
-                              {cartLoading ? 'Adding...' : (product.inStock ? 'Add to Cart' : 'Out of Stock')}
-                      </button>
-                          );
-                        }
-                      })()}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Pagination - always visible */}
-          <div
-            style={{
+                return (
+                  <ProductCard 
+                    key={productId}
+                    offer={transformedProduct.offer} 
+                    image={transformedProduct.image} 
+                    badge={transformedProduct.badge} 
+                    title={transformedProduct.title} 
+                    rating={transformedProduct.rating} 
+                    price={transformedProduct.price} 
+                    originalPrice={transformedProduct.originalPrice}
+                    id={transformedProduct.id}
+                    onClick={() => handleProductClick(productId)}
+                  />
+                );
+              })}
+            </Box>
+          ) : (
+            <Box sx={{
               display: 'flex',
               justifyContent: 'center',
-              margin: '48px 0 0 0',
-              width: '100%',
               alignItems: 'center',
-              gap: 24,
-            }}
-          >
-            <span
+              minHeight: '400px',
+              width: '100%'
+            }}>
+              <Typography variant="h6" color="text.secondary">
+                No products found. Please try adjusting your filters or check back later.
+              </Typography>
+            </Box>
+          )}
+
+          {/* Pagination - only show when there are products and multiple pages */}
+          {displayProducts && displayProducts.length > 0 && totalPages > 1 && (
+            <div
               style={{
-                fontWeight: 500,
-                color: '#1976d2',
-                fontSize: 18,
-                letterSpacing: 0.5,
-                alignSelf: 'center',
+                display: 'flex',
+                justifyContent: 'center',
+                margin: '48px 0 0 0',
+                width: '100%',
+                alignItems: 'center',
+                gap: 24,
               }}
             >
-              Page {pagination.page} of {totalPages}
-            </span>
-            <Pagination
-              count={totalPages}
-              page={pagination.page}
-              onChange={handlePageChange}
-              color="primary"
-              size="large"
-              siblingCount={1}
-              boundaryCount={1}
-              sx={{
-                '& .MuiPaginationItem-root': {
-                  fontWeight: 600,
+              <span
+                style={{
+                  fontWeight: 500,
+                  color: '#1976d2',
                   fontSize: 18,
-                  borderRadius: '8px',
-                  margin: '0 4px',
-                  transition: 'all 0.2s',
-                  border: '1px solid #e0e7ef',
-                  background: '#fff',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-                  '&:hover': {
-                    background: '#e3e8ee',
-                    color: '#1976d2',
-                    borderColor: '#1976d2',
+                  letterSpacing: 0.5,
+                  alignSelf: 'center',
+                }}
+              >
+                Page {pagination.page} of {totalPages}
+              </span>
+              <Pagination
+                count={totalPages}
+                page={pagination.page}
+                onChange={handlePageChange}
+                color="primary"
+                size="large"
+                siblingCount={1}
+                boundaryCount={1}
+                sx={{
+                  '& .MuiPaginationItem-root': {
+                    fontWeight: 600,
+                    fontSize: 18,
+                    borderRadius: '8px',
+                    margin: '0 4px',
+                    transition: 'all 0.2s',
+                    border: '1px solid #e0e7ef',
+                    background: '#fff',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                    '&:hover': {
+                      background: '#e3e8ee',
+                      color: '#1976d2',
+                      borderColor: '#1976d2',
+                    },
                   },
-                },
-                '& .Mui-selected': {
-                  background: '#1976d2',
-                  color: '#fff',
-                  borderColor: '#1976d2',
-                  boxShadow: '0 2px 8px rgba(25, 118, 210, 0.10)',
-                },
-              }}
-            />
-          </div>
+                  '& .Mui-selected': {
+                    background: '#1976d2',
+                    color: '#fff',
+                    borderColor: '#1976d2',
+                    boxShadow: '0 2px 8px rgba(25, 118, 210, 0.10)',
+                  },
+                }}
+              />
+            </div>
+          )}
         </>
       )}
     </Container>
