@@ -117,8 +117,9 @@
 .checkout-content {
   max-width: 1200px;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  justify-content: space-between;
+  display: flex;
+  /* grid-template-columns: 1fr 1fr; */
   gap: 30px;
 }
 
@@ -461,7 +462,7 @@
 /* Responsive Design */
 @media (max-width: 1024px) {
   .checkout-content {
-    grid-template-columns: 1fr;
+    /* grid-template-columns: 1fr; */
     gap: 20px;
   }
   

@@ -1,4 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { Box, Button, Paper, Typography, CircularProgress, Alert, Card, CardContent , 
+  
+  Divider,
+  FormControl,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  Checkbox,} from '@mui/material'
 import { useNavigate } from 'react-router-dom';
 import { getCart, clearCart, deleteCartItem } from '../../../utils/Service';
 import { getAllAddresses, createOrder } from '../../../utils/Service';
@@ -18,12 +26,19 @@ const Checkout = () => {
   const [clearingCart, setClearingCart] = useState(false);
   const [error, setError] = useState('');
 
+  const [shipping, setShipping] = useState('flat');
+  const [paymentMethod, setPaymentMethod] = useState('bank');
+  const [agreed, setAgreed] = useState(false);
+
+  const subtotal = 0.89;
+  const shippingCost = shipping === 'flat' ? 15.0 : 0;
+  const total = (subtotal + shippingCost).toFixed(2);
   // Get user info from token
   const user = getUserInfoFromToken();
   const userId = user?.id;
 
   // Also check localStorage as fallback
-  // const localToken = localStorage.getItem('token');
+  const localToken = localStorage.getItem('token');
   // const localUser = localToken ? JSON.parse(atob(localToken.split('.')[1])) : null;
   let localUser = null;
   if (localToken) {
@@ -219,10 +234,9 @@ const Checkout = () => {
   return (
     <div className="checkout-container">
       {/* Header */}
-      <div className="checkout-header">
+      {/* <div className="checkout-header">
         <h1>Checkout</h1>
 
-        {/* Progress Steps */}
         <div className="progress-steps">
           <div className="step completed">
             <div className="step-icon">🛒</div>
@@ -237,7 +251,7 @@ const Checkout = () => {
             <span>Payment</span>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {error && (
         <div className="error-alert">
@@ -307,7 +321,7 @@ const Checkout = () => {
           </div>
 
           {/* Payment Method */}
-          <div className="checkout-section">
+          {/* <div className="checkout-section">
             <div className="section-header">
               <span className="section-icon">💳</span>
               <h2>Payment Method</h2>
@@ -328,11 +342,11 @@ const Checkout = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Right Column - Order Summary */}
-        <div className="checkout-right">
+        {/* <div className="checkout-right">
           <div className="order-summary">
             <div className="section-header">
               <span className="section-icon">🛒</span>
@@ -340,7 +354,6 @@ const Checkout = () => {
             </div>
 
             <div className="section-content">
-              {/* Cart Items */}
               <div className="cart-items">
                 {cart?.map((item, index) => (
                   <div key={item.id} className="cart-item">
@@ -371,7 +384,6 @@ const Checkout = () => {
                 </div>
               </div>
 
-              {/* Terms and Conditions */}
               <div className="terms-section">
                 <label className="terms-checkbox">
                   <input
@@ -383,7 +395,6 @@ const Checkout = () => {
                 </label>
               </div>
 
-              {/* Place Order Button */}
               <button
                 className={`place-order-btn ${canPlaceOrder ? 'enabled' : 'disabled'}`}
                 onClick={handleConfirmOrder}
@@ -412,7 +423,155 @@ const Checkout = () => {
               )}
             </div>
           </div>
-        </div>
+        </div> */}
+
+         <Card sx={{ maxWidth: 400, margin: '0 auto', borderRadius: 2 }} className="checkout-right">
+      <CardContent>
+ 
+        <Typography variant="h6" fontWeight="bold" gutterBottom>
+          Your order
+        </Typography>
+
+        {/* Product */}
+        
+                  {/* <div key={item.id} className="cart-item">
+                    <div className="item-header">
+                      <h4 className="item-name">{item.Product.name}</h4>
+                      <span className="item-price">₹{(parseFloat(item.Product.price) * item.quantity).toFixed(2)}</span>
+                    </div>
+                    <div className="item-details">
+                      <span className="item-quantity">Qty: {item.quantity}</span>
+                      <span className="item-unit-price">₹{parseFloat(item.Product.price).toFixed(2)} each</span>
+                    </div>
+                  </div> */}
+             {cart?.map((item, index) => (
+        <Box key={item.id} display="flex" justifyContent="space-between">
+
+        
+          <Typography variant="body2">
+            {item.Product.name}
+          </Typography>
+          <Typography variant="body2" fontWeight="bold">
+            ₹{(parseFloat(item.Product.price) * item.quantity).toFixed(2)}
+          </Typography>
+        </Box>
+                ))}
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* Subtotal */}
+        <Box display="flex" justifyContent="space-between">
+          <Typography variant="body2">Subtotal</Typography>
+          <Typography variant="body2" fontWeight="bold">
+            ₹{totalCost.toFixed(2)}
+          </Typography>
+        </Box>
+
+        {/* Shipping */}
+        {/* <Box mt={2}>
+          <Typography variant="body2" fontWeight="bold" gutterBottom>
+            Shipping:
+          </Typography>
+          <FormControl component="fieldset">
+            <RadioGroup
+              value={shipping}
+              onChange={(e) => setShipping(e.target.value)}
+            >
+              <FormControlLabel
+                value="flat"
+                control={<Radio size="small" />}
+                label="Flat rate: $15.00"
+              />
+              <FormControlLabel
+                value="pickup"
+                control={<Radio size="small" />}
+                label="Local pickup"
+              />
+            </RadioGroup>
+          </FormControl>
+        </Box> */}
+
+        {/* Total */}
+        <Divider sx={{ my: 2 }} />
+        <Box display="flex" justifyContent="space-between">
+          <Typography variant="body2" fontWeight="bold">
+            Total
+          </Typography>
+          <Typography variant="body2" fontWeight="bold">
+            ₹{totalCost.toFixed(2)}
+          </Typography>
+        </Box>
+
+        {/* Payment Methods */}
+        <Box mt={3}>
+          <FormControl component="fieldset">
+            <RadioGroup
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+            >
+              <FormControlLabel
+                value="bank"
+                control={<Radio size="small" />}
+                label={
+                  <Box>
+                    <Typography fontWeight="bold">Direct Bank Transfer</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Make your payment directly into our bank account. Please use your Order ID as
+                      the payment reference. Your order will not be shipped until the funds have
+                      cleared in our account.
+                    </Typography>
+                  </Box>
+                }
+              />
+              <FormControlLabel
+                value="check"
+                control={<Radio size="small" />}
+                label="Check Payments"
+              />
+              <FormControlLabel
+                value="cod"
+                control={<Radio size="small" />}
+                label="Cash On Delivery"
+              />
+            </RadioGroup>
+          </FormControl>
+        </Box>
+
+        {/* Privacy Agreement */}
+        <Box mt={2}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                size="small"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+              />
+            }
+            label={
+              <Typography variant="caption">
+                I have read and agree to the website{" "}
+                <a href="#" style={{ textDecoration: "underline" }}>
+                  terms and conditions
+                </a>
+                .
+              </Typography>
+            }
+          />
+        </Box>
+
+        {/* Place Order Button */}
+        <Button
+          variant="contained"
+          fullWidth
+          sx={{ mt: 2, borderRadius: 2 }}
+                className={`place-order-btn ${canPlaceOrder ? 'enabled' : 'disabled'}`}
+                onClick={handleConfirmOrder}
+                disabled={!canPlaceOrder || clearingCart}
+        >
+          Place order
+        </Button>
+      </CardContent>
+    </Card>
       </div>
     </div>
   );
