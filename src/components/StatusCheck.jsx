@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { LinearProgress, Box, Typography } from '@mui/material';
 import { getUserInfoFromToken, isUserStatusPending } from '../utils/jwtUtils';
 import './StatusCheck.css';
 
@@ -68,6 +69,8 @@ const StatusCheck = () => {
       return;
     }
 
+    console.log('Checking user status...');
+    
     // Use the utility function to check if user status is pending
     if (isUserStatusPending()) {
       // Get user info from token
@@ -89,12 +92,15 @@ const StatusCheck = () => {
       const currentUser = parsedUserData || user;
       
       if (currentUser) {
-        console.log('User status is pending, showing popup for:', currentUser);
+        console.log('✅ User status is pending, showing popup for:', currentUser);
         setUserData(currentUser);
         setShowPopup(true);
+      } else {
+        console.log('❌ No user data found for status check');
       }
     } else {
       // If status is not pending, hide the popup
+      console.log('✅ User status is not pending, hiding popup');
       setShowPopup(false);
     }
   };
@@ -134,6 +140,31 @@ const StatusCheck = () => {
         </div>
         
         <div className="status-popup-content">
+          {/* Progress Bar */}
+          <Box sx={{ mb: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '14px', fontWeight: 500 }}>
+                Account Create Progress
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '14px', fontWeight: 500 }}>
+                50%
+              </Typography>
+            </Box>
+            <LinearProgress 
+              variant="determinate" 
+              value={50} 
+              sx={{
+                height: 8,
+                borderRadius: 4,
+                backgroundColor: '#e0e0e0',
+                '& .MuiLinearProgress-bar': {
+                  borderRadius: 4,
+                  background: 'linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)',
+                }
+              }}
+            />
+          </Box>
+          
           <p>
             Your account is currently pending approval from our admin team. 
             This process usually takes 24-48 hours.

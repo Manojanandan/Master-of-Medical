@@ -114,7 +114,7 @@ const Signup = () => {
                     </Stack>
                     <Stack direction='row'>
                         <FormControlLabel control={<Checkbox checked={checked} onClick={(e) => setChecked(e.target.checked)} />} sx={{ margin: '2% 0% 2% 6%', fontSize: '10px', color: '#837c7c', userSelect: 'none' }} />
-                        <Typography variant='span' sx={{alignItems:'center',margin:'3.5% 0 0',fontWeight:'bold',fontSize:'14px'}} >By creating an account, you agree to the <Link to='#' style={{color:"#009e92",textDecoration:'none',borderBottom:'solid 1.5px #009e92'}}>Terms of use</Link> and <Link to='#' style={{color:"#009e92",textDecoration:'none',borderBottom:'solid 1.5px #009e92'}}>Privacy Policy.</Link> </Typography> 
+                        <Typography variant='span' sx={{alignItems:'center',margin:'3.5% 0 0',fontWeight:'bold',fontSize:'14px'}} >By creating an account, you agree to the <Link to='/ecommerceDashboard/termsofuse' style={{color:"#009e92",textDecoration:'none',borderBottom:'solid 1.5px #009e92'}}>Terms of use</Link> and <Link to='/ecommerceDashboard/privacyPolicy' style={{color:"#009e92",textDecoration:'none',borderBottom:'solid 1.5px #009e92'}}>Privacy Policy.</Link> </Typography> 
                     </Stack>
                     <Stack direction='column'>
                         <Button disabled={!checked} onClick={createAccount} variant='outlined' sx={{ width: '85%', margin: '2% auto 7%', textTransform: 'capitalize', padding: '1%', fontSize: '16px', fontWeight: 'bold' }}>Create an account</Button>
