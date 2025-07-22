@@ -11,6 +11,7 @@ import PngIcon from '../../assets/PngIcon.png';
 import WordIcon from '../../assets/WordIcon.jpg';
 import JpgIcon from '../../assets/JpgIcon.png';
 import { registerVendor, registerCustomer } from './Signup/SignUpReducer';
+import { triggerLoginSuccess } from '../../components/StatusCheck';
 
 const VisuallyHiddenInput = styled('input')({
     clip: 'rect(0 0 0 0)',
@@ -93,6 +94,8 @@ const Details = () => {
         if (success) {
             const jwt = sessionStorage.getItem("jwt");
             if (jwt) {
+                // Trigger login success event to check status immediately
+                triggerLoginSuccess();
                 if (type === "user" || type === "customer") {
                     navigate("/ecommerceDashboard");
                 } else if (type === "vendor") {
