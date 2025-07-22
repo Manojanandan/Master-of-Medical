@@ -15,6 +15,7 @@ import WordIcon from '../../assets/WordIcon.jpg';
 import JpgIcon from '../../assets/JpgIcon.png';
 import { registerVendor, registerCustomer } from './Signup/SignUpReducer';
 import { triggerLoginSuccess } from '../../components/StatusCheck';
+import RegistrationStepper from '../../components/RegistrationStepper';
 
 const VisuallyHiddenInput = styled('input')({
     clip: 'rect(0 0 0 0)',
@@ -294,8 +295,14 @@ const Details = () => {
             <Box sx={{ height: '100%', width: '100%',backgroundColor:'#f2f3f5',padding:'4% 0' }}>
                 <Box sx={{ border: 'solid 1.5px #fff', height: 'auto', margin: '0% auto', backgroundColor: '#fff', borderRadius: '15px', width: '65%' }}>
                     <Stack direction='column'>
-                        <Typography variant='p' sx={{ margin: '2% auto', textTransform: 'capitalize',fontSize:'2rem' }}>{type} Details</Typography>
+                        <Typography variant='p' sx={{ margin: '2% auto', textTransform: 'capitalize',fontSize:'2rem' }}>User Details</Typography>
                     </Stack>
+                    
+                    {/* Registration Stepper */}
+                    <Box sx={{ width: '95%', margin: '0 auto 2%' }}>
+                        <RegistrationStepper currentStep={2} />
+                    </Box>
+                    
                     <Box sx={{ width: '95%', margin: '1% auto', }}>
                         <Grid container columnSpacing={2}>
                             <Grid item size={12} >

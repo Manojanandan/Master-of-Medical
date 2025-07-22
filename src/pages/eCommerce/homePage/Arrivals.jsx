@@ -1,6 +1,6 @@
 import React from 'react'
 import TitleSection from '../../../components/e_commerceComponents/TitleSection'
-import { Box } from '@mui/material'
+import { Box, useTheme, useMediaQuery } from '@mui/material'
 import ProductCard from '../../../components/e_commerceComponents/ProductCard'
 import { getAllProductsPublic } from '../../../utils/Service'
 import { useNavigate } from 'react-router-dom'
@@ -8,6 +8,10 @@ import { useDispatch } from 'react-redux'
 import { fetchCart } from '../../../redux/CartReducer'
 
 const Arrivals = () => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+    
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [arrivalsData, setArrivalsData] = React.useState([]);
@@ -78,48 +82,6 @@ const Arrivals = () => {
         console.log('Arrivals data:', arrivalsData);
     }, [arrivalsData]);
     
-    // Commented out static data - now using API data
-    /*
-    const arrivalsJson =[
-        {
-            offer: '70%',
-            image: "https://www.lifenowhealth.com/cdn/shop/files/Untitled-3_0021_Plantbasedcollagenbuilder.jpg?v=1695386987",
-            badge: "cold sale",
-            title: "Eur Health Planet Based Collagen builder mix fruit",
-            rating: '3.5',
-            price: '30.00',
-            onClick: onClick(),
-        },
-        {
-            offer: '70%',
-            image: "https://www.lifenowhealth.com/cdn/shop/files/Untitled-3_0021_Plantbasedcollagenbuilder.jpg?v=1695386987",
-            badge: "cold sale",
-            title: "Eur Health Planet Based Collagen builder mix fruit",
-            rating: '3.5',
-            price: '30.00',
-            onClick: onClick(),
-        },
-        {
-            offer: '70%',
-            image: "https://www.lifenowhealth.com/cdn/shop/files/Untitled-3_0021_Plantbasedcollagenbuilder.jpg?v=1695386987",
-            badge: "cold sale",
-            title: "Eur Health Planet Based Collagen builder mix fruit",
-            rating: '3.5',
-            price: '30.00',
-            onClick: onClick(),
-        },
-        {
-            offer: '70%',
-            image: "https://www.lifenowhealth.com/cdn/shop/files/Untitled-3_0021_Plantbasedcollagenbuilder.jpg?v=1695386987",
-            badge: "cold sale",
-            title: "Eur Health Planet Based Collagen builder mix fruit",
-            rating: '3.5',
-            price: '30.00',
-            onClick: onClick(),
-        },
-    ]
-    */
-    
     // Transform API data to match ProductCard expected format - limit to 4 products
     const transformedData = arrivalsData
         .slice(0, 4) // Limit to 4 products
@@ -139,9 +101,20 @@ const Arrivals = () => {
     
   return (
     <React.Fragment>
-        <Box sx={{height:'auto',width:'100%',margin:'2% 0',}}>
+        <Box sx={{
+            height: 'auto',
+            width: '100%',
+            margin: isMobile ? '4% 0' : '2% 0',
+        }}>
             <TitleSection title={"New Arrivals"} subTitle={"Don't miss this opportunity at a special discount just for this week."} />
-            <Box sx={{display:'flex',justifyContent:'flex-start',margin: '1% 3% 1%',width:'95%',flexWrap:'wrap',gap:'4%'}}>
+            <Box sx={{
+                display: 'grid',
+                gridTemplateColumns: isMobile ? 'repeat(1, 1fr)' : isTablet ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)',
+                gap: isMobile ? '20px' : '24px',
+                padding: isMobile ? '0 16px' : '0 24px',
+                width: '100%',
+                maxWidth: '100%'
+            }}>
                     {loading ? (
                         <div>Loading arrivals...</div>
                     ) : transformedData.length > 0 ? (
