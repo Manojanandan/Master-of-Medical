@@ -1,6 +1,5 @@
 import React from 'react'
-import { Box, Button, Typography, IconButton } from '@mui/material'
-import AcUnitIcon from '@mui/icons-material/AcUnit';
+import { Box, Button, Typography, IconButton, Chip, useTheme, useMediaQuery } from '@mui/material'
 import Star from './Star'
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
@@ -8,10 +7,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addToCart, updateCartItemQuantity, removeFromCart } from '../../redux/CartReducer';
 
 const ProductCard = ({offer,image,badge,title,rating,price,originalPrice,id,onClick}) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+  
   const dispatch = useDispatch();
   const { loading, items } = useSelector((state) => state.cartReducer);
-
-
 
   // Check if this product is already in the cart
   const cartItem = items.find(item => item.productId === id);
@@ -79,71 +80,184 @@ const ProductCard = ({offer,image,badge,title,rating,price,originalPrice,id,onCl
     }
   };
 
+  // Determine badge color based on badge type
+  const getBadgeColor = (badgeText) => {
+    const text = badgeText?.toLowerCase();
+    if (text?.includes('organic')) return '#4CAF50';
+    if (text?.includes('cold sale')) return '#2196F3';
+    return '#FF9800'; // default orange
+  };
+
   return (
-    <React.Fragment>
         <Box 
           sx={{
-            height:'auto',
-            width:'300px',
-            border:'solid 1.5px #2424',
-            borderRadius:'10px',
-            marginBottom:'1%',
+        width: '100%',
+        height: 'auto',
+        border: '1px solid #e0e0e0',
+        borderRadius: '12px',
+        backgroundColor: '#ffffff',
             cursor: 'pointer',
+        position: 'relative',
+        overflow: 'hidden',
+        transition: 'all 0.3s ease',
             '&:hover': {
-              boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-              transform: 'translateY(-2px)',
-              transition: 'all 0.3s ease'
+          boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+          transform: 'translateY(-4px)',
             }
           }}
           onClick={onClick}
         >
-          <Box sx={{height:'auto',width:'80%',margin:'6% 8% 2%',}}>
-            <Box sx={{width:'50px',padding:'3px 10px',borderRadius:'20px',backgroundColor:'#c5225f',color:'#fff',textAlign:'center'}}>
-              <Typography variant='p' sx={{fontWeight:'bold',fontSize:'12px'}}>{offerPercentage}</Typography>
+      {/* Discount Badge - Top Left */}
+      <Box 
+        sx={{
+          position: 'absolute',
+          top: '12px',
+          left: '12px',
+          backgroundColor: '#ff4444',
+          color: '#ffffff',
+          padding: isMobile ? '2px 6px' : '4px 8px',
+          borderRadius: '4px',
+          fontSize: isMobile ? '10px' : '12px',
+          fontWeight: 'bold',
+          zIndex: 2,
+        }}
+      >
+        {offerPercentage}
             </Box>
-            <Box sx={{height:'80%',width:'70%',margin:'2% auto'}}>
-              <img height='100%' width='100%' src={image} alt={image} />
+
+      {/* Product Image Container */}
+      <Box 
+        sx={{
+          position: 'relative',
+          height: isMobile ? '150px' : '200px',
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: isMobile ? '15px' : '20px',
+        }}
+      >
+        <img 
+          src={image} 
+          alt={title}
+          style={{
+            maxWidth: '100%',
+            maxHeight: '100%',
+            objectFit: 'contain',
+          }}
+        />
             </Box>
-            <Button size='small' variant='contained' startIcon={<AcUnitIcon />} sx={{fontWeight:'bold',borderRadius:'20px',backgroundColor:'skyblue',margin:'5% 0 2%'}}>{badge}</Button>
+
+      {/* Badge below image */}
+      {badge && (
+        <Box sx={{ padding: isMobile ? '0 12px' : '0 16px', marginTop: '8px' }}>
+          <Chip
+            label={badge}
+            size="small"
+            sx={{
+              backgroundColor: getBadgeColor(badge),
+              color: '#ffffff',
+              fontSize: isMobile ? '8px' : '10px',
+              fontWeight: 'bold',
+              height: isMobile ? '18px' : '20px',
+              '& .MuiChip-label': {
+                padding: isMobile ? '0 6px' : '0 8px',
+              }
+            }}
+          />
           </Box>
-          <Box sx={{height:'auto',width:'80%',margin:'1% 8% 6%'}}>
-            <Box sx={{width:'100%',height:'50px'}}>
-              <Typography variant='body1' sx={{fontWeight:'bold',textTransform:'capitalize',textOverflow:'ellipsis',overflow: 'hidden', display: '-webkit-box',  WebkitLineClamp: 2,WebkitBoxOrient: 'vertical'}}>{title}</Typography>
+      )}
+
+      {/* Product Details */}
+      <Box sx={{ padding: isMobile ? '12px' : '16px' }}>
+        {/* Product Title */}
+        <Typography 
+          variant="body2" 
+          sx={{
+            fontWeight: '600',
+            fontSize: isMobile ? '12px' : '14px',
+            lineHeight: '1.3',
+            height: isMobile ? '32px' : '36px',
+            overflow: 'hidden',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            marginBottom: '8px',
+            color: '#333333',
+          }}
+        >
+          {title}
+        </Typography>
+
+        {/* Rating - Fixed to show 4 stars */}
+        <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+          {[...Array(5)].map((_, index) => (
+            <Box
+              key={index}
+              sx={{
+                color: index < 4 ? '#FFD700' : '#e0e0e0',
+                fontSize: isMobile ? '14px' : '16px',
+                marginRight: '1px',
+              }}
+            >
+              ★
             </Box>
-            <Star rating={rating} />
-            <Box sx={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'3%'}}>
-              <Typography variant='h5' sx={{color:'#c5225f',fontWeight:'bold'}}>${price}</Typography>
+          ))}
+        </Box>
+
+        {/* Price Section */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+          <Typography 
+            variant="h6" 
+            sx={{
+              color: '#ff4444',
+              fontWeight: 'bold',
+              fontSize: isMobile ? '16px' : '18px',
+            }}
+          >
+            ₹{price}
+          </Typography>
               {originalPrice && parseFloat(originalPrice) > parseFloat(price) && (
-                <Typography variant='span' sx={{color:'#666',fontSize:'14px',fontWeight:'300',textDecoration:'line-through'}}>
-                  ${originalPrice}
+            <Typography 
+              variant="body2" 
+              sx={{
+                color: '#666666',
+                fontSize: isMobile ? '12px' : '14px',
+                fontWeight: '300',
+                textDecoration: 'line-through',
+              }}
+            >
+              ₹{originalPrice}
                 </Typography>
               )}
             </Box>
             
+        {/* Add to Cart Button */}
             {isInCart ? (
               // Show quantity controls if product is in cart
               <Box sx={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '10px',
-                width: '80%',
-                margin: '0 auto'
+            gap: isMobile ? '8px' : '12px',
+            width: '100%',
               }}>
                 <IconButton 
                   size="small" 
                   onClick={handleDecreaseQuantity}
                   disabled={loading}
                   sx={{
-                    border: '1px solid #c5225f',
-                    color: '#c5225f',
+                border: '1px solid #2196F3',
+                color: '#2196F3',
+                width: isMobile ? '28px' : '32px',
+                height: isMobile ? '28px' : '32px',
                     '&:hover': {
-                      backgroundColor: '#c5225f',
+                  backgroundColor: '#2196F3',
                       color: 'white'
                     }
                   }}
                 >
-                  <RemoveIcon />
+              <RemoveIcon fontSize="small" />
                 </IconButton>
                 <Typography 
                   variant="h6" 
@@ -151,7 +265,8 @@ const ProductCard = ({offer,image,badge,title,rating,price,originalPrice,id,onCl
                     minWidth: '30px',
                     textAlign: 'center',
                     fontWeight: 'bold',
-                    color: '#c5225f'
+                color: '#2196F3',
+                fontSize: isMobile ? '14px' : '16px',
                   }}
                 >
                   {currentQuantity}
@@ -161,24 +276,40 @@ const ProductCard = ({offer,image,badge,title,rating,price,originalPrice,id,onCl
                   onClick={handleIncreaseQuantity}
                   disabled={loading}
                   sx={{
-                    border: '1px solid #c5225f',
-                    color: '#c5225f',
+                border: '1px solid #2196F3',
+                color: '#2196F3',
+                width: isMobile ? '28px' : '32px',
+                height: isMobile ? '28px' : '32px',
                     '&:hover': {
-                      backgroundColor: '#c5225f',
+                  backgroundColor: '#2196F3',
                       color: 'white'
                     }
                   }}
                 >
-                  <AddIcon />
+              <AddIcon fontSize="small" />
                 </IconButton>
               </Box>
             ) : (
               // Show "Add to cart" button if product is not in cart
               <Button 
-                endIcon={<AddIcon />} 
-                variant='outlined' 
+            variant="outlined"
+                endIcon={<AddIcon sx={{ fontSize: isMobile ? 16 : 20 }} />} 
                 disabled={loading}
-                sx={{width:'80%',borderRadius:'15px',fontWeight:'bold',textTransform:'capitalize'}} 
+            sx={{
+              width: '100%',
+              borderRadius: '24px',
+              fontWeight: 'bold',
+              textTransform: 'capitalize',
+              borderColor: '#2196F3',
+              color: '#2196F3',
+              fontSize: isMobile ? '12px' : '14px',
+              padding: isMobile ? '6px 12px' : '8px 16px',
+              '&:hover': {
+                backgroundColor: '#2196F3',
+                color: 'white',
+                borderColor: '#2196F3',
+              }
+            }} 
                 onClick={handleAddToCart}
               >
                 {loading ? 'Adding...' : 'Add to cart'}
@@ -186,7 +317,6 @@ const ProductCard = ({offer,image,badge,title,rating,price,originalPrice,id,onCl
             )}
           </Box>
         </Box>
-    </React.Fragment>
   )
 }
 
