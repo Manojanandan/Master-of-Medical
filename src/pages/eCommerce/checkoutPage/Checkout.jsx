@@ -7,7 +7,7 @@ import './Checkout.css';
 
 const Checkout = () => {
   const navigate = useNavigate();
-  
+
   // State management
   const [cart, setCart] = useState(null);
   const [addresses, setAddresses] = useState([]);
@@ -17,14 +17,27 @@ const Checkout = () => {
   const [orderLoading, setOrderLoading] = useState(false);
   const [clearingCart, setClearingCart] = useState(false);
   const [error, setError] = useState('');
-  
+
   // Get user info from token
   const user = getUserInfoFromToken();
   const userId = user?.id;
-  
+
   // Also check localStorage as fallback
-  const localToken = localStorage.getItem('token');
-  const localUser = localToken ? JSON.parse(atob(localToken.split('.')[1])) : null;
+  // const localToken = localStorage.getItem('token');
+  // const localUser = localToken ? JSON.parse(atob(localToken.split('.')[1])) : null;
+  let localUser = null;
+  if (localToken) {
+    try {
+      const base64Url = localToken.split('.')[1];
+      const base64 = base64Url
+        .replace(/-/g, '+')
+        .replace(/_/g, '/')
+        .padEnd(base64Url.length + (4 - (base64Url.length % 4)) % 4, '=');
+      localUser = JSON.parse(atob(base64));
+    } catch (error) {
+      console.error("Invalid token format:", error);
+    }
+  }
   const finalUserId = userId || localUser?.id || localUser?._id;
 
   // Calculate totals
@@ -41,7 +54,7 @@ const Checkout = () => {
       setLoading(false);
       return;
     }
-    
+
     fetchData();
   }, [finalUserId]);
 
@@ -53,14 +66,14 @@ const Checkout = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch cart data
       const cartResponse = await getCart(finalUserId);
       console.log('Cart response:', cartResponse.data);
       if (cartResponse.data.success) {
         setCart(cartResponse.data.data);
       }
-      
+
       // Fetch addresses
       const addressesResponse = await getAllAddresses({ customerId: finalUserId });
       console.log('Addresses response:', addressesResponse.data);
@@ -68,7 +81,7 @@ const Checkout = () => {
         console.log('Addresses loaded:', addressesResponse.data.data);
         setAddresses(addressesResponse.data.data);
       }
-      
+
     } catch (error) {
       console.error('Error fetching data:', error);
       setError('Failed to load checkout data');
@@ -94,7 +107,7 @@ const Checkout = () => {
       console.log('Cart cleared successfully using bulk clear');
     } catch (bulkError) {
       console.log('Bulk clear failed, trying individual item deletion');
-      
+
       // Fallback: Clear cart items individually
       if (cart && cart.length > 0) {
         try {
@@ -115,7 +128,7 @@ const Checkout = () => {
       setError('Please select a delivery address');
       return;
     }
-    
+
     if (!termsAccepted) {
       setError('Please accept the terms and conditions');
       return;
@@ -139,7 +152,7 @@ const Checkout = () => {
           price: parseFloat(item.Product.price),
           quantity: item.quantity,
           subTotal: parseFloat(item.Product.price) * item.quantity,
-          gst: parseFloat(subTotal) * 0.18,  
+          gst: parseFloat(subTotal) * 0.18,
           total: parseFloat(subTotal) + parseFloat(gstAmount)
         })),
         subTotal: subTotal,
@@ -149,17 +162,17 @@ const Checkout = () => {
       };
 
       const response = await createOrder(orderData);
-      
+
       if (response.data.success) {
         // Clear the cart after successful order
         await clearUserCart();
-        
+
         // Navigate to thank you page
         navigate('/ecommerceDashboard/thank-you');
       } else {
         setError('Failed to place order. Please try again.');
       }
-      
+
     } catch (error) {
       console.error('Error creating order:', error);
       setError('Failed to place order. Please try again.');
@@ -208,7 +221,7 @@ const Checkout = () => {
       {/* Header */}
       <div className="checkout-header">
         <h1>Checkout</h1>
-        
+
         {/* Progress Steps */}
         <div className="progress-steps">
           <div className="step completed">
@@ -241,15 +254,15 @@ const Checkout = () => {
               <span className="section-icon">📍</span>
               <h2>Delivery Address</h2>
             </div>
-            
+
             <div className="section-content">
               {addresses.length === 0 ? (
                 <div className="empty-addresses">
                   <div className="empty-icon">📍</div>
                   <h3>No addresses found</h3>
                   <p>Please add an address to continue with checkout.</p>
-                  <button 
-                    className="btn-secondary" 
+                  <button
+                    className="btn-secondary"
                     onClick={() => navigate('/ecommerceDashboard/profile')}
                   >
                     Add Address
@@ -258,15 +271,15 @@ const Checkout = () => {
               ) : (
                 <div className="address-list">
                   {addresses.map((address, index) => (
-                    <div 
+                    <div
                       key={address._id || address.id}
                       className={`address-card ${selectedAddress?._id === address._id || selectedAddress?.id === address.id ? 'selected' : ''}`}
                       onClick={() => handleAddressSelect(address)}
                     >
                       <div className="address-radio">
-                        <input 
-                          type="radio" 
-                          name="address" 
+                        <input
+                          type="radio"
+                          name="address"
                           value={address._id || address.id}
                           checked={selectedAddress?._id === address._id || selectedAddress?.id === address.id}
                           onChange={() => handleAddressSelect(address)}
@@ -299,14 +312,14 @@ const Checkout = () => {
               <span className="section-icon">💳</span>
               <h2>Payment Method</h2>
             </div>
-            
+
             <div className="section-content">
               <div className="payment-option">
-                <input 
-                  type="radio" 
-                  name="payment" 
-                  value="cod" 
-                  defaultChecked 
+                <input
+                  type="radio"
+                  name="payment"
+                  value="cod"
+                  defaultChecked
                   readOnly
                 />
                 <div className="payment-content">
@@ -325,7 +338,7 @@ const Checkout = () => {
               <span className="section-icon">🛒</span>
               <h2>Order Summary</h2>
             </div>
-            
+
             <div className="section-content">
               {/* Cart Items */}
               <div className="cart-items">
@@ -361,8 +374,8 @@ const Checkout = () => {
               {/* Terms and Conditions */}
               <div className="terms-section">
                 <label className="terms-checkbox">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={termsAccepted}
                     onChange={handleTermsChange}
                   />
@@ -376,25 +389,25 @@ const Checkout = () => {
                 onClick={handleConfirmOrder}
                 disabled={!canPlaceOrder || clearingCart}
               >
-                              {orderLoading ? (
-                <>
-                  <div className="loading-spinner-small"></div>
-                  <span>Processing Order...</span>
-                </>
-              ) : clearingCart ? (
-                <>
-                  <div className="loading-spinner-small"></div>
-                  <span>Clearing Cart...</span>
-                </>
-              ) : (
-                `Place Order - ₹${totalCost.toFixed(2)}`
-              )}
+                {orderLoading ? (
+                  <>
+                    <div className="loading-spinner-small"></div>
+                    <span>Processing Order...</span>
+                  </>
+                ) : clearingCart ? (
+                  <>
+                    <div className="loading-spinner-small"></div>
+                    <span>Clearing Cart...</span>
+                  </>
+                ) : (
+                  `Place Order - ₹${totalCost.toFixed(2)}`
+                )}
               </button>
-              
+
               {!canPlaceOrder && (
                 <p className="order-hint">
-                  {!selectedAddress ? 'Please select a delivery address' : 
-                   !termsAccepted ? 'Please accept the terms and conditions' : ''}
+                  {!selectedAddress ? 'Please select a delivery address' :
+                    !termsAccepted ? 'Please accept the terms and conditions' : ''}
                 </p>
               )}
             </div>

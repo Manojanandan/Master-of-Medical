@@ -1,8 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { getUserInfoFromToken, isUserStatusPending } from '../utils/jwtUtils';
 import './StatusCheck.css';
 
+// Custom event for login success
+const LOGIN_SUCCESS_EVENT = 'loginSuccess';
+
+// Utility function to trigger login success event
+export const triggerLoginSuccess = () => {
+  window.dispatchEvent(new CustomEvent(LOGIN_SUCCESS_EVENT));
+};
+
 const StatusCheck = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [showPopup, setShowPopup] = useState(false);
   const [userData, setUserData] = useState(null);
 
@@ -14,10 +25,49 @@ const StatusCheck = () => {
       checkUserStatus();
     }, 30000);
     
-    return () => clearInterval(interval);
+    // Listen for login success events
+    const handleLoginSuccess = () => {
+      console.log('Login success event received, checking status immediately');
+      setTimeout(() => {
+        checkUserStatus();
+      }, 100); // Small delay to ensure user data is stored
+    };
+    
+    window.addEventListener(LOGIN_SUCCESS_EVENT, handleLoginSuccess);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener(LOGIN_SUCCESS_EVENT, handleLoginSuccess);
+    };
   }, []);
 
+  // Monitor route changes and hide popup on profile pages
+  useEffect(() => {
+    if (isProfilePage()) {
+      console.log('Route changed to profile page, hiding status popup');
+      setShowPopup(false);
+    } else {
+      // If not on profile page, check status again
+      checkUserStatus();
+    }
+  }, [location.pathname]);
+
+  // Check if current route is a profile page
+  const isProfilePage = () => {
+    const currentPath = location.pathname;
+    return currentPath.includes('/profile') || 
+           currentPath.includes('/vendorDashboard/profile') || 
+           currentPath.includes('/ecommerceDashboard/profile');
+  };
+
   const checkUserStatus = () => {
+    // Don't show popup if user is on profile page
+    if (isProfilePage()) {
+      console.log('User is on profile page, not showing status popup');
+      setShowPopup(false);
+      return;
+    }
+
     // Use the utility function to check if user status is pending
     if (isUserStatusPending()) {
       // Get user info from token
@@ -58,6 +108,19 @@ const StatusCheck = () => {
     window.location.href = '/login';
   };
 
+  const handleEditProfile = () => {
+    // Close the popup
+    setShowPopup(false);
+    
+    // Navigate to profile page based on user type
+    const userType = sessionStorage.getItem('userType');
+    if (userType === 'vendor') {
+      navigate('/vendorDashboard/profile');
+    } else {
+      navigate('/ecommerceDashboard/profile');
+    }
+  };
+
   if (!showPopup) {
     return null;
   }
@@ -94,14 +157,17 @@ const StatusCheck = () => {
           <div className="status-info">
             <h4>What happens next?</h4>
             <ul>
-              <li>Our admin team will review your account</li>
-              <li>You'll receive an email notification once approved</li>
-              <li>You can then access all features of the platform</li>
+              <li>Our admin team will review your account and verify</li>
+              <li>You'll receive an approval status within 24-48 hours</li>
+              <li>Once approved, you can access all features of the platform</li>
             </ul>
           </div>
         </div>
         
         <div className="status-popup-actions">
+          <button className="btn-primary" onClick={handleEditProfile}>
+            Edit Profile
+          </button>
           <button className="btn-secondary" onClick={handleLogout}>
             Logout
           </button>

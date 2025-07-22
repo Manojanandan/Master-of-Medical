@@ -11,6 +11,8 @@ const ProductCard = ({offer,image,badge,title,rating,price,originalPrice,id,onCl
   const dispatch = useDispatch();
   const { loading, items } = useSelector((state) => state.cartReducer);
 
+
+
   // Check if this product is already in the cart
   const cartItem = items.find(item => item.productId === id);
   const isInCart = !!cartItem;
@@ -45,7 +47,7 @@ const ProductCard = ({offer,image,badge,title,rating,price,originalPrice,id,onCl
     e.stopPropagation(); // Prevent card click when button is clicked
     
     if (!id) {
-      console.error('Product ID is required to add to cart');
+      console.error('Product ID is required to add to cart. Product:', { title, id });
       return;
     }
 
