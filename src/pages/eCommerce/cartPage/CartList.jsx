@@ -1,5 +1,12 @@
-import { Box, Button, Paper, Typography, CircularProgress, Alert } from '@mui/material'
-import React, { useEffect, useCallback } from 'react'
+import { Box, Button, Paper, Typography, CircularProgress, Alert, Card, CardContent , 
+  
+  Divider,
+  FormControl,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  Checkbox,} from '@mui/material'
+import React, { useEffect, useCallback, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import AddIcon from '@mui/icons-material/Add';
@@ -9,6 +16,13 @@ import { fetchCart, updateCartItemQuantity, removeFromCart } from '../../../redu
 const CartList = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+  const [shipping, setShipping] = useState('flat');
+  const [paymentMethod, setPaymentMethod] = useState('bank');
+  const [agreed, setAgreed] = useState(false);
+
+  const subtotal = 0.89;
+  const shippingCost = shipping === 'flat' ? 15.0 : 0;
+  const total = (subtotal + shippingCost).toFixed(2);
     const { items, totalItems, totalAmount, loading, error } = useSelector((state) => state.cartReducer);
     const [localItems, setLocalItems] = React.useState([]);
     const [localTotals, setLocalTotals] = React.useState({ totalItems: 0, totalAmount: 0 });
@@ -103,7 +117,7 @@ const CartList = () => {
                     <Box sx={{ height: '150px', width: '200px', margin: '7% auto' }}>
                         <img height='150px' width='200px' src='https://www.svgrepo.com/show/17356/empty-cart.svg' alt='' />
                     </Box>
-                    <Box sx={{ width: '400px', border: 'solid 1px black', margin: '0 auto', textAlign: 'center', color: 'red', padding: '5px 0', fontWeight: 'bold', fontSize: '14px' }}>
+                    <Box sx={{ width: '400px', margin: '0 auto', textAlign: 'center', color: 'red', padding: '5px 0', fontWeight: 'bold', fontSize: '14px' }}>
                         YOUR CART IS CURRENTLY EMPTY
                     </Box>
                     <Box sx={{ height: 'auto', width: '140px', margin: '3% auto' }}>
@@ -125,13 +139,13 @@ const CartList = () => {
     const displayTotals = localTotals.totalItems > 0 ? localTotals : { totalItems, totalAmount };
 
     return (
-        <div style={{ height: '100%', width: '100%', display: 'flex', justifyContent: 'center', padding: '2% 0 3% 3%' }}>
+        <div style={{ height: '100%', width: '100%', display: 'flex', justifyContent: 'space-evenly', padding: '2% 3%', gap: "20px" }}>
             
-            <Box sx={{ height: 'auto', width: '1000px', }}>
+            <Card sx={{ height: 'auto', width: '65%', }}>
                 <Paper elevation={3}>
                     <Typography variant='h5' sx={{ fontWeight: 'bold', padding: '2% 2% 0' }}>Shopping Cart</Typography>
                     <Box sx={{ height: 'auto', width: '97%', borderBottom: 'solid 1px #2424', display: 'flex', justifyContent: 'space-between', margin: '0 2%', padding: '0.5% 0' }}>
-                        <Typography variant='p' sx={{marginRight:'2%'}}>Price</Typography>
+                        {/* <Typography variant='p' sx={{marginRight:'2%'}}>Price</Typography> */}
                     </Box>
                     
                     {displayItems.map((item, index) => (
@@ -166,7 +180,7 @@ const CartList = () => {
                                                 onClick={() => handleQuantityChange(item._id, item.quantity, 1)}
                                             />
                                         </Box>
-                                        <Box sx={{width:'80px',height:'25px',borderLeft:'solid 1px black',paddingLeft:'10px',margin:'8px 0 5px 12px'}}>
+                                        {/* <Box sx={{width:'80px',height:'25px',borderLeft:'solid 1px black',paddingLeft:'10px',margin:'8px 0 5px 12px'}}>
                                             <Link 
                                                 to='' 
                                                 style={{textDecoration:'none'}}
@@ -178,12 +192,12 @@ const CartList = () => {
                                                 Delete
                                             </Link>
                                         </Box>
-                                        <Box sx={{width:'130px',height:'20px',borderLeft:'solid 1px black',paddingLeft:'10px',margin:'10px 0 5px'}}>
+                                         <Box sx={{width:'130px',height:'20px',borderLeft:'solid 1px black',paddingLeft:'10px',margin:'10px 0 5px'}}>
                                             <Link to='' style={{textDecoration:'none'}}>Save for later</Link>
                                         </Box>
                                         <Box sx={{width:'100px',height:'20px',borderLeft:'solid 1px black',paddingLeft:'10px',margin:'10px 0 5px'}}>
                                             <Link to='' style={{textDecoration:'none'}}>Share</Link>
-                                        </Box>
+                                        </Box> */}
                                     </Box>
                                 </Box>
                                 <Box sx={{height:'100%',width:'200px',textAlign:'right'}}>
@@ -203,8 +217,8 @@ const CartList = () => {
                         </Box>
                     </Box>
                 </Paper>
-            </Box>
-            <Box sx={{ height: '300px', width: '300px', margin: '0 3%' }}>
+            </Card>
+            {/* <Box sx={{ height: '300px', width: '300px', margin: '0 3%' }}>
                <Paper elevation={3}>
                     <Box sx={{fontSize:'20px',padding:'10px 15px'}}>
                         <Typography variant='p' >Subtotal ({displayTotals.totalItems} items) :</Typography><br />
@@ -219,7 +233,143 @@ const CartList = () => {
                         </Button>
                     </Box>
                 </Paper>
-            </Box>
+            </Box> */}
+
+             <Card sx={{ maxWidth: 400, margin: '0 auto', borderRadius: 2 }}>
+      <CardContent>
+                    <Typography variant='h5' sx={{ fontWeight: 'bold', padding: '0%' }}>Cart Summary</Typography>
+
+        <Divider sx={{ my: 2 }} />
+        {/* Product */}
+        <Box display="flex" justifyContent="space-between">
+          <Typography variant="body2">
+            Optimum Nutrition (ON) Micronised Creatine Monohydrate for Performance Support × 1
+          </Typography>
+          <Typography variant="body2" fontWeight="bold">
+            $0.89
+          </Typography>
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* Subtotal */}
+        <Box display="flex" justifyContent="space-between">
+          <Typography variant="body2">Subtotal</Typography>
+          <Typography variant="body2" fontWeight="bold">
+            $0.89
+          </Typography>
+        </Box>
+
+        <Box display="flex" justifyContent="space-between">
+          <Typography variant="body2">GST</Typography>
+          <Typography variant="body2" fontWeight="bold">
+            $0.89
+          </Typography>
+        </Box>
+        {/* Shipping */}
+        {/* <Box mt={2}>
+          <Typography variant="body2" fontWeight="bold" gutterBottom>
+            Shipping:
+          </Typography>
+          <FormControl component="fieldset">
+            <RadioGroup
+              value={shipping}
+              onChange={(e) => setShipping(e.target.value)}
+            >
+              <FormControlLabel
+                value="flat"
+                control={<Radio size="small" />}
+                label="Flat rate: $15.00"
+              />
+              <FormControlLabel
+                value="pickup"
+                control={<Radio size="small" />}
+                label="Local pickup"
+              />
+            </RadioGroup>
+          </FormControl>
+        </Box> */}
+
+        {/* Total */}
+        <Divider sx={{ my: 2 }} />
+        <Box display="flex" justifyContent="space-between">
+          <Typography variant="body2" fontWeight="bold">
+            Total
+          </Typography>
+          <Typography variant="body2" fontWeight="bold">
+            ${total}
+          </Typography>
+        </Box>
+
+        {/* Payment Methods */}
+        {/* <Box mt={3}>
+          <FormControl component="fieldset">
+            <RadioGroup
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+            >
+              <FormControlLabel
+                value="bank"
+                control={<Radio size="small" />}
+                label={
+                  <Box>
+                    <Typography fontWeight="bold">Direct Bank Transfer</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Make your payment directly into our bank account. Please use your Order ID as
+                      the payment reference. Your order will not be shipped until the funds have
+                      cleared in our account.
+                    </Typography>
+                  </Box>
+                }
+              />
+              <FormControlLabel
+                value="check"
+                control={<Radio size="small" />}
+                label="Check Payments"
+              />
+              <FormControlLabel
+                value="cod"
+                control={<Radio size="small" />}
+                label="Cash On Delivery"
+              />
+            </RadioGroup>
+          </FormControl>
+        </Box> */}
+
+        {/* Privacy Agreement */}
+        {/* <Box mt={2}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                size="small"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+              />
+            }
+            label={
+              <Typography variant="caption">
+                I have read and agree to the website{" "}
+                <a href="#" style={{ textDecoration: "underline" }}>
+                  terms and conditions
+                </a>
+                .
+              </Typography>
+            }
+          />
+        </Box> */}
+
+        {/* Place Order Button */}
+        <Button
+          variant="contained"
+          fullWidth
+          sx={{ mt: 2, borderRadius: 2 }}
+                            onClick={()=>navigate('/ecommerceDashboard/checkout')}
+                            disabled={displayTotals.totalItems === 0}
+        >
+          Place order
+        </Button>
+      </CardContent>
+    </Card>
         </div>
     )
 }

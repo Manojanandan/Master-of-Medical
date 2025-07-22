@@ -80,6 +80,7 @@ import {
   deleteAddress,
   getAllOrders
 } from '../../utils/Service';
+import Sidebar from '../Sidebar';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -1167,10 +1168,15 @@ const Profile = () => {
 
   return (
     <Box sx={{ backgroundColor: '#f5f5f5', minHeight: 'calc(100vh - 200px)' }} className={styles.profileContainer}>
+      
+      
       <Container maxWidth="xl" sx={{ py: 4 }}>
         {/* User Info Header */}
+        
         <Fade in={true} timeout={800}>
+        
           <Card sx={{ mb: 4, p: 3, textAlign: 'center' }} className={styles.userInfoCard}>
+          
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
             <Avatar 
               sx={{ 
@@ -1266,6 +1272,7 @@ const Profile = () => {
         maxWidth="sm"
         fullWidth
       >
+      
         <DialogTitle>
           {editingAddress ? 'Edit Address' : 'Add New Address'}
         </DialogTitle>
