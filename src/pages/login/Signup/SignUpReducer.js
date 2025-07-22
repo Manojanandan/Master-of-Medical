@@ -51,7 +51,20 @@ export const signUpReducer = createSlice({
                 state.createUser.type = action.payload.type;
                 state.success = action.payload.success;
                 state.message = "Vendor created successfully";
-                sessionStorage.setItem("jwt", action.payload.accessToken);                
+                sessionStorage.setItem("jwt", action.payload.accessToken);
+                
+                // Store user data with status for status check
+                if (action.payload.data) {
+                    const userData = {
+                        id: action.payload.data.id,
+                        name: action.payload.data.name,
+                        email: action.payload.data.email,
+                        phone: action.payload.data.phone,
+                        status: action.payload.data.status,
+                        userType: sessionStorage.getItem("userType")
+                    };
+                    sessionStorage.setItem("userData", JSON.stringify(userData));
+                }
             })
             .addCase(registerVendor.rejected, (state, action) => {
                 state.loader = false;
@@ -75,7 +88,20 @@ export const signUpReducer = createSlice({
                 state.createUser.type = action.payload.type;
                 state.success = action.payload.success;
                 state.message = "Customer created successfully";
-                sessionStorage.setItem("jwt", action.payload.accessToken);                
+                sessionStorage.setItem("jwt", action.payload.accessToken);
+                
+                // Store user data with status for status check
+                if (action.payload.data) {
+                    const userData = {
+                        id: action.payload.data.id,
+                        name: action.payload.data.name,
+                        email: action.payload.data.email,
+                        phone: action.payload.data.phone,
+                        status: action.payload.data.status,
+                        userType: sessionStorage.getItem("userType")
+                    };
+                    sessionStorage.setItem("userData", JSON.stringify(userData));
+                }
             })
             .addCase(registerCustomer.rejected, (state, action) => {
                 state.loader = false;

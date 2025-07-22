@@ -5,6 +5,7 @@ import { loginUser } from './LoginReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import WestIcon from '@mui/icons-material/West';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { triggerLoginSuccess } from '../../components/StatusCheck';
 
 // Email: basic pattern for most emails
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -46,6 +47,8 @@ const LoginForm = () => {
     useEffect(() => {
         if (success) {
             setOpenModal(true);
+            // Trigger login success event to check status immediately
+            triggerLoginSuccess();
             setTimeout(() => {
                 if (type === 'vendor') {
                     navigate("/vendorDashboard");

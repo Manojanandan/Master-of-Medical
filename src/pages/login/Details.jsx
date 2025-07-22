@@ -4,6 +4,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import { styled } from '@mui/material/styles';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useDispatch, useSelector } from 'react-redux';
+import { CountrySelect, StateSelect, CitySelect } from "react-country-state-city";
+import "react-country-state-city/dist/react-country-state-city.css";
+import "../../styles/countryStateCity.css";
 import PDFIcon from '../../assets/PDFIcon.png';
 import ExcelIcon from '../../assets/ExcelIcon.jpg';
 import JpegIcon from '../../assets/JpegIcon.png';
@@ -11,6 +14,8 @@ import PngIcon from '../../assets/PngIcon.png';
 import WordIcon from '../../assets/WordIcon.jpg';
 import JpgIcon from '../../assets/JpgIcon.png';
 import { registerVendor, registerCustomer } from './Signup/SignUpReducer';
+import { triggerLoginSuccess } from '../../components/StatusCheck';
+import RegistrationStepper from '../../components/RegistrationStepper';
 
 const VisuallyHiddenInput = styled('input')({
     clip: 'rect(0 0 0 0)',
@@ -40,6 +45,11 @@ const Details = () => {
         addressLine1: "", addressLine2: "", number: "", city: "", state: "", pincode: "", vendorType: "", country: ""
     });
     const [errorMsg, setErrorMsg] = useState({ addressLine1Error: '', numberError: "", cityError: "", stateError: "", pincodeError: "", vendorTypeError: "",countryError: "" });
+    
+    // Country, State, City dropdown states
+    const [country, setCountry] = useState(null);
+    const [currentState, setCurrentState] = useState(null);
+    const [currentCity, setCurrentCity] = useState(null);
     const [manufacturingImage, setManufacturingImage] = useState({
         mdmLicense: null,
         gst: null,
@@ -93,6 +103,8 @@ const Details = () => {
         if (success) {
             const jwt = sessionStorage.getItem("jwt");
             if (jwt) {
+                // Trigger login success event to check status immediately
+                triggerLoginSuccess();
                 if (type === "user" || type === "customer") {
                     navigate("/ecommerceDashboard");
                 } else if (type === "vendor") {
@@ -113,19 +125,38 @@ const Details = () => {
         if (e.target.id === "number") {
             setErrorMsg({ ...errorMsg, numberError: "" });
         }
-        if (e.target.id === "city") {
-            setErrorMsg({ ...errorMsg, cityError: "" });
-        }
-        if (e.target.id === "state") {
-            setErrorMsg({ ...errorMsg, stateError: "" });
-        }
         if (e.target.id === "pincode") {
             setErrorMsg({ ...errorMsg, pincodeError: "" });
         }
-        if (e.target.id === "country") {
-            setErrorMsg({ ...errorMsg, countryError: "" });
-        }
     }
+
+    // Handle country selection
+    const handleCountryChange = (_country) => {
+        setCountry(_country);
+        setAlldata({ ...allData, country: _country?.name || "" });
+        setErrorMsg({ ...errorMsg, countryError: "" });
+        // Reset state and city when country changes
+        setCurrentState(null);
+        setCurrentCity(null);
+        setAlldata({ ...allData, country: _country?.name || "", state: "", city: "" });
+    };
+
+    // Handle state selection
+    const handleStateChange = (_state) => {
+        setCurrentState(_state);
+        setAlldata({ ...allData, state: _state?.name || "" });
+        setErrorMsg({ ...errorMsg, stateError: "" });
+        // Reset city when state changes
+        setCurrentCity(null);
+        setAlldata({ ...allData, state: _state?.name || "", city: "" });
+    };
+
+    // Handle city selection
+    const handleCityChange = (_city) => {
+        setCurrentCity(_city);
+        setAlldata({ ...allData, city: _city?.name || "" });
+        setErrorMsg({ ...errorMsg, cityError: "" });
+    };
 
     const handleFileChange = (event, field) => {
         const file = event.target.files[0];
@@ -179,14 +210,14 @@ const Details = () => {
             setErrorMsg({ ...errorMsg, addressLine1Error: "Address Line 1 is required" });
         } else if (allData.number === "") {
             setErrorMsg({ ...errorMsg, numberError: "Contact Number is required" });
-        } else if (allData.city === "") {
-            setErrorMsg({ ...errorMsg, cityError: "City is required" });
-        } else if (allData.state === "") {
+        } else if (!country || allData.country === "") {
+            setErrorMsg({ ...errorMsg, countryError: "Country is required" });
+        } else if (!currentState || allData.state === "") {
             setErrorMsg({ ...errorMsg, stateError: "State is required" });
+        } else if (!currentCity || allData.city === "") {
+            setErrorMsg({ ...errorMsg, cityError: "City is required" });
         } else if (allData.pincode === "") {
             setErrorMsg({ ...errorMsg, pincodeError: "Pincode is required" });
-        } else if (allData.country === "") {
-            setErrorMsg({ ...errorMsg, countryError: "Country is required" });
         } else if (type === "vendor" && allData.vendorType === "") {
             setErrorMsg({ ...errorMsg, vendorTypeError: "Vendor type is required" });
         } else {
@@ -264,8 +295,14 @@ const Details = () => {
             <Box sx={{ height: '100%', width: '100%',backgroundColor:'#f2f3f5',padding:'4% 0' }}>
                 <Box sx={{ border: 'solid 1.5px #fff', height: 'auto', margin: '0% auto', backgroundColor: '#fff', borderRadius: '15px', width: '65%' }}>
                     <Stack direction='column'>
-                        <Typography variant='p' sx={{ margin: '2% auto', textTransform: 'capitalize',fontSize:'2rem' }}>{type} Details</Typography>
+                        <Typography variant='p' sx={{ margin: '2% auto', textTransform: 'capitalize',fontSize:'2rem' }}>User Details</Typography>
                     </Stack>
+                    
+                    {/* Registration Stepper */}
+                    <Box sx={{ width: '95%', margin: '0 auto 2%' }}>
+                        <RegistrationStepper currentStep={2} />
+                    </Box>
+                    
                     <Box sx={{ width: '95%', margin: '1% auto', }}>
                         <Grid container columnSpacing={2}>
                             <Grid item size={12} >
@@ -288,25 +325,52 @@ const Details = () => {
                                 <TextField value={allData.addressLine2} autoComplete='off' fullWidth id="addressLine2" size="small" onChange={handleChange} />
                             </Grid>
                            
+
                             <Grid item size={6} >
-                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 1%' }}>City<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
-                                {errorMsg.cityError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.cityError}</Typography>}
-                                <TextField value={allData.city} autoComplete='off' fullWidth id="city" size="small" onChange={handleChange} />
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '5% 0 1%' }}>Country<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                {errorMsg.countryError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.countryError}</Typography>}
+                                <div style={{ marginBottom: '10px' }}>
+                                    <CountrySelect
+                                        containerClassName="form-group"
+                                        inputClassName=""
+                                        onChange={handleCountryChange}
+                                        onTextChange={(_txt) => console.log(_txt)}
+                                        placeHolder="Select Country"
+                                    />
+                                </div>
                             </Grid>
                             <Grid item size={6} >
                                 <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '5% 0 1%' }}>State<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                 {errorMsg.stateError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.stateError}</Typography>}
-                                <TextField value={allData.state} autoComplete='off' fullWidth id="state" size="small" onChange={handleChange} />
+                                <div style={{ marginBottom: '10px' }}>
+                                    <StateSelect
+                                        countryid={country?.id}
+                                        containerClassName="form-group"
+                                        inputClassName=""
+                                        onChange={handleStateChange}
+                                        onTextChange={(_txt) => console.log(_txt)}
+                                        defaultValue={currentState}
+                                        placeHolder="Select State"
+                                    />
+                                </div>
+                            </Grid>
+                            <Grid item size={6} >
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '5% 0 1%' }}>City<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                {errorMsg.cityError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.cityError}</Typography>}
+                                <div style={{ marginBottom: '10px' }}>
+                                    <CitySelect
+                                        countryid={country?.id}
+                                        stateid={currentState?.id}
+                                        onChange={handleCityChange}
+                                        defaultValue={currentCity}
+                                        placeHolder="Select City"
+                                    />
+                                </div>
                             </Grid>
                             <Grid item size={6} >
                                 <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '5% 0 1%' }}>Pincode<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                 {errorMsg.pincodeError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.pincodeError}</Typography>}
                                 <TextField value={allData.pincode} autoComplete='off' fullWidth id="pincode" size="small" onChange={handleChange} />
-                            </Grid>
-                            <Grid item size={6} >
-                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '5% 0 1%' }}>Country<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
-                                {errorMsg.countryError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.countryError}</Typography>}
-                                <TextField value={allData.country} autoComplete='off' fullWidth id="country" size="small" onChange={handleChange} />
                             </Grid>
                             {type === "user" ? (
                                 <React.Fragment>
