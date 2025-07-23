@@ -315,7 +315,7 @@ const ProductDetail = () => {
   const parsedAdditionalInfo = getParsedAdditionalInfo();
 
   return (
-    <Box sx={{ p: { xs: 1, md: 4 }, maxWidth: 1200, mx: 'auto' }}>
+    <Box sx={{ p: { xs: 1, md: 4 }, width: '90%', mx: 'auto' }}>
       {/* Back to Products Button */}
       <Button
         startIcon={<ArrowBack />}
@@ -332,96 +332,29 @@ const ProductDetail = () => {
           gap: { xs: 3, md: 6 },
         }}
       >
-        {/* Image Showcase Section */}
+        {/* Main Image Section - 50% width on desktop */}
         <Box
           sx={{
+            width: { xs: '100%', md: '50%' },
             display: 'flex',
-            flexDirection: { xs: 'row', md: 'column' },
-            alignItems: { xs: 'center', md: 'flex-start' },
-            gap: 2,
-            minWidth: { md: 120 },
-            maxWidth: { md: 120 },
-            mb: { xs: 2, md: 0 },
-            overflowX: { xs: 'auto', md: 'visible' },
-          }}
-        >
-          <Card
-            elevation={3}
-            sx={{
-              p: 1,
-              bgcolor: 'background.paper',
-              borderRadius: 3,
-              boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-              display: 'flex',
-              flexDirection: { xs: 'row', md: 'column' },
-              gap: 1,
-              minWidth: { xs: 0, md: 100 },
-              maxWidth: { xs: '100%', md: 100 },
-              minHeight: { md: 420 },
-              maxHeight: { md: 420 },
-              overflow: 'auto',
-            }}
-          >
-            {(product?.galleryImage || []).map((img, idx) => (
-              <Box
-                key={img}
-                onClick={() => setSelectedImage(idx)}
-                sx={{
-                  borderRadius: 2,
-                  overflow: 'hidden',
-                  border: selectedImage === idx ? `2px solid ${theme.palette.primary.main}` : '2px solid transparent',
-                  cursor: 'pointer',
-                  mb: { xs: 0, md: 1 },
-                  mr: { xs: 1, md: 0 },
-                  transition: 'border 0.2s',
-                  boxShadow: selectedImage === idx ? '0 2px 8px rgba(0,0,0,0.10)' : 'none',
-                  width: { xs: 60, md: 80 },
-                  height: { xs: 60, md: 80 },
-                  flex: '0 0 auto',
-                  '&:hover': {
-                    border: `2px solid ${theme.palette.primary.light}`,
-                  },
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  image={img}
-                  alt={`Thumbnail ${idx + 1}`}
-                  sx={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                  }}
-                />
-              </Box>
-            ))}
-          </Card>
-        </Box>
-
-        {/* Main Image Section */}
-        <Box
-          sx={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'flex-start',
+            flexDirection: 'column',
+            alignItems: 'center',
             justifyContent: 'center',
             minHeight: 400,
           }}
         >
           <Card
-            elevation={4}
+            elevation={0}
             sx={{
               p: 2,
               bgcolor: 'background.paper',
               borderRadius: 4,
-              boxShadow: '0 4px 24px rgba(0,0,0,0.10)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: { xs: '100%', md: 420 },
-              height: { xs: 260, sm: 340, md: 420 },
-              maxWidth: 480,
-              maxHeight: 480,
+              width: '100%',
+              height: { xs: 300, sm: 350, md: 400 },
+              mb: 3,
             }}
           >
             <CardMedia
@@ -433,31 +366,92 @@ const ProductDetail = () => {
                 height: '100%',
                 objectFit: 'contain',
                 borderRadius: 3,
-                boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
                 background: '#f8f8f8',
               }}
             />
           </Card>
+
+          {/* Thumbnail Images - Now below the main image */}
+          {(product?.galleryImage && product.galleryImage.length > 0) && (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 2,
+                flexWrap: 'wrap',
+                maxWidth: '100%',
+                overflowX: 'auto',
+              }}
+            >
+              {product.galleryImage.map((img, idx) => (
+                <Box
+                  key={img}
+                  onClick={() => setSelectedImage(idx)}
+                  sx={{
+                    borderRadius: 2,
+                    overflow: 'hidden',
+                    border: selectedImage === idx ? `3px solid ${theme.palette.primary.main}` : '2px solid #e0e0e0',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    width: 80,
+                    height: 80,
+                    minWidth: 80,
+                    maxWidth: 80,
+                    minHeight: 80,
+                    maxHeight: 80,
+                    flex: '0 0 auto',
+                    '&:hover': {
+                      border: `3px solid ${theme.palette.primary.light}`,
+                      transform: 'scale(1.05)',
+                    },
+                  }}
+                >
+                  <CardMedia
+                    component="img"
+                    image={img}
+                    alt={`Thumbnail ${idx + 1}`}
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                    }}
+                  />
+                </Box>
+              ))}
+            </Box>
+          )}
         </Box>
 
-        {/* Product Info Section */}
-        <Grid item xs={12} md={6}>
+        {/* Product Info Section - 50% width on desktop */}
+        <Box
+          sx={{
+            width: { xs: '100%', md: '50%' },
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
           <Box sx={{ mb: 3 }}>
             <Typography variant="h4" component="h1" sx={{ fontWeight: 600, mb: 1 }}>
               {product?.name}
             </Typography>
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-              <Chip
-                label={product.brandName}
-                size="small"
-                variant="outlined"
-              />
-              <Chip
-                label={product.category}
-                size="small"
-                variant="outlined"
-              />
+              {product.brandName && (
+                <Chip
+                  label={product.brandName}
+                  size="small"
+                  variant="outlined"
+                />
+              )}
+              {product.category && (
+                <Chip
+                  label={product.category}
+                  size="small"
+                  variant="outlined"
+                />
+              )}
             </Box>
 
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 2 }}>
@@ -467,17 +461,21 @@ const ProductDetail = () => {
                 size="large"
                 showReviewCount={true}
               />
-              <Typography variant="body2" color="text.secondary">
-                Total Orders: {product.totalOrders || 0}
-              </Typography>
+              {product.totalOrders && (
+                <Typography variant="body2" color="text.secondary">
+                  Total Orders: {product.totalOrders}
+                </Typography>
+              )}
             </Box>
 
             <Typography variant="h5" color="primary" sx={{ fontWeight: 'bold', mb: 1 }}>
               ₹{product.price}
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              {product.priceLable || product.priceLabel}
-            </Typography>
+            {product.priceLable && (
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {product.priceLable}
+              </Typography>
+            )}
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
               <Chip
@@ -485,11 +483,13 @@ const ProductDetail = () => {
                 size="small"
                 color={product.status === 'approved' ? "success" : "error"}
               />
-              <Chip
-                label={`Expires: ${product.expiresOn ? new Date(product.expiresOn).toLocaleDateString() : 'N/A'}`}
-                size="small"
-                variant="outlined"
-              />
+              {product.expiresOn && (
+                <Chip
+                  label={`Expires: ${new Date(product.expiresOn).toLocaleDateString()}`}
+                  size="small"
+                  variant="outlined"
+                />
+              )}
             </Box>
           </Box>
 
@@ -592,13 +592,16 @@ const ProductDetail = () => {
 
 
 
-        </Grid>
+        </Box>
       </Box>
 
       {/* Product Description */}
-      <Typography variant="body1" sx={{ mb: 3 }}>
-        {product.description}
-      </Typography>
+      {product.description && (
+        <Typography variant="body1" sx={{ mb: 3, mt: 8 }}>
+          {product.description}
+        </Typography>
+      )}
+
       {/* Benefits */}
       {product.benefits && (
         <Box sx={{ mb: 3 }}>
@@ -624,36 +627,43 @@ const ProductDetail = () => {
         </Box>
       )}
 
-      {/* Shipping Info */}
-      <Paper sx={{ p: 2, mb: 3 }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          Shipping & Returns
-        </Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <LocalShipping color="primary" fontSize="small" />
-              <Typography variant="body2">
-                {product?.shipping?.freeShipping ? 'Free Shipping' : 'Shipping charges apply'}
-              </Typography>
-            </Box>
-            <Typography variant="body2" color="text.secondary">
-              Delivery: {product.shipping?.deliveryTime}
-            </Typography>
+      {/* Shipping Info - Only show if shipping data exists */}
+      {product.shipping && (
+        <Paper sx={{ p: 2, mb: 3 }}>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Shipping & Returns
+          </Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                <LocalShipping color="primary" fontSize="small" />
+                <Typography variant="body2">
+                  {product.shipping.freeShipping ? 'Free Shipping' : 'Shipping charges apply'}
+                </Typography>
+              </Box>
+              {product.shipping.deliveryTime && (
+                <Typography variant="body2" color="text.secondary">
+                  Delivery: {product.shipping.deliveryTime}
+                </Typography>
+              )}
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                <Security color="primary" fontSize="small" />
+                <Typography variant="body2">
+                  {product.shipping.returnPolicy}
+                </Typography>
+              </Box>
+              {product.shipping.warranty && (
+                <Typography variant="body2" color="text.secondary">
+                  Warranty: {product.shipping.warranty}
+                </Typography>
+              )}
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <Security color="primary" fontSize="small" />
-              <Typography variant="body2">
-                {product.shipping?.returnPolicy}
-              </Typography>
-            </Box>
-            <Typography variant="body2" color="text.secondary">
-              Warranty: {product.shipping?.warranty}
-            </Typography>
-          </Grid>
-        </Grid>
-      </Paper>
+        </Paper>
+      )}
+
       {/* Product Details Tabs */}
       <Box sx={{ mt: 6 }}>
         <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 3 }}>
@@ -701,22 +711,30 @@ const ProductDetail = () => {
                   Product Information
                 </Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" color="text.secondary">Expires On:</Typography>
-                    <Typography variant="body2">{product.expiresOn || 'Not specified'}</Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" color="text.secondary">Category:</Typography>
-                    <Typography variant="body2">{product.category}</Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" color="text.secondary">Sub Category:</Typography>
-                    <Typography variant="body2">{product.subCategory}</Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" color="text.secondary">Status:</Typography>
-                    <Typography variant="body2">{product.status}</Typography>
-                  </Box>
+                  {product.expiresOn && (
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="text.secondary">Expires On:</Typography>
+                      <Typography variant="body2">{product.expiresOn}</Typography>
+                    </Box>
+                  )}
+                  {product.category && (
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="text.secondary">Category:</Typography>
+                      <Typography variant="body2">{product.category}</Typography>
+                    </Box>
+                  )}
+                  {product.subCategory && (
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="text.secondary">Sub Category:</Typography>
+                      <Typography variant="body2">{product.subCategory}</Typography>
+                    </Box>
+                  )}
+                  {product.status && (
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="text.secondary">Status:</Typography>
+                      <Typography variant="body2">{product.status}</Typography>
+                    </Box>
+                  )}
                 </Box>
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -735,74 +753,27 @@ const ProductDetail = () => {
               <Typography variant="h6" sx={{ mb: 2 }}>
                 What's Included
               </Typography>
-              <List>
-                {parsedAdditionalInfo?.packageContents?.map((item, index) => (
-                  <ListItem key={index} sx={{ py: 0.5 }}>
-                    <ListItemIcon sx={{ minWidth: 32 }}>
-                      <CheckCircle color="success" fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText primary={item} />
-                  </ListItem>
-                ))}
-              </List>
+              {parsedAdditionalInfo?.packageContents && Array.isArray(parsedAdditionalInfo.packageContents) ? (
+                <List>
+                  {parsedAdditionalInfo.packageContents.map((item, index) => (
+                    <ListItem key={index} sx={{ py: 0.5 }}>
+                      <ListItemIcon sx={{ minWidth: 32 }}>
+                        <CheckCircle color="success" fontSize="small" />
+                      </ListItemIcon>
+                      <ListItemText primary={item} />
+                    </ListItem>
+                  ))}
+                </List>
+              ) : (
+                <Typography variant="body2" color="text.secondary">
+                  Package contents information not available.
+                </Typography>
+              )}
             </Box>
           )}
 
 
         </Paper>
-      </Box>
-
-      {/* Trust Indicators */}
-      <Box sx={{ mt: 6 }}>
-        <Typography variant="h6" sx={{ mb: 3 }}>
-          Why Choose Us
-        </Typography>
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={3}>
-            <Box sx={{ textAlign: 'center', p: 2 }}>
-              <Verified sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
-              <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-                Verified Products
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                All products are verified for quality and authenticity
-              </Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Box sx={{ textAlign: 'center', p: 2 }}>
-              <LocalShipping sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
-              <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-                Fast Delivery
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Quick and reliable delivery across India
-              </Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Box sx={{ textAlign: 'center', p: 2 }}>
-              <Security sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
-              <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-                Secure Payment
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Multiple secure payment options available
-              </Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Box sx={{ textAlign: 'center', p: 2 }}>
-              <Support sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
-              <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-                24/7 Support
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Round the clock customer support
-              </Typography>
-            </Box>
-          </Grid>
-        </Grid>
       </Box>
 
       {/* Customer Reviews Section */}

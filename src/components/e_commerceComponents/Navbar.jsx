@@ -380,7 +380,7 @@ const Navbar = () => {
 
       {/* Right side menu */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
-        <Box 
+        {/* <Box 
           sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "pointer" }}
           onClick={() => navigate("/ecommerceDashboard/products")}
         >
@@ -397,7 +397,7 @@ const Navbar = () => {
             Trending Products
           </Typography>
           <ExpandMoreIcon sx={{ fontSize: "18px" }} />
-        </Box>
+        </Box> */}
 {/*  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "pointer" }}>
           <Typography sx={{ fontSize: "14px", fontWeight: 600, color: "red" }}>
             Almost Finished
