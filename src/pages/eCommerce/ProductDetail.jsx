@@ -37,9 +37,11 @@ import {
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPublicProductById, clearCurrentProduct } from "../../redux/PublicProductReducer";
-import { getProductById } from "../../utils/Service";
 import { addToCart, fetchCart, removeFromCart, updateCartItemQuantity } from "../../redux/CartReducer";
-
+import { fetchProductReviews, clearReviews } from "../../redux/ReviewReducer";
+import StarRating from "../../components/e_commerceComponents/StarRating";
+import ReviewForm from "../../components/e_commerceComponents/ReviewForm";
+import ReviewList from "../../components/e_commerceComponents/ReviewList";
 
 
 const ProductDetail = () => {
@@ -50,32 +52,19 @@ const ProductDetail = () => {
   const { currentProduct, loading, error } = useSelector((state) => state.publicProductReducer);
   const { cart, loading: cartLoading } = useSelector((state) => state.cartReducer);
   
-  // State for API product data
-  const [apiProduct, setApiProduct] = useState(null);
-  const [apiLoading, setApiLoading] = useState(false);
-  const [apiError, setApiError] = useState(null);
   const [cartMessage, setCartMessage] = useState('');
   
-  // Use API product if available, otherwise fall back to current product
-  const product = apiProduct || currentProduct;
-
-  // Safety check for product data
-  if (!product) {
-    return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Button
-          startIcon={<ArrowBack />}
-          onClick={() => navigate('/ecommerceDashboard')}
-          sx={{ mb: 3, color: 'text.secondary' }}
-        >
-          Back to Products
-        </Button>
-        <Alert severity="error" sx={{ mb: 3 }}>
-          Product not found
-        </Alert>
-      </Container>
-    );
-  }
+  // Use current product from Redux
+  const product = currentProduct;
+  
+  // Debug logging
+  console.log('ProductDetail Debug Info:', {
+    id,
+    currentProduct,
+    product,
+    loading,
+    error
+  });
 
   // Local state
   const [selectedImage, setSelectedImage] = useState(0);
@@ -86,7 +75,12 @@ const ProductDetail = () => {
 
   useEffect(() => {
     if (id) {
+      console.log('ProductDetail: Fetching product and reviews for ID:', id);
       dispatch(fetchPublicProductById(id));
+      // Fetch reviews for this product - try both string and number formats
+      const productId = parseInt(id) || id;
+      console.log('ProductDetail: Fetching reviews with productId:', productId);
+      dispatch(fetchProductReviews({ productId }));
     }
     
     // Fetch cart data
@@ -94,56 +88,38 @@ const ProductDetail = () => {
 
     return () => {
       dispatch(clearCurrentProduct());
+      dispatch(clearReviews());
     };
   }, [dispatch, id]);
 
   // Reset local quantity when product is not in cart
   useEffect(() => {
-    if (!isProductInCart()) {
+    if (product && !isProductInCart()) {
       setLocalQuantity(1);
     }
-  }, [cart, product.id]);
-
-  // Call the getProductById API and console log response
-  useEffect(() => {
-    const fetchProductById = async () => {
-      if (id) {
-        try {
-          setApiLoading(true);
-          setApiError(null);
-          console.log('Calling getProductById API with ID:', id);
-          const response = await getProductById(id);
-          console.log('getProductById API Response:', response);
-          console.log('getProductById API Response Data:', response.data);
-          
-          // Extract the actual product data from the nested response structure
-          if (response.data && response.data.success && response.data.data) {
-            const productData = response.data.data;
-            console.log('Extracted product data:', productData);
-            setApiProduct(productData);
-          } else {
-            console.error('Invalid API response structure:', response.data);
-            setApiError(new Error('Invalid API response structure'));
-          }
-        } catch (error) {
-          console.error('Error calling getProductById API:', error);
-          setApiError(error);
-        } finally {
-          setApiLoading(false);
-        }
-      }
-    };
-
-    fetchProductById();
-  }, [id]);
+  }, [cart, product?.id]);
 
   const handleImageChange = (index) => {
     setSelectedImage(index);
   };
 
+  // Handle review submission
+  const handleReviewSubmitted = () => {
+    // Refresh reviews after a new review is submitted
+    if (id) {
+      const productId = parseInt(id) || id;
+      console.log('ProductDetail: Refreshing reviews with productId:', productId);
+      dispatch(fetchProductReviews({ productId }));
+    }
+  };
+
 
 
   const handleAddToCart = () => {
+    if (!product) {
+      console.error('Product not available');
+      return;
+    }
     const productId = product.id;
     if (!productId) {
       console.error('Product ID is required to add to cart');
@@ -171,6 +147,10 @@ const ProductDetail = () => {
   };
 
   const handleRemoveFromCart = () => {
+    if (!product) {
+      console.error('Product not available');
+      return;
+    }
     const productId = product.id;
     if (!productId) {
       console.error('Product ID is required to remove from cart');
@@ -194,7 +174,7 @@ const ProductDetail = () => {
 
   // Check if product is in cart and get its quantity
   const getCartItemQuantity = () => {
-    if (!cart || !cart.items) return 0;
+    if (!cart || !cart.items || !product) return 0;
     const productId = product.id;
     const cartItem = cart.items.find(item => item.productId === productId);
     return cartItem ? cartItem.quantity : 0;
@@ -214,6 +194,10 @@ const ProductDetail = () => {
 
   // Handle quantity change based on whether product is in cart
   const handleQuantityChange = (newQuantity) => {
+    if (!product) {
+      console.error('Product not available');
+      return;
+    }
     if (newQuantity >= 1 && newQuantity <= 10) {
       if (isProductInCart()) {
                 // Update cart quantity
@@ -253,7 +237,7 @@ const ProductDetail = () => {
 
   // Helper function to parse additionalInformation JSON string
   const getParsedAdditionalInfo = () => {
-    if (!product.additionalInformation) return {};
+    if (!product || !product.additionalInformation) return {};
     
     if (typeof product.additionalInformation === 'string') {
       try {
@@ -267,9 +251,7 @@ const ProductDetail = () => {
     return product.additionalInformation;
   };
 
-  const parsedAdditionalInfo = getParsedAdditionalInfo();
-
-  if (loading || apiLoading) { // Combine loading states
+  if (loading) { // Loading state
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Grid container spacing={4}>
@@ -295,7 +277,7 @@ const ProductDetail = () => {
     );
   }
 
-  if (error || apiError) { // Combine error states
+  if (error) { // Error state
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Button
@@ -306,11 +288,31 @@ const ProductDetail = () => {
           Back to Products
         </Button>
         <Alert severity="error" sx={{ mb: 3 }}>
-          {error?.message || apiError?.message || 'Failed to load product details'}
+          {error?.message || 'Failed to load product details'}
         </Alert>
       </Container>
     );
   }
+
+  // Check if product data is available
+  if (!product) {
+    return (
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Button
+          startIcon={<ArrowBack />}
+          onClick={() => navigate('/ecommerceDashboard')}
+          sx={{ mb: 3, color: 'text.secondary' }}
+        >
+          Back to Products
+        </Button>
+        <Alert severity="error" sx={{ mb: 3 }}>
+          Product not found
+        </Alert>
+      </Container>
+    );
+  }
+
+  const parsedAdditionalInfo = getParsedAdditionalInfo();
 
   return (
     <Box sx={{ p: { xs: 1, md: 4 }, maxWidth: 1200, mx: 'auto' }}>
@@ -360,7 +362,7 @@ const ProductDetail = () => {
               overflow: 'auto',
             }}
           >
-            {(product.galleryImage || []).map((img, idx) => (
+            {(product?.galleryImage || []).map((img, idx) => (
               <Box
                 key={img}
                 onClick={() => setSelectedImage(idx)}
@@ -424,8 +426,8 @@ const ProductDetail = () => {
           >
             <CardMedia
               component="img"
-              image={product.galleryImage && product.galleryImage[selectedImage] ? product.galleryImage[selectedImage] : product.thumbnailImage}
-              alt={product.name}
+              image={product?.galleryImage && product.galleryImage[selectedImage] ? product.galleryImage[selectedImage] : product?.thumbnailImage}
+              alt={product?.name}
               sx={{
                 width: '100%',
                 height: '100%',
@@ -442,7 +444,7 @@ const ProductDetail = () => {
         <Grid item xs={12} md={6}>
           <Box sx={{ mb: 3 }}>
             <Typography variant="h4" component="h1" sx={{ fontWeight: 600, mb: 1 }}>
-              {product.name}
+              {product?.name}
             </Typography>
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
@@ -458,7 +460,13 @@ const ProductDetail = () => {
               />
             </Box>
 
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 2 }}>
+              <StarRating 
+                rating={product.averageRating || 0}
+                reviewCount={product.reviewCount || 0}
+                size="large"
+                showReviewCount={true}
+              />
               <Typography variant="body2" color="text.secondary">
                 Total Orders: {product.totalOrders || 0}
               </Typography>
@@ -739,6 +747,8 @@ const ProductDetail = () => {
               </List>
             </Box>
           )}
+
+
         </Paper>
       </Box>
 
@@ -793,6 +803,22 @@ const ProductDetail = () => {
             </Box>
           </Grid>
         </Grid>
+      </Box>
+
+      {/* Customer Reviews Section */}
+      <Box sx={{ mt: 6 }}>
+        <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
+          Customer Reviews
+        </Typography>
+        
+        {/* Review Form */}
+        <ReviewForm 
+          productId={product?.id} 
+          onReviewSubmitted={handleReviewSubmitted}
+        />
+        
+        {/* Review List */}
+        <ReviewList productId={product?.id} />
       </Box>
     </Box>
   );

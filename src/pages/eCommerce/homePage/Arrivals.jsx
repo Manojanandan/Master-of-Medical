@@ -94,6 +94,8 @@ const Arrivals = () => {
             price: item.price || '30.00',
             originalPrice: item.originalPrice || (parseFloat(item.price || '30.00') * 1.5).toFixed(2), // Set original price 50% higher if not provided
             id: item.id, // Use the actual ID from API response
+            averageRating: item.averageRating || '0.0',
+            reviewCount: item.reviewCount || 0,
         }));
     
     console.log('Transformed data:', transformedData);
@@ -130,6 +132,8 @@ const Arrivals = () => {
                                     price={e?.price} 
                                     originalPrice={e?.originalPrice}
                                     id={e?.id}
+                                    averageRating={e?.averageRating}
+                                    reviewCount={e?.reviewCount}
                                     onClick={() => handleProductClick(e.id)} 
                                 />
                             )

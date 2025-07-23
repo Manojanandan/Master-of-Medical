@@ -1,377 +1,432 @@
-import { Box, Button, Paper, Typography, CircularProgress, Alert, Card, CardContent , 
-  
+import React, { useEffect, useCallback, useState } from 'react';
+import {
+  Box,
+  Button,
+  Paper,
+  Typography,
+  CircularProgress,
+  Alert,
+  Card,
+  CardContent,
   Divider,
-  FormControl,
-  FormControlLabel,
-  Radio,
-  RadioGroup,
-  Checkbox,} from '@mui/material'
-import React, { useEffect, useCallback, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import AddIcon from '@mui/icons-material/Add';
+  Grid,
+  IconButton,
+  Chip,
+  useTheme,
+  useMediaQuery
+} from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCart, updateCartItemQuantity, removeFromCart } from '../../../redux/CartReducer';
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+import StarRating from '../../../components/e_commerceComponents/StarRating';
 
 const CartList = () => {
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
-  const [shipping, setShipping] = useState('flat');
-  const [paymentMethod, setPaymentMethod] = useState('bank');
-  const [agreed, setAgreed] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
+  const { items, totalItems, totalAmount, loading, error } = useSelector((state) => state.cartReducer);
+  const [localItems, setLocalItems] = useState([]);
+  const [localTotals, setLocalTotals] = useState({ totalItems: 0, totalAmount: 0 });
 
-  const subtotal = 0.89;
-  const shippingCost = shipping === 'flat' ? 15.0 : 0;
-  const total = (subtotal + shippingCost).toFixed(2);
-    const { items, totalItems, totalAmount, loading, error } = useSelector((state) => state.cartReducer);
-    const [localItems, setLocalItems] = React.useState([]);
-    const [localTotals, setLocalTotals] = React.useState({ totalItems: 0, totalAmount: 0 });
+  // Constants for calculations
+  const SHIPPING_COST = 15.00;
+  const GST_RATE = 0.18; // 18% GST
+  const FREE_SHIPPING_THRESHOLD = 500; // Free shipping above $500
 
-    // Sync local state with Redux state only when items change (not quantity updates)
-    React.useEffect(() => {
-        if (items.length > 0 && localItems.length === 0) {
-            setLocalItems(items);
-            setLocalTotals({ totalItems, totalAmount });
-        }
-    }, [items, totalItems, totalAmount, localItems.length]);
+  // Calculate totals
+  const calculateTotals = useCallback((cartItems) => {
+    const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const gst = subtotal * GST_RATE;
+    const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+    const total = subtotal + gst + shipping;
+    const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-    // Debug: Log cart state
-    React.useEffect(() => {
-        console.log('CartList - Cart state:', { items, totalItems, totalAmount, loading, error });
-    }, [items, totalItems, totalAmount, loading, error]);
+    return {
+      subtotal,
+      gst,
+      shipping,
+      total,
+      totalItems
+    };
+  }, []);
 
-    // Fetch cart data on component mount
-    useEffect(() => {
-        dispatch(fetchCart());
-    }, [dispatch]);
+  // Sync local state with Redux state
+  useEffect(() => {
+    if (items.length > 0 && localItems.length === 0) {
+      setLocalItems(items);
+      const totals = calculateTotals(items);
+      setLocalTotals(totals);
+    }
+  }, [items, calculateTotals, localItems.length]);
 
-    const handleQuantityChange = useCallback((cartItemId, currentQuantity, change) => {
-        const newQuantity = currentQuantity + change;
-        console.log('Quantity change request:', { cartItemId, currentQuantity, change, newQuantity });
+  // Fetch cart data on component mount
+  useEffect(() => {
+    dispatch(fetchCart());
+  }, [dispatch]);
+
+  const handleQuantityChange = useCallback((cartItemId, currentQuantity, change) => {
+    const newQuantity = currentQuantity + change;
+    
+    if (newQuantity >= 1 && newQuantity <= 10) {
+      // Update local state immediately for instant feedback
+      setLocalItems(prevItems => {
+        const updatedItems = prevItems.map(item => 
+          item._id === cartItemId 
+            ? { ...item, quantity: newQuantity }
+            : item
+        );
         
-        if (newQuantity >= 1 && newQuantity <= 10) {
-            console.log('Dispatching updateCartItemQuantity with:', { cartItemId, quantity: newQuantity });
-            
-            // Update local state immediately for instant feedback
-            setLocalItems(prevItems => 
-                prevItems.map(item => 
-                    item._id === cartItemId 
-                        ? { ...item, quantity: newQuantity }
-                        : item
-                )
-            );
-            
-            // Update local totals
-            setLocalTotals(prev => {
-                const item = localItems.find(item => item._id === cartItemId);
-                if (item) {
-                    const quantityDifference = newQuantity - currentQuantity;
-                    return {
-                        totalItems: prev.totalItems + quantityDifference,
-                        totalAmount: prev.totalAmount + (item.price * quantityDifference)
-                    };
-                }
-                return prev;
-            });
-            
-            dispatch(updateCartItemQuantity({ cartItemId, quantity: newQuantity }));
-        } else {
-            console.log('Quantity change rejected:', { newQuantity, min: 1, max: 10 });
-        }
-    }, [dispatch, localItems]);
-
-    const handleRemoveItem = useCallback((cartItemId) => {
-        dispatch(removeFromCart(cartItemId));
-    }, [dispatch]);
-
-    if (loading) {
-        return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
-                <CircularProgress />
-            </Box>
-        );
+        // Update local totals
+        const totals = calculateTotals(updatedItems);
+        setLocalTotals(totals);
+        
+        return updatedItems;
+      });
+      
+      dispatch(updateCartItemQuantity({ cartItemId, quantity: newQuantity }));
     }
+  }, [dispatch, calculateTotals]);
 
-    if (error) {
-        return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
-                <Alert severity="error" sx={{ maxWidth: '600px' }}>
-                    <Typography variant="h6">Cart Error</Typography>
-                    <Typography>{error}</Typography>
-                    <Button 
-                        variant="outlined" 
-                        sx={{ mt: 2 }}
-                        onClick={() => dispatch(fetchCart())}
-                    >
-                        Retry
-                    </Button>
-                </Alert>
-            </Box>
-        );
-    }
+  const handleRemoveItem = useCallback((cartItemId) => {
+    setLocalItems(prevItems => {
+      const updatedItems = prevItems.filter(item => item._id !== cartItemId);
+      const totals = calculateTotals(updatedItems);
+      setLocalTotals(totals);
+      return updatedItems;
+    });
+    
+    dispatch(removeFromCart(cartItemId));
+  }, [dispatch, calculateTotals]);
 
-    if (items.length === 0) {
-        return (
-            <div style={{ height: '100%', width: '100%', display: 'flex', justifyContent: 'center', padding: '2% 0 3% 3%' }}>
-                <Box sx={{ height: 'auto', width: '500px', }}>
-                    <Box sx={{ height: '150px', width: '200px', margin: '7% auto' }}>
-                        <img height='150px' width='200px' src='https://www.svgrepo.com/show/17356/empty-cart.svg' alt='' />
-                    </Box>
-                    <Box sx={{ width: '400px', margin: '0 auto', textAlign: 'center', color: 'red', padding: '5px 0', fontWeight: 'bold', fontSize: '14px' }}>
-                        YOUR CART IS CURRENTLY EMPTY
-                    </Box>
-                    <Box sx={{ height: 'auto', width: '140px', margin: '3% auto' }}>
-                        <Button 
-                            variant='contained' 
-                            sx={{ fontSize: '14px', textTransform: 'capitalize', marginTop: '5%' }}
-                            onClick={() => navigate('/ecommerceDashboard')}
-                        >
-                            return to shop
-                        </Button>
-                    </Box>
-                </Box>
-            </div>
-        );
-    }
-
-    // Use local state for rendering to prevent re-renders
-    const displayItems = localItems.length > 0 ? localItems : items;
-    const displayTotals = localTotals.totalItems > 0 ? localTotals : { totalItems, totalAmount };
-
+  // Loading state
+  if (loading) {
     return (
-        <div style={{ height: '100%', width: '100%', display: 'flex', justifyContent: 'space-evenly', padding: '2% 3%', gap: "20px" }}>
-            
-            <Card sx={{ height: 'auto', width: '65%', }}>
-                <Paper elevation={3}>
-                    <Typography variant='h5' sx={{ fontWeight: 'bold', padding: '2% 2% 0' }}>Shopping Cart</Typography>
-                    <Box sx={{ height: 'auto', width: '97%', borderBottom: 'solid 1px #2424', display: 'flex', justifyContent: 'space-between', margin: '0 2%', padding: '0.5% 0' }}>
-                        {/* <Typography variant='p' sx={{marginRight:'2%'}}>Price</Typography> */}
-                    </Box>
-                    
-                    {displayItems.map((item, index) => (
-                        <Box key={item._id} sx={{ height: '300px', width: '97%', margin: '0 2%', borderBottom: 'solid 1px #2424', padding: '1.5% 0', display: 'flex', justifyContent: 'space-around' }}>
-                            <Box sx={{ width: '220px', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                <Box sx={{height:'150px',width:'250px',margin:'1%'}}>
-                                    <img height='150px' width='90%' src={item.product?.thumbnailImage || 'https://www.lifenowhealth.com/cdn/shop/files/Untitled-3_0021_Plantbasedcollagenbuilder.jpg?v=1695386987'} alt={item.product?.name || 'Product'} />
-                                </Box>
-                            </Box>
-                            <Box sx={{ height: '100%', width: '60%', display: 'flex', justifyContent: 'space-between' }}>
-                                <Box sx={{ height: '100%', width: '70%', padding: '2% 0' }}>
-                                    <Typography variant='h6' sx={{ fontWeight: 'bold', marginBottom: '2%' }}>
-                                        {item.product?.name || 'Product Name'}
-                                    </Typography>
-                                    <Typography variant='body2' sx={{ color: '#666', marginBottom: '2%' }}>
-                                        {item.product?.description || 'Product description'}
-                                    </Typography>
-                                    <Typography variant='h6' sx={{ color: '#c5225f', fontWeight: 'bold', marginBottom: '2%' }}>
-                                        ${item.price || '0.00'}
-                                    </Typography>
-                                    <Box sx={{height:'50px',width:'100%',display:'flex'}} >
-                                        <Box sx={{height:'40px',width:'130px',border:'solid 3px #f1ac1b',display:'flex',justifyContent:'space-around',alignItems:'center',borderRadius:'20px'}}>
-                                            <DeleteOutlineIcon 
-                                                sx={{cursor:'pointer'}} 
-                                                onClick={() => handleQuantityChange(item._id, item.quantity, -1)}
-                                            />
-                                            <Typography variant='p' sx={{fontWeight:'bold'}}>
-                                                {item.quantity}
-                                            </Typography>
-                                            <AddIcon 
-                                                sx={{cursor:'pointer'}} 
-                                                onClick={() => handleQuantityChange(item._id, item.quantity, 1)}
-                                            />
-                                        </Box>
-                                        {/* <Box sx={{width:'80px',height:'25px',borderLeft:'solid 1px black',paddingLeft:'10px',margin:'8px 0 5px 12px'}}>
-                                            <Link 
-                                                to='' 
-                                                style={{textDecoration:'none'}}
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    handleRemoveItem(item._id);
-                                                }}
-                                            >
-                                                Delete
-                                            </Link>
-                                        </Box>
-                                         <Box sx={{width:'130px',height:'20px',borderLeft:'solid 1px black',paddingLeft:'10px',margin:'10px 0 5px'}}>
-                                            <Link to='' style={{textDecoration:'none'}}>Save for later</Link>
-                                        </Box>
-                                        <Box sx={{width:'100px',height:'20px',borderLeft:'solid 1px black',paddingLeft:'10px',margin:'10px 0 5px'}}>
-                                            <Link to='' style={{textDecoration:'none'}}>Share</Link>
-                                        </Box> */}
-                                    </Box>
-                                </Box>
-                                <Box sx={{height:'100%',width:'200px',textAlign:'right'}}>
-                                    <Typography variant='p' sx={{fontWeight:'bold',fontSize:'20px',}}>
-                                        ${(item.price * item.quantity).toFixed(2)}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                        </Box>
-                    ))}
-                    
-                    <Box sx={{height:'50px',wdth:'97%',}}>
-                        <Box sx={{height:'auto',width:'auto',textAlign:'right',padding:'7px 15px'}} >
-                            <Typography variant='p' sx={{fontSize:'20px',textAlign:'right'}}>
-                                Subtotal ({displayTotals.totalItems} items) : <b>${displayTotals.totalAmount.toFixed(2)}</b>
-                            </Typography>
-                        </Box>
-                    </Box>
-                </Paper>
-            </Card>
-            {/* <Box sx={{ height: '300px', width: '300px', margin: '0 3%' }}>
-               <Paper elevation={3}>
-                    <Box sx={{fontSize:'20px',padding:'10px 15px'}}>
-                        <Typography variant='p' >Subtotal ({displayTotals.totalItems} items) :</Typography><br />
-                        <Typography variant='p' sx={{fontWeight:'bold'}}>${displayTotals.totalAmount.toFixed(2)}</Typography>
-                        <Button 
-                            variant='contained' 
-                            sx={{backgroundColor:'#f1ac1b',textTransform:'capitalize',padding:'2% 20%',fontSize:'17px',margin:'10px 0',borderRadius:'20px'}} 
-                            onClick={()=>navigate('/ecommerceDashboard/checkout')}
-                            disabled={displayTotals.totalItems === 0}
-                        >
-                            proceed to Buy
-                        </Button>
-                    </Box>
-                </Paper>
-            </Box> */}
-
-             <Card sx={{ maxWidth: 400, margin: '0 auto', borderRadius: 2 }}>
-      <CardContent>
-                    <Typography variant='h5' sx={{ fontWeight: 'bold', padding: '0%' }}>Cart Summary</Typography>
-
-        <Divider sx={{ my: 2 }} />
-        {/* Product */}
-        <Box display="flex" justifyContent="space-between">
-          <Typography variant="body2">
-            Optimum Nutrition (ON) Micronised Creatine Monohydrate for Performance Support × 1
-          </Typography>
-          <Typography variant="body2" fontWeight="bold">
-            $0.89
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+        <Box sx={{ textAlign: 'center' }}>
+          <CircularProgress size={60} sx={{ mb: 2 }} />
+          <Typography variant="h6" color="text.secondary">
+            Loading your cart...
           </Typography>
         </Box>
+      </Box>
+    );
+  }
 
-        <Divider sx={{ my: 2 }} />
+  // Error state
+  if (error) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+        <Alert severity="error" sx={{ maxWidth: '600px' }}>
+          <Typography variant="h6">Cart Error</Typography>
+          <Typography>{error}</Typography>
+          <Button 
+            variant="outlined" 
+            sx={{ mt: 2 }}
+            onClick={() => dispatch(fetchCart())}
+          >
+            Retry
+          </Button>
+        </Alert>
+      </Box>
+    );
+  }
 
-        {/* Subtotal */}
-        <Box display="flex" justifyContent="space-between">
-          <Typography variant="body2">Subtotal</Typography>
-          <Typography variant="body2" fontWeight="bold">
-            $0.89
-          </Typography>
-        </Box>
-
-        <Box display="flex" justifyContent="space-between">
-          <Typography variant="body2">GST</Typography>
-          <Typography variant="body2" fontWeight="bold">
-            $0.89
-          </Typography>
-        </Box>
-        {/* Shipping */}
-        {/* <Box mt={2}>
-          <Typography variant="body2" fontWeight="bold" gutterBottom>
-            Shipping:
-          </Typography>
-          <FormControl component="fieldset">
-            <RadioGroup
-              value={shipping}
-              onChange={(e) => setShipping(e.target.value)}
-            >
-              <FormControlLabel
-                value="flat"
-                control={<Radio size="small" />}
-                label="Flat rate: $15.00"
-              />
-              <FormControlLabel
-                value="pickup"
-                control={<Radio size="small" />}
-                label="Local pickup"
-              />
-            </RadioGroup>
-          </FormControl>
-        </Box> */}
-
-        {/* Total */}
-        <Divider sx={{ my: 2 }} />
-        <Box display="flex" justifyContent="space-between">
-          <Typography variant="body2" fontWeight="bold">
-            Total
-          </Typography>
-          <Typography variant="body2" fontWeight="bold">
-            ${total}
-          </Typography>
-        </Box>
-
-        {/* Payment Methods */}
-        {/* <Box mt={3}>
-          <FormControl component="fieldset">
-            <RadioGroup
-              value={paymentMethod}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-            >
-              <FormControlLabel
-                value="bank"
-                control={<Radio size="small" />}
-                label={
-                  <Box>
-                    <Typography fontWeight="bold">Direct Bank Transfer</Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Make your payment directly into our bank account. Please use your Order ID as
-                      the payment reference. Your order will not be shipped until the funds have
-                      cleared in our account.
-                    </Typography>
-                  </Box>
-                }
-              />
-              <FormControlLabel
-                value="check"
-                control={<Radio size="small" />}
-                label="Check Payments"
-              />
-              <FormControlLabel
-                value="cod"
-                control={<Radio size="small" />}
-                label="Cash On Delivery"
-              />
-            </RadioGroup>
-          </FormControl>
-        </Box> */}
-
-        {/* Privacy Agreement */}
-        {/* <Box mt={2}>
-          <FormControlLabel
-            control={
-              <Checkbox
-                size="small"
-                checked={agreed}
-                onChange={(e) => setAgreed(e.target.checked)}
-              />
-            }
-            label={
-              <Typography variant="caption">
-                I have read and agree to the website{" "}
-                <a href="#" style={{ textDecoration: "underline" }}>
-                  terms and conditions
-                </a>
-                .
-              </Typography>
-            }
-          />
-        </Box> */}
-
-        {/* Place Order Button */}
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{ mt: 2, borderRadius: 2 }}
-                            onClick={()=>navigate('/ecommerceDashboard/checkout')}
-                            disabled={displayTotals.totalItems === 0}
+  // Empty cart state
+  if (items.length === 0) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column',
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '400px',
+        textAlign: 'center'
+      }}>
+        <ShoppingCartOutlinedIcon sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
+        <Typography variant="h4" sx={{ mb: 1, fontWeight: 600 }}>
+          Your cart is empty
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+          Looks like you haven't added any items to your cart yet.
+        </Typography>
+        <Button 
+          variant="contained" 
+          size="large"
+          startIcon={<ArrowBackIcon />}
+          onClick={() => navigate('/ecommerceDashboard')}
+          sx={{ 
+            borderRadius: 2,
+            px: 4,
+            py: 1.5,
+            textTransform: 'none',
+            fontSize: '16px'
+          }}
         >
-          Place order
+          Continue Shopping
         </Button>
-      </CardContent>
-    </Card>
-        </div>
-    )
-}
+      </Box>
+    );
+  }
 
-export default CartList
+  // Use local state for rendering
+  const displayItems = localItems.length > 0 ? localItems : items;
+  const displayTotals = localTotals.totalItems > 0 ? localTotals : calculateTotals(items);
+
+  return (
+    <Grid container spacing={3}>
+      {/* Cart Items Section */}
+      <Grid item xs={12} lg={8}>
+        <Paper elevation={2} sx={{ borderRadius: 2, overflow: 'hidden' }}>
+          <Box sx={{ p: 3, borderBottom: '1px solid #e0e0e0' }}>
+            <Typography variant="h5" sx={{ fontWeight: 600 }}>
+              Shopping Cart ({displayTotals.totalItems} items)
+            </Typography>
+          </Box>
+          
+          <Box sx={{ maxHeight: '600px', overflowY: 'auto' }}>
+            {displayItems.map((item, index) => (
+              <CartItemCard
+                key={item._id}
+                item={item}
+                onQuantityChange={handleQuantityChange}
+                onRemoveItem={handleRemoveItem}
+                isLast={index === displayItems.length - 1}
+              />
+            ))}
+          </Box>
+        </Paper>
+      </Grid>
+
+      {/* Order Summary Section */}
+      <Grid item xs={12} lg={4}>
+        <Card elevation={2} sx={{ borderRadius: 2, position: 'sticky', top: 20 }}>
+          <CardContent sx={{ p: 3 }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
+              Order Summary
+            </Typography>
+
+            {/* Price Breakdown */}
+            <Box sx={{ mb: 3 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                <Typography variant="body2" color="text.secondary">
+                  Subtotal ({displayTotals.totalItems} items)
+                </Typography>
+                <Typography variant="body2" fontWeight={500}>
+                  ₹{displayTotals.subtotal.toFixed(2)}
+                </Typography>
+              </Box>
+              
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                <Typography variant="body2" color="text.secondary">
+                  GST (18%)
+                </Typography>
+                <Typography variant="body2" fontWeight={500}>
+                  ₹{displayTotals.gst.toFixed(2)}
+                </Typography>
+              </Box>
+              
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                <Typography variant="body2" color="text.secondary">
+                  Shipping
+                </Typography>
+                <Typography variant="body2" fontWeight={500}>
+                  {displayTotals.shipping === 0 ? (
+                    <Chip label="FREE" size="small" color="success" />
+                  ) : (
+                    `₹${displayTotals.shipping.toFixed(2)}`
+                  )}
+                </Typography>
+              </Box>
+              
+              {displayTotals.subtotal < FREE_SHIPPING_THRESHOLD && (
+                <Box sx={{ mt: 1 }}>
+                  <Typography variant="caption" color="success.main">
+                    Add ₹{(FREE_SHIPPING_THRESHOLD - displayTotals.subtotal).toFixed(2)} more for FREE shipping
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+
+            <Divider sx={{ my: 2 }} />
+
+            {/* Total */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+              <Typography variant="h6" fontWeight={600}>
+                Total
+              </Typography>
+              <Typography variant="h6" fontWeight={600} color="primary">
+                ₹{displayTotals.total.toFixed(2)}
+              </Typography>
+            </Box>
+
+            {/* Checkout Button */}
+            <Button
+              variant="contained"
+              fullWidth
+              size="large"
+              onClick={() => navigate('/ecommerceDashboard/checkout')}
+              disabled={displayTotals.totalItems === 0}
+              sx={{
+                borderRadius: 2,
+                py: 1.5,
+                textTransform: 'none',
+                fontSize: '16px',
+                fontWeight: 600
+              }}
+            >
+              Proceed to Checkout
+            </Button>
+
+            {/* Continue Shopping */}
+            <Button
+              variant="outlined"
+              fullWidth
+              size="large"
+              onClick={() => navigate('/ecommerceDashboard')}
+              sx={{
+                mt: 2,
+                borderRadius: 2,
+                py: 1.5,
+                textTransform: 'none',
+                fontSize: '16px'
+              }}
+            >
+              Continue Shopping
+            </Button>
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
+  );
+};
+
+// Cart Item Card Component
+const CartItemCard = ({ item, onQuantityChange, onRemoveItem, isLast }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  return (
+    <Box sx={{
+      p: 3,
+      borderBottom: isLast ? 'none' : '1px solid #e0e0e0',
+      '&:hover': { bgcolor: '#fafafa' }
+    }}>
+      <Grid container spacing={3}>
+        {/* Product Image */}
+        <Grid item xs={12} sm={3} md={2}>
+          <Box sx={{
+            width: '100%',
+            height: isMobile ? '120px' : '100px',
+            borderRadius: 2,
+            overflow: 'hidden',
+            bgcolor: '#f5f5f5'
+          }}>
+            <img
+              src={item.product?.thumbnailImage || 'https://via.placeholder.com/150x100?text=Product'}
+              alt={item.product?.name || 'Product'}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover'
+              }}
+            />
+          </Box>
+        </Grid>
+
+        {/* Product Details */}
+        <Grid item xs={12} sm={9} md={7}>
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, lineHeight: 1.3 }}>
+              {item.product?.name || 'Product Name'}
+            </Typography>
+            
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              {item.product?.description || 'Product description'}
+            </Typography>
+
+            {/* Rating */}
+            <Box sx={{ mb: 2 }}>
+              <StarRating
+                rating={item.product?.averageRating || 0}
+                reviewCount={item.product?.reviewCount || 0}
+                size="small"
+                showReviewCount={true}
+              />
+            </Box>
+
+            {/* Price */}
+            <Typography variant="h6" color="primary" sx={{ fontWeight: 600 }}>
+              ₹{item.price?.toFixed(2) || '0.00'}
+            </Typography>
+          </Box>
+        </Grid>
+
+        {/* Quantity Controls */}
+        <Grid item xs={12} sm={6} md={2}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <IconButton
+              size="small"
+              onClick={() => onQuantityChange(item._id, item.quantity, -1)}
+              disabled={item.quantity <= 1}
+              sx={{
+                border: '1px solid #e0e0e0',
+                '&:hover': { bgcolor: '#f5f5f5' }
+              }}
+            >
+              <RemoveIcon fontSize="small" />
+            </IconButton>
+            
+            <Typography variant="body1" sx={{ 
+              minWidth: '40px', 
+              textAlign: 'center',
+              fontWeight: 600
+            }}>
+              {item.quantity}
+            </Typography>
+            
+            <IconButton
+              size="small"
+              onClick={() => onQuantityChange(item._id, item.quantity, 1)}
+              disabled={item.quantity >= 10}
+              sx={{
+                border: '1px solid #e0e0e0',
+                '&:hover': { bgcolor: '#f5f5f5' }
+              }}
+            >
+              <AddIcon fontSize="small" />
+            </IconButton>
+          </Box>
+        </Grid>
+
+        {/* Total Price & Remove */}
+        <Grid item xs={12} sm={6} md={1}>
+          <Box sx={{ textAlign: 'right' }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+              ₹{(item.price * item.quantity).toFixed(2)}
+            </Typography>
+            
+            <IconButton
+              size="small"
+              onClick={() => onRemoveItem(item._id)}
+              sx={{
+                color: 'error.main',
+                '&:hover': { bgcolor: 'error.light', color: 'white' }
+              }}
+            >
+              <DeleteOutlineIcon fontSize="small" />
+            </IconButton>
+          </Box>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+};
+
+export default CartList;

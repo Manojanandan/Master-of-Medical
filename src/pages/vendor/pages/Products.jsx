@@ -1,25 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Grid, 
-  Button, 
-  Pagination, 
-  Card, 
-  CardContent, 
-  CardActions, 
-  Link, 
-  CircularProgress, 
-  Snackbar, 
-  Alert,
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  CardMedia,
+  CardActions,
+  Button,
   Chip,
-  CardMedia
+  TextField,
+  InputAdornment,
+  Pagination,
+  Grid,
+  IconButton,
+  Menu,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Select,
+  Alert,
+  Snackbar,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  CircularProgress
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import {
+  Search,
+  FilterList,
+  MoreVert,
+  Edit,
+  Delete,
+  Visibility as VisibilityIcon,
+  Add as AddIcon
+} from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllProducts, clearError } from '../reducers/ProductReducer';
+import StarRating from '../../../components/e_commerceComponents/StarRating';
 
 const Products = () => {
   const [page, setPage] = useState(1);
@@ -254,6 +273,16 @@ const Products = () => {
                       Brand: {product.brandName}
                     </Typography>
                   )}
+                  
+                  {/* Rating */}
+                  <Box sx={{ mb: 1.5 }}>
+                    <StarRating 
+                      rating={product.averageRating || 0}
+                      reviewCount={product.reviewCount || 0}
+                      size="small"
+                      showReviewCount={true}
+                    />
+                  </Box>
                   
                   {/* Category and Subcategory */}
                   <Box sx={{ display: 'flex', gap: 1, mb: 1.5, flexWrap: 'wrap' }}>

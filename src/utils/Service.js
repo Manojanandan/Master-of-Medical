@@ -1,4 +1,4 @@
-import instance from "./Instance";
+import { instance } from "./Instance";
 
 //vendor creation
 export const createVendorRegisteration = async(data) =>{
@@ -173,6 +173,25 @@ export const getAllOrders = async(params = {}) =>{
     const url = queryString ? `order/get-all-orders?${queryString}` : 'order/get-all-orders';
     
     console.log('getAllOrders URL:', url);
+    
+    return await instance.get(url)
+}
+
+// Review and Rating APIs
+export const createReview = async(reviewData) =>{
+    return await instance.post('review/create-review', reviewData)
+}
+
+export const getAllReviews = async(params = {}) =>{
+    const queryParams = new URLSearchParams();
+    
+    // Add query parameters
+    if (params.productId) queryParams.append('productId', params.productId);
+    if (params.page) queryParams.append('page', params.page);
+    if (params.limit) queryParams.append('limit', params.limit);
+    
+    const queryString = queryParams.toString();
+    const url = queryString ? `review/get-all-review?${queryString}` : 'review/get-all-review';
     
     return await instance.get(url)
 }
