@@ -1,166 +1,477 @@
-import { Box, Button, Grid, IconButton, InputAdornment, Modal, TextField, Typography } from '@mui/material'
-import React, { useState } from 'react'
-import WestIcon from '@mui/icons-material/West';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { 
+  Box, 
+  Button, 
+  TextField, 
+  Typography,
+  InputAdornment,
+  IconButton,
+  Modal,
+  CircularProgress,
+  Stack
+} from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
+import { 
+  West as WestIcon,
+  Visibility,
+  VisibilityOff
+} from '@mui/icons-material';
 import OTPInput from '../../../components/e_commerceComponents/OTPInput';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
 
-// Email: basic pattern for most emails
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const ForgotPassword = () => {
-    const navigate = useNavigate()
-    const [errors, setErrors] = useState({ emailError: "", newpasswordError: "", confirmpasswordError: "" })
-    const [allData, setAllData] = useState({ email: "", newpassword: "", confirmpassword: "", otpModal: false, otpInput: "", passwordModal: false })
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({ 
+        email: "", 
+        newPassword: "", 
+        confirmPassword: "" 
+    });
+    const [formData, setFormData] = useState({ 
+        email: "", 
+        newPassword: "", 
+        confirmPassword: "" 
+    });
+    const [modalState, setModalState] = useState({
+        otpModal: false,
+        passwordModal: false,
+        otp: ""
+    });
+    const [showPassword, setShowPassword] = useState({
+        newPassword: false,
+        confirmPassword: false
+    });
+    const [resendTimer, setResendTimer] = useState(0);
 
-    const togglePasswordVisibility = () => {
-        setShowPassword((prev) => !prev);
-    }
-    const toggleConfirmPasswordVisibility = () => {
-        setShowConfirmPassword((prev) => !prev);
-    }
-    const handleOtpChange = (value) => {
-        setAllData(prev => ({
-        ...prev,
-        otpInput: value
-    }));
-    };
+    useEffect(() => {
+        let interval;
+        if (resendTimer > 0) {
+            interval = setInterval(() => {
+                setResendTimer(prev => prev - 1);
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [resendTimer]);
 
     const handleChange = (e) => {
-        setAllData({ ...allData, [e.target.id]: e.target.value })
-        if (e.target.id === "email") {
-            setErrors({ ...errors, emailError: "" });
-        }
-        if (e.target.id === "newpassword") {
-            setErrors({ ...errors, newpasswordError: "" });
-        }
-        if (e.target.id === "confirmpassword") {
-            setErrors({ ...errors, confirmpasswordError: "" });
-        }
-    }
+        const { id, value } = e.target;
+        setFormData(prev => ({ ...prev, [id]: value }));
+        if (errors[id]) setErrors(prev => ({ ...prev, [id]: "" }));
+    };
 
-    const generateOTP = () => {
-        if (allData.email === "") {
-            setErrors({ ...errors, emailError: "Email is required" })
-        } else if (!emailRegex.test(allData.email)) {
-            setErrors({ ...errors, emailError: "Invalid email format" })
-        } else {
-            setAllData({ otpModal: true })
-        }
-    }
+    const handleOtpChange = (otp) => {
+        setModalState(prev => ({ ...prev, otp }));
+    };
 
-    const handleCloseOTP = () => {
-        setAllData({ email: "", otpInput: "", otpModal: false })
-    }
-    const handleVerifyOTP = () => {
-        setAllData({ otpInput: "", email: '', otpModal: false, passwordModal: true })
-    }
-
-    const confirmPassword = () => {
-        console.log(allData.newpassword);
-        console.log(allData.confirmpassword);
-        if (!allData.newpassword) {
-            setErrors({ ...errors, newpasswordError: "New password is required" })
-        } else if (!allData.confirmpassword) {
-            setErrors({ ...errors, confirmpasswordError: "Confirm password is required" })
-        } else if (allData.newpassword !== allData.confirmpassword) {
-            setErrors({ ...errors, confirmpasswordError: "Confirm password should be same as new password" })
-        } else {
-            navigate('/loginform')
+    const validateEmail = () => {
+        if (!formData.email) {
+            setErrors(prev => ({ ...prev, email: "Email is required" }));
+            return false;
         }
-    }
+        if (!emailRegex.test(formData.email)) {
+            setErrors(prev => ({ ...prev, email: "Invalid email format" }));
+            return false;
+        }
+        return true;
+    };
+
+    const validatePasswords = () => {
+        let isValid = true;
+        const newErrors = { newPassword: "", confirmPassword: "" };
+
+        if (!formData.newPassword) {
+            newErrors.newPassword = "New password is required";
+            isValid = false;
+        } else if (formData.newPassword.length < 8) {
+            newErrors.newPassword = "Password must be at least 8 characters";
+            isValid = false;
+        }
+
+        if (!formData.confirmPassword) {
+            newErrors.confirmPassword = "Please confirm your password";
+            isValid = false;
+        } else if (formData.newPassword !== formData.confirmPassword) {
+            newErrors.confirmPassword = "Passwords do not match";
+            isValid = false;
+        }
+
+        setErrors(prev => ({ ...prev, ...newErrors }));
+        return isValid;
+    };
+
+    const handleSendOtp = async () => {
+        if (!validateEmail()) return;
+        
+        setLoading(true);
+        try {
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            setModalState(prev => ({ ...prev, otpModal: true }));
+            setResendTimer(30); // Start the countdown when OTP is sent
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleResendOtp = async () => {
+        setLoading(true);
+        try {
+            // Simulate API call to resend OTP
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            setResendTimer(30); // Reset the timer
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleVerifyOtp = () => {
+        // In a real app, you would verify the OTP with your backend
+        setModalState({ otpModal: false, passwordModal: true, otp: "" });
+    };
+
+    const handleResetPassword = async () => {
+        if (!validatePasswords()) return;
+        
+        setLoading(true);
+        try {
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            navigate('/login');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
-        <>
-            <Box sx={{ height: '100vh', width: '100%', backgroundColor: '#f2f3f5', padding: '4% 0' }}>
-                <Box onClick={() => navigate('/loginform')} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', width: '90%', gap: '10px', cursor: 'pointer', right: '20px' }}>
-                    <WestIcon sx={{ fontSize: '2rem' }} />
-                    <Typography variant='p' component='div' sx={{ fontSize: '1.6rem', fontWeight: 'bold', color: 'black' }}>Back</Typography>
-                </Box>
-                <Box sx={{ border: 'solid 1.5px #fff', height: 'auto', margin: '4% auto', backgroundColor: '#fff', borderRadius: '15px', width: '30%' }}>
-                    <Box sx={{ margin: '7% auto 5%', width: 'auto', textAlign: 'center' }}>
-                        <Typography variant='p' sx={{ margin: '5% auto 0', fontSize: '1.8rem', }}>Forgot Password</Typography><br />
-                        <Typography variant='p' sx={{ fontSize: '14px', fontWeight: 'bold' }}>Create a new password</Typography>
-                    </Box>
-                    <Grid container spacing={2}>
-                        <Grid item size={12} sx={{ margin: '5% 7% 0' }}>
-                            <Typography sx={{ fontSize: '18px', fontWeight: 'bold' }}>Email<span style={{ color: 'red', marginLeft: '5px' }}>*</span></Typography>
-                            {errors.emailError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errors.emailError}</Typography>}
-                            <TextField fullWidth id="email" size="small" value={allData.email} onChange={handleChange} />
-                        </Grid>
-                    </Grid>
-                    <Button onClick={generateOTP} variant='contained' sx={{ fontSize: '16px', fontWeight: 'bold', margin: '7% 35% 10%', backgroundColor: '#009e92', width: '30%' }}>Send OTP</Button>
-
-                </Box>
+        <Box sx={{ 
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            backgroundColor: '#f8f9fa',
+            padding: { xs: '1rem', md: '3%' }
+        }}>
+            {/* Back Button */}
+            <Box 
+                onClick={() => navigate('/login')} 
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    cursor: 'pointer',
+                    alignSelf: 'flex-start',
+                    mb: 2,
+                    '&:hover': {
+                        color: 'primary.main'
+                    }
+                }}
+            >
+                <WestIcon sx={{ fontSize: '1.5rem' }} />
+                <Typography variant='body1' sx={{ fontWeight: 'bold' }}>Back</Typography>
             </Box>
-            {allData.otpModal &&
-                <Modal
-                    open={allData.otpModal}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
-                >
-                    <Box sx={{ position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%, -50%)', width: '30%', bgcolor: 'background.paper', boxShadow: 24, border: 'none', padding: '2%', outline: 'none', borderRadius: '10px' }}>
-                        <Box sx={{ width: '80%', margin: '0 auto', textAlign: 'center' }}>
-                            <Typography variant='p' component='div' sx={{ fontSize: '1.7rem', fontWeight: 'bold' }}>Verification</Typography>
-                            <Typography variant='p' component='div' sx={{ fontSize: '1rem', }}>Enter your verification code</Typography>
-                        </Box>
-                        <Box sx={{ margin: '8% auto', width: '80%' }}>
-                            <OTPInput length={6} onChange={handleOtpChange} />
-                        </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', width: '75%', margin: '5% auto', fontWeight: 'bold', fontSize: '1.8rem', flexWrap: 'wrap-reverse' }}>
-                            <Button onClick={handleCloseOTP} variant='outlined' sx={{ padding: '2% 8%', backgroundColor: '#938d8dde', color: '#fff', fontWeight: 'bold' }}>Cancel</Button>
-                            <Button onClick={handleVerifyOTP} variant='contained' sx={{ backgroundColor: '#009e92', color: '#fff', fontWeight: 'bold' }}>Verify OTP</Button>
-                        </Box>
+            
+            {/* Main Card */}
+            <Box sx={{ 
+                width: { xs: '100%', md: '55%' },
+                maxWidth: '500px',
+                margin: '0 auto',
+                backgroundColor: '#fff',
+                borderRadius: '12px',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                padding: { xs: '1.5rem', md: '2.5rem' }
+            }}>
+                <Stack spacing={3}>
+                    {/* Header */}
+                    <Box textAlign="center">
+                        <Typography variant="h4" sx={{ 
+                            fontWeight: 'bold',
+                            color: 'text.primary',
+                            mb: 1
+                        }}>
+                            Forgot Password
+                        </Typography>
+                        <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                            Enter your email to reset your password
+                        </Typography>
                     </Box>
-                </Modal>
-            }
-            {allData.passwordModal &&
-                <Modal
-                    open={allData.passwordModal}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
-                >
-                    <Box sx={{ position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%, -50%)', width: '30%', bgcolor: 'background.paper', boxShadow: 24, border: 'none', padding: '2%', outline: 'none', borderRadius: '10px' }}>
-                        <Box sx={{ width: '80%', margin: '0 auto', textAlign: 'center' }}>
-                            <Typography variant='p' component='div' sx={{ fontSize: '1.7rem', fontWeight: 'bold' }}>Reset Your Password</Typography>
-                        </Box>
-                        <Box sx={{ height: 'auto', margin: '4% auto 2%', backgroundColor: '#fff', borderRadius: '15px', width: '95%' }}>
-                            <Grid container spacing={2}>
-                                <Grid item size={12} sx={{ margin: '5% 0 1%' }}>
-                                    <Typography sx={{ fontSize: '18px', fontWeight: 'bold' }}>New Password<span style={{ color: 'red', marginLeft: '5px' }}>*</span></Typography>
-                                    {errors.newpasswordError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errors.newpasswordError}</Typography>}
-                                    <TextField fullWidth id="newpassword" size="small" value={allData.newpassword} onChange={handleChange} type={showPassword ? 'text' : 'password'} InputProps={{
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <IconButton onClick={togglePasswordVisibility} edge="end">
-                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                                                </IconButton>
-                                            </InputAdornment>
-                                        ),
-                                    }} />
-                                </Grid>
-                                <Grid item size={12} sx={{ margin: '0% 0' }}>
-                                    <Typography sx={{ fontSize: '18px', fontWeight: 'bold' }}>Confirm Password<span style={{ color: 'red', marginLeft: '5px' }}>*</span></Typography>
-                                    {errors.confirmpasswordError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errors.confirmpasswordError}</Typography>}
-                                    <TextField fullWidth id="confirmpassword" size="small" value={allData.confirmpassword} onChange={handleChange} type={showConfirmPassword ? 'text' : 'password'} InputProps={{
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <IconButton onClick={toggleConfirmPasswordVisibility} edge="end">
-                                                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                                                </IconButton>
-                                            </InputAdornment>
-                                        ),
-                                    }} />
-                                </Grid>
-                            </Grid>
-                            <Button onClick={confirmPassword} variant='contained' sx={{ fontSize: '16px', fontWeight: 'bold', margin: '10% 30% 2%', backgroundColor: '#009e92', width: '40%' }}>confirm</Button>
-                        </Box>
+                    
+                    {/* Email Field */}
+                    <Box>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+                            Email <span style={{ color: 'red' }}>*</span>
+                        </Typography>
+                        <TextField
+                            fullWidth
+                            id="email"
+                            size="medium"
+                            variant="outlined"
+                            autoComplete="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            error={!!errors.email}
+                            helperText={errors.email}
+                            placeholder="Enter your email"
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: '8px'
+                                }
+                            }}
+                        />
                     </Box>
-                </Modal>
-            }
-        </>
-    )
-}
+                    
+                    {/* Submit Button */}
+                    <Button
+                        onClick={handleSendOtp}
+                        variant="contained"
+                        color="primary"
+                        disabled={loading}
+                        fullWidth
+                        size="large"
+                        sx={{
+                            borderRadius: '8px',
+                            py: 1.5,
+                            textTransform: 'none',
+                            fontSize: '1rem',
+                            fontWeight: 'bold',
+                            boxShadow: 'none',
+                            '&:hover': {
+                                boxShadow: 'none'
+                            }
+                        }}
+                    >
+                        {loading ? (
+                            <CircularProgress size={24} color="inherit" />
+                        ) : (
+                            'Send OTP'
+                        )}
+                    </Button>
+                    
+                    {/* Login Link */}
+                    <Typography variant="body2" sx={{ textAlign: 'center', mt: 2 }}>
+                        Remember your password?{' '}
+                        <Link 
+                            to="/login" 
+                            style={{ 
+                                color: '#009e92',
+                                fontWeight: '600',
+                                textDecoration: 'none',
+                                borderBottom: '1.5px solid #009e92'
+                            }}
+                        >
+                            Login
+                        </Link>
+                    </Typography>
+                </Stack>
+            </Box>
+            
+            {/* OTP Verification Modal */}
+            <Modal
+                open={modalState.otpModal}
+                onClose={() => setModalState(prev => ({ ...prev, otpModal: false }))}
+                aria-labelledby="otp-modal-title"
+            >
+                <Box sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: { xs: '90%', sm: '400px' },
+                    bgcolor: 'background.paper',
+                    boxShadow: 24,
+                    borderRadius: '12px',
+                    p: 4,
+                    outline: 'none'
+                }}>
+                    <Typography variant="h6" sx={{ 
+                        fontWeight: 'bold', 
+                        mb: 1, 
+                        textAlign: 'center',
+                        fontSize: '1.25rem'
+                    }}>
+                        OTP Verification
+                    </Typography>
+                    <Typography variant="body2" sx={{ 
+                        textAlign: 'center', 
+                        mb: 3, 
+                        color: 'text.secondary',
+                        fontSize: '0.875rem'
+                    }}>
+                      
+                    </Typography>
+                    
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+                        <OTPInput length={6} onChange={handleOtpChange} />
+                    </Box>
+                    
+                    <Box sx={{ 
+                        display: 'flex', 
+                        justifyContent: 'center', 
+                        mb: 3,
+                        fontSize: '0.875rem',
+                        color: 'text.secondary'
+                    }}>
+                        {resendTimer > 0 ? (
+                            <Typography variant="body2">
+                            </Typography>
+                        ) : (
+                            <Button 
+                                onClick={handleResendOtp}
+                                disabled={loading}
+                                sx={{
+                                    textTransform: 'none',
+                                    color: 'primary.main',
+                                    fontWeight: 'bold',
+                                    fontSize: '0.875rem',
+                                    p: 0,
+                                    minWidth: 0,
+                                    '&:hover': {
+                                        backgroundColor: 'transparent',
+                                        textDecoration: 'underline'
+                                    }
+                                }}
+                            >
+                                Resend OTP
+                            </Button>
+                        )}
+                    </Box>
+                    
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        onClick={handleVerifyOtp}
+                        disabled={modalState.otp.length !== 6 || loading}
+                        sx={{
+                            borderRadius: '8px',
+                            py: 1.5,
+                            textTransform: 'none',
+                            fontWeight: 'bold',
+                            fontSize: '1rem'
+                        }}
+                    >
+                        {loading ? <CircularProgress size={24} color="inherit" /> : 'Verify OTP'}
+                    </Button>
+                </Box>
+            </Modal>
+            
+            {/* Password Reset Modal */}
+            <Modal
+                open={modalState.passwordModal}
+                onClose={() => setModalState(prev => ({ ...prev, passwordModal: false }))}
+                aria-labelledby="password-modal-title"
+            >
+                <Box sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: { xs: '90%', sm: '400px' },
+                    bgcolor: 'background.paper',
+                    boxShadow: 24,
+                    borderRadius: '12px',
+                    p: 4,
+                    outline: 'none'
+                }}>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3, textAlign: 'center' }}>
+                        Create New Password
+                    </Typography>
+                    
+                    {/* New Password Field */}
+                    <Box sx={{ mb: 2 }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+                            New Password <span style={{ color: 'red' }}>*</span>
+                        </Typography>
+                        <TextField
+                            fullWidth
+                            id="newPassword"
+                            type={showPassword.newPassword ? 'text' : 'password'}
+                            size="medium"
+                            variant="outlined"
+                            value={formData.newPassword}
+                            onChange={handleChange}
+                            error={!!errors.newPassword}
+                            helperText={errors.newPassword}
+                            placeholder="Enter new password"
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={() => setShowPassword(prev => ({ ...prev, newPassword: !prev.newPassword }))}
+                                            edge="end"
+                                        >
+                                            {showPassword.newPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: '8px'
+                                }
+                            }}
+                        />
+                    </Box>
+                    
+                    {/* Confirm Password Field */}
+                    <Box sx={{ mb: 3 }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+                            Confirm Password <span style={{ color: 'red' }}>*</span>
+                        </Typography>
+                        <TextField
+                            fullWidth
+                            id="confirmPassword"
+                            type={showPassword.confirmPassword ? 'text' : 'password'}
+                            size="medium"
+                            variant="outlined"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            error={!!errors.confirmPassword}
+                            helperText={errors.confirmPassword}
+                            placeholder="Confirm new password"
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={() => setShowPassword(prev => ({ ...prev, confirmPassword: !prev.confirmPassword }))}
+                                            edge="end"
+                                        >
+                                            {showPassword.confirmPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: '8px'
+                                }
+                            }}
+                        />
+                    </Box>
+                    
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        onClick={handleResetPassword}
+                        disabled={loading}
+                        sx={{
+                            borderRadius: '8px',
+                            py: 1.5,
+                            textTransform: 'none',
+                            fontWeight: 'bold'
+                        }}
+                    >
+                        {loading ? <CircularProgress size={24} color="inherit" /> : 'Reset Password'}
+                    </Button>
+                </Box>
+            </Modal>
+            
+            {/* Footer */}
+            <Box sx={{ mt: 3, textAlign: 'center' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    © {new Date().getFullYear()} Your Company. All rights reserved.
+                </Typography>
+            </Box>
+        </Box>
+    );
+};
 
-export default ForgotPassword
+export default ForgotPassword;

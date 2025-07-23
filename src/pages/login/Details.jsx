@@ -96,7 +96,20 @@ const Details = () => {
         cfAuthorization: "",
     })
     const [featureImage, setFeatureImage] = useState(null);
-    const tempData = JSON.parse(sessionStorage.getItem("tempData"));
+    let tempData = [];
+    try {
+        const raw = sessionStorage.getItem("tempData");
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+                tempData = parsed;
+            } else if (parsed && typeof parsed === 'object') {
+                tempData = [parsed];
+            }
+        }
+    } catch (e) {
+        tempData = [];
+    }
 
     // Add useEffect to track success state changes
     useEffect(() => {
@@ -307,11 +320,11 @@ const Details = () => {
                         <Grid container columnSpacing={2}>
                             <Grid item size={12} >
                                 <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '1% 0 1%' }}>Name</Typography>
-                                <TextField disabled fullWidth id="name" size="small" value={tempData[0].userName} onChange={handleChange} />
+                                <TextField disabled fullWidth id="name" size="small" value={tempData[0]?.userName || ''} onChange={handleChange} />
                             </Grid>
                             <Grid item size={6} >
                                 <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 1%' }}>Email</Typography>
-                                <TextField disabled fullWidth id="email" size="small" value={tempData[0].email} onChange={handleChange} />
+                                <TextField disabled fullWidth id="email" size="small" value={tempData[0]?.email || ''} onChange={handleChange} />
                             </Grid>
                              <Grid item size={6} >
                                 <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 1%' }}>Contact Number<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
