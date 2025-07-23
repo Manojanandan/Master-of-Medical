@@ -5,6 +5,7 @@ import vendorProfileReducer from "../pages/vendor/reducers/VendorProfileReducer"
 import productReducer from "../pages/vendor/reducers/ProductReducer";
 import publicProductReducer from "./PublicProductReducer";
 import cartReducer from "./CartReducer";
+import reviewReducer from "./ReviewReducer";
 
  const rootReducer = combineReducers({
     signUpReducer: signUpReducer,
@@ -13,6 +14,7 @@ import cartReducer from "./CartReducer";
     productReducer: productReducer,
     publicProductReducer: publicProductReducer,
     cartReducer: cartReducer,
+    reviewReducer: reviewReducer,
 })
 
 export default rootReducer  

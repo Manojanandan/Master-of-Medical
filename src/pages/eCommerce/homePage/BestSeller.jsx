@@ -94,6 +94,8 @@ const BestSeller = () => {
         originalPrice: originalPrice.toFixed(2),
         description: item.description || "Product description goes here",
         id: item.id, // Use the actual ID from API response
+        averageRating: item.averageRating || '0.0',
+        reviewCount: item.reviewCount || 0,
       };
     });
   
@@ -132,6 +134,8 @@ const BestSeller = () => {
                 price={product.price} 
                 originalPrice={product.originalPrice}
                 id={product.id}
+                averageRating={product.averageRating}
+                reviewCount={product.reviewCount}
                 onClick={() => handleProductClick(product.id)} 
               />
             ))}

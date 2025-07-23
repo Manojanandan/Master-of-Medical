@@ -20,7 +20,9 @@ import {
   InputAdornment,
   Slider,
   Divider,
-  Paper
+  Paper,
+  useTheme,
+  useMediaQuery
 } from "@mui/material";
 import ProductCard from "../components/e_commerceComponents/ProductCard";
 import { 
@@ -55,6 +57,10 @@ const sortOptions = [
 ];
 
 const Products = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -375,12 +381,12 @@ const Products = () => {
         <>
           {displayProducts && displayProducts.length > 0 ? (
             <Box sx={{
-              display: 'flex',
-              justifyContent: 'flex-start',
-              margin: '1% 3% 1%',
-              width: '95%',
-              flexWrap: 'wrap',
-              gap: '4%'
+              display: 'grid',
+              gridTemplateColumns: isMobile ? 'repeat(1, 1fr)' : isTablet ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)',
+              gap: isMobile ? '20px' : '24px',
+              padding: isMobile ? '10px 16px' : '24px 24px',
+              width: '100%',
+              maxWidth: '100%'
             }}>
               {displayProducts.map((product) => {
                 // Try to find the product ID from various possible field names
@@ -401,6 +407,8 @@ const Products = () => {
                   price: product.price || '30.00',
                   originalPrice: product.originalPrice || (parseFloat(product.price || '30.00') * 1.5).toFixed(2),
                   id: productId,
+                  averageRating: product.averageRating || '0.0',
+                  reviewCount: product.reviewCount || 0,
                 };
 
                 return (
@@ -414,6 +422,8 @@ const Products = () => {
                     price={transformedProduct.price} 
                     originalPrice={transformedProduct.originalPrice}
                     id={transformedProduct.id}
+                    averageRating={transformedProduct.averageRating}
+                    reviewCount={transformedProduct.reviewCount}
                     onClick={() => handleProductClick(productId)}
                   />
                 );
@@ -435,18 +445,18 @@ const Products = () => {
 
           {/* Pagination - only show when there are products and multiple pages */}
           {displayProducts && displayProducts.length > 0 && totalPages > 1 && (
-            <div
-              style={{
+            <Box
+              sx={{
                 display: 'flex',
                 justifyContent: 'center',
                 margin: '48px 0 0 0',
                 width: '100%',
                 alignItems: 'center',
-                gap: 24,
+                gap: 3,
               }}
             >
-              <span
-                style={{
+              <Typography
+                sx={{
                   fontWeight: 500,
                   color: '#1976d2',
                   fontSize: 18,
@@ -455,7 +465,7 @@ const Products = () => {
                 }}
               >
                 Page {pagination.page} of {totalPages}
-              </span>
+              </Typography>
               <Pagination
                 count={totalPages}
                 page={pagination.page}
@@ -488,7 +498,7 @@ const Products = () => {
                   },
                 }}
               />
-            </div>
+            </Box>
           )}
         </>
       )}

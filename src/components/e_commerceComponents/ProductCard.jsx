@@ -1,12 +1,12 @@
 import React from 'react'
 import { Box, Button, Typography, IconButton, Chip, useTheme, useMediaQuery } from '@mui/material'
-import Star from './Star'
+import StarRating from './StarRating'
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCart, updateCartItemQuantity, removeFromCart } from '../../redux/CartReducer';
 
-const ProductCard = ({offer,image,badge,title,rating,price,originalPrice,id,onClick}) => {
+const ProductCard = ({offer,image,badge,title,rating,price,originalPrice,id,onClick,averageRating,reviewCount}) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.down('md'));
@@ -189,20 +189,14 @@ const ProductCard = ({offer,image,badge,title,rating,price,originalPrice,id,onCl
           {title}
         </Typography>
 
-        {/* Rating - Fixed to show 4 stars */}
-        <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-          {[...Array(5)].map((_, index) => (
-            <Box
-              key={index}
-              sx={{
-                color: index < 4 ? '#FFD700' : '#e0e0e0',
-                fontSize: isMobile ? '14px' : '16px',
-                marginRight: '1px',
-              }}
-            >
-              ★
-            </Box>
-          ))}
+        {/* Rating - Dynamic based on averageRating */}
+        <Box sx={{ marginBottom: '8px' }}>
+          <StarRating 
+            rating={averageRating || rating || 0}
+            reviewCount={reviewCount || 0}
+            size={isMobile ? 'small' : 'medium'}
+            showReviewCount={true}
+          />
         </Box>
 
         {/* Price Section */}
