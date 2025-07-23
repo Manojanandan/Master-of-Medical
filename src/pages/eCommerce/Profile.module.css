@@ -1118,6 +1118,64 @@
   }
 }
 
+/* Dropdown Styles */
+.dropdownContainer {
+  width: 100%;
+}
+
+.dropdownInput {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: #ffffff;
+  transition: border-color 0.2s ease;
+  color: #333;
+}
+
+.dropdownInput:focus {
+  outline: none;
+  border-color: #1976d2;
+}
+
+/* Address Form Styles */
+.addressForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.formTextarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: #ffffff;
+  transition: border-color 0.2s ease;
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
+.formTextarea:focus {
+  outline: none;
+  border-color: #1976d2;
+}
+
+.formTextarea:disabled {
+  background-color: #f5f5f5;
+  color: #666;
+  cursor: not-allowed;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .layout {
@@ -1211,6 +1269,11 @@
 
   .addressActions {
     align-self: flex-end;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .modalOverlay {
