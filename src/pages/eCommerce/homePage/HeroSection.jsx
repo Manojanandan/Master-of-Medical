@@ -104,7 +104,7 @@ const HeroSection = () => {
                                 }}>
                                     {feature.icon}
                                 </Box>
-                                <Box sx={{ height: 'auto', width: '100%' }}>
+                                    <Box sx={{ height: 'auto', width: '100%' }}>
                                     <Typography variant='h6' sx={{ 
                                         fontWeight: 'bold', 
                                         width: '100%',
@@ -122,8 +122,8 @@ const HeroSection = () => {
                                     }}>
                                         {feature.description}
                                     </Typography>
-                                </Box>
-                            </Stack>
+                                    </Box>
+                                </Stack>
                         </Box>
                     ))}
                 </Box>

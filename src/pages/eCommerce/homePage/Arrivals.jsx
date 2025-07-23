@@ -84,7 +84,7 @@ const Arrivals = () => {
     
     // Transform API data to match ProductCard expected format - limit to 4 products
     const transformedData = arrivalsData
-        .slice(0, 4) // Limit to 4 products
+        .slice(0, 5) // Limit to 4 products
         .map((item, index) => ({
             offer: item.offer || '70%',
             image: item.image || item.thumbnailImage || "https://www.lifenowhealth.com/cdn/shop/files/Untitled-3_0021_Plantbasedcollagenbuilder.jpg?v=1695386987",
@@ -111,7 +111,7 @@ const Arrivals = () => {
                 display: 'grid',
                 gridTemplateColumns: isMobile ? 'repeat(1, 1fr)' : isTablet ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)',
                 gap: isMobile ? '20px' : '24px',
-                padding: isMobile ? '0 16px' : '0 24px',
+                padding: isMobile ? '10px 16px' : '24px 24px',
                 width: '100%',
                 maxWidth: '100%'
             }}>
