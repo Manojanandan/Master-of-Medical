@@ -150,7 +150,7 @@ const LandingFeature = () => {
                                 border: 'solid 2px black',
                                 borderRadius: '12px',
                                 outline: 'none',
-                                border:'none'
+                                border: 'none'
                               }}
                             >
                               Continue Reading
