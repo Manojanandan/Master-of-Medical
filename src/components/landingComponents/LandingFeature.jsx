@@ -149,8 +149,7 @@ const LandingFeature = () => {
                                 fontWeight: 'bold',
                                 border: 'solid 2px black',
                                 borderRadius: '12px',
-                                outline: 'none',
-                                border: 'none'
+                                outline: 'none'
                               }}
                             >
                               Continue Reading

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Box, 
   Button, 
@@ -10,7 +10,9 @@ import {
   InputAdornment,
   IconButton,
   Divider,
-  CircularProgress
+  CircularProgress,
+  Alert,
+  Snackbar
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
@@ -19,18 +21,15 @@ import {
   Visibility,
   VisibilityOff
 } from '@mui/icons-material';
-import { useDispatch } from 'react-redux';
 
-// Validation patterns
+// Enhanced validation patterns
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const userNameRegex = /^[a-zA-Z]{3,16}$/;
-const passwordRegex = /^(?=.[A-Za-z])(?=.\d)(?=.[@$!%#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+const userNameRegex = /^[a-zA-Z][a-zA-Z0-9_]{2,15}$/;
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
 const Signup = () => {
     const navigate = useNavigate();
-    const dispatch = useDispatch();
-    const type = sessionStorage.getItem("userType");
-    const storeVendorDetails = [];
+    const userType = sessionStorage.getItem("userType") || 'user';
     
     const [checked, setChecked] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -41,65 +40,80 @@ const Signup = () => {
         userName: ""
     });
     
-    const [errorMsg, setErrorMsg] = useState({ 
-        emailError: '', 
-        passwordError: "", 
-        useNameError: "" 
+    const [errors, setErrors] = useState({ 
+        email: '', 
+        password: "", 
+        userName: "" 
     });
+    
+    const [submitError, setSubmitError] = useState(null);
+    const [formValid, setFormValid] = useState(false);
+
+    // Validate form on each change
+    useEffect(() => {
+        const isValid = 
+            formData.email && emailRegex.test(formData.email) &&
+            formData.userName && userNameRegex.test(formData.userName) &&
+            formData.password && passwordRegex.test(formData.password) &&
+            checked;
+        setFormValid(isValid);
+    }, [formData, checked]);
 
     const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.id]: e.target.value
-        });
+        const { id, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [id]: value
+        }));
         
         // Clear error when user starts typing
-        if (e.target.id === "email" && errorMsg.emailError) {
-            setErrorMsg({ ...errorMsg, emailError: "" });
-        }
-        if (e.target.id === "userName" && errorMsg.useNameError) {
-            setErrorMsg({ ...errorMsg, useNameError: "" });
-        }
-        if (e.target.id === "password" && errorMsg.passwordError) {
-            setErrorMsg({ ...errorMsg, passwordError: "" });
+        if (errors[id]) {
+            setErrors(prev => ({ ...prev, [id]: "" }));
         }
     };
 
-    const validateForm = () => {
-        let isValid = true;
-        const newErrors = { emailError: '', passwordError: "", useNameError: "" };
-
-        if (!formData.email) {
-            newErrors.emailError = "Email is required";
-            isValid = false;
-        } else if (!emailRegex.test(formData.email)) {
-            newErrors.emailError = "Invalid email format";
-            isValid = false;
+    const validateField = (fieldName, value) => {
+        switch (fieldName) {
+            case 'email':
+                if (!value) return "Email is required";
+                if (!emailRegex.test(value)) return "Please enter a valid email address";
+                return "";
+            case 'userName':
+                if (!value) return "Username is required";
+                if (!userNameRegex.test(value)) return "Username must be 3-16 characters (letters, numbers, _) starting with a letter";
+                return "";
+            case 'password':
+                if (!value) return "Password is required";
+                if (!passwordRegex.test(value)) return "Must be 8+ chars with uppercase, lowercase, number, and special character";
+                return "";
+            default:
+                return "";
         }
+    };
 
-        if (!formData.userName) {
-            newErrors.useNameError = "Username is required";
-            isValid = false;
-        } else if (!userNameRegex.test(formData.userName)) {
-            newErrors.useNameError = "Username must be 3-16 letters only";
-            isValid = false;
-        }
-
-        if (!formData.password) {
-            newErrors.passwordError = "Password is required";
-            isValid = false;
-        } else if (!passwordRegex.test(formData.password)) {
-            newErrors.passwordError = "Password must be at least 8 characters with one letter, number, and special character";
-            isValid = false;
-        }
-
-        setErrorMsg(newErrors);
-        return isValid;
+    const handleBlur = (e) => {
+        const { id, value } = e.target;
+        const error = validateField(id, value);
+        setErrors(prev => ({ ...prev, [id]: error }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!validateForm()) return;
+        
+        // Validate all fields
+        const emailError = validateField('email', formData.email);
+        const userNameError = validateField('userName', formData.userName);
+        const passwordError = validateField('password', formData.password);
+        
+        setErrors({
+            email: emailError,
+            userName: userNameError,
+            password: passwordError
+        });
+        
+        if (emailError || userNameError || passwordError || !checked) {
+            return;
+        }
         
         setIsLoading(true);
         
@@ -107,25 +121,24 @@ const Signup = () => {
             // Simulate API call
             await new Promise(resolve => setTimeout(resolve, 1000));
             
-            storeVendorDetails.push({
-                email: formData.email, 
-                password: formData.password, 
-                userName: formData.userName
-            });
+            const userData = {
+                ...formData,
+                userType,
+                createdAt: new Date().toISOString()
+            };
             
-            sessionStorage.setItem("tempData", JSON.stringify(storeVendorDetails));
+            // Store temporarily
+            sessionStorage.setItem("tempUserData", JSON.stringify(userData));
+            
+            // Redirect to details page
             navigate('/details');
-            setFormData({ email: "", password: "", userName: "" });
             
         } catch (error) {
             console.error("Signup error:", error);
+            setSubmitError("Failed to create account. Please try again.");
         } finally {
             setIsLoading(false);
         }
-    };
-
-    const togglePasswordVisibility = () => {
-        setShowPassword(!showPassword);
     };
 
     return (
@@ -168,17 +181,16 @@ const Signup = () => {
                 <Stack spacing={3}>
                     {/* Header */}
                     <Box textAlign="center">
-                        <Typography variant="h4" sx={{ 
+                        <Typography variant="h5" sx={{ 
                             fontWeight: 'bold',
-                            color: 'text.primary',
                             mb: 1
                         }}>
-                            Join as {type?.toLowerCase() || 'user'}
+                            Join as {userType.charAt(0).toUpperCase() + userType.slice(1)}
                         </Typography>
                         <Typography variant="body1" sx={{ color: 'text.secondary' }}>
                             Already have an account?{' '}
                             <Link 
-                                to="/loginform" 
+                                to="/login" 
                                 style={{ 
                                     color: '#009e92',
                                     fontWeight: '600',
@@ -192,24 +204,26 @@ const Signup = () => {
                     </Box>
                     
                     {/* Form */}
-                    <Box component="form" onSubmit={handleSubmit}>
+                    <Box component="form" onSubmit={handleSubmit} noValidate>
                         <Stack spacing={2.5}>
                             {/* Email Field */}
                             <Box>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+                                <Typography variant="subtitle1" component="label" htmlFor="email" sx={{ fontWeight: 'bold', mb: 0.5 }}>
                                     Email <span style={{ color: 'red' }}>*</span>
                                 </Typography>
                                 <TextField
                                     fullWidth
                                     id="email"
+                                    type="email"
                                     size="medium"
                                     variant="outlined"
                                     autoComplete="email"
                                     value={formData.email}
                                     onChange={handleChange}
-                                    error={!!errorMsg.emailError}
-                                    helperText={errorMsg.emailError}
-                                    placeholder="Enter your email"
+                                    onBlur={handleBlur}
+                                    error={!!errors.email}
+                                    helperText={errors.email}
+                                    placeholder="your@email.com"
                                     sx={{
                                         '& .MuiOutlinedInput-root': {
                                             borderRadius: '8px'
@@ -220,7 +234,7 @@ const Signup = () => {
                             
                             {/* Username Field */}
                             <Box>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+                                <Typography variant="subtitle1" component="label" htmlFor="userName" sx={{ fontWeight: 'bold', mb: 0.5 }}>
                                     Username <span style={{ color: 'red' }}>*</span>
                                 </Typography>
                                 <TextField
@@ -231,9 +245,10 @@ const Signup = () => {
                                     autoComplete="username"
                                     value={formData.userName}
                                     onChange={handleChange}
-                                    error={!!errorMsg.useNameError}
-                                    helperText={errorMsg.useNameError}
-                                    placeholder="Choose a username"
+                                    onBlur={handleBlur}
+                                    error={!!errors.userName}
+                                    helperText={errors.userName}
+                                    placeholder="your_username"
                                     sx={{
                                         '& .MuiOutlinedInput-root': {
                                             borderRadius: '8px'
@@ -244,7 +259,7 @@ const Signup = () => {
                             
                             {/* Password Field */}
                             <Box>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+                                <Typography variant="subtitle1" component="label" htmlFor="password" sx={{ fontWeight: 'bold', mb: 0.5 }}>
                                     Password <span style={{ color: 'red' }}>*</span>
                                 </Typography>
                                 <TextField
@@ -256,14 +271,16 @@ const Signup = () => {
                                     autoComplete="new-password"
                                     value={formData.password}
                                     onChange={handleChange}
-                                    error={!!errorMsg.passwordError}
-                                    helperText={errorMsg.passwordError}
+                                    onBlur={handleBlur}
+                                    error={!!errors.password}
+                                    helperText={errors.password || "8+ chars with uppercase, lowercase, number & special char"}
                                     placeholder="Create a password"
                                     InputProps={{
                                         endAdornment: (
                                             <InputAdornment position="end">
                                                 <IconButton
-                                                    onClick={togglePasswordVisibility}
+                                                    aria-label="toggle password visibility"
+                                                    onClick={() => setShowPassword(!showPassword)}
                                                     edge="end"
                                                 >
                                                     {showPassword ? <VisibilityOff /> : <Visibility />}
@@ -277,6 +294,23 @@ const Signup = () => {
                                         }
                                     }}
                                 />
+                                {formData.password && !errors.password && (
+                                    <Box sx={{ width: '100%', height: '4px', backgroundColor: '#e0e0e0', borderRadius: '2px', mt: 1 }}>
+                                        <Box 
+                                            sx={{ 
+                                                height: '100%',
+                                                borderRadius: '2px',
+                                                backgroundColor: 
+                                                    formData.password.length < 8 ? '#f44336' :
+                                                    formData.password.length < 12 ? '#ff9800' : '#4caf50',
+                                                width: 
+                                                    formData.password.length < 8 ? '33%' :
+                                                    formData.password.length < 12 ? '66%' : '100%',
+                                                transition: 'all 0.3s ease'
+                                            }}
+                                        />
+                                    </Box>
+                                )}
                             </Box>
                             
                             {/* Terms Checkbox */}
@@ -292,7 +326,7 @@ const Signup = () => {
                                     <Typography variant="body2">
                                         I agree to the{' '}
                                         <Link 
-                                            to="#" 
+                                            to="/terms" 
                                             style={{ 
                                                 color: '#009e92',
                                                 textDecoration: 'none',
@@ -303,7 +337,7 @@ const Signup = () => {
                                         </Link>{' '}
                                         and{' '}
                                         <Link 
-                                            to="#" 
+                                            to="/privacy" 
                                             style={{ 
                                                 color: '#009e92',
                                                 textDecoration: 'none',
@@ -316,10 +350,7 @@ const Signup = () => {
                                 }
                                 sx={{ 
                                     mt: 1,
-                                    alignItems: 'flex-start',
-                                    '& .MuiCheckbox-root': {
-                                        paddingTop: 0
-                                    }
+                                    alignItems: 'flex-start'
                                 }}
                             />
                             
@@ -328,7 +359,7 @@ const Signup = () => {
                                 type="submit"
                                 variant="contained"
                                 color="primary"
-                                disabled={!checked || isLoading}
+                                disabled={!formValid || isLoading}
                                 fullWidth
                                 size="large"
                                 sx={{
@@ -344,7 +375,10 @@ const Signup = () => {
                                 }}
                             >
                                 {isLoading ? (
-                                    <CircularProgress size={24} color="inherit" />
+                                    <>
+                                        <CircularProgress size={24} color="inherit" sx={{ mr: 1 }} />
+                                        Creating Account...
+                                    </>
                                 ) : (
                                     'Create Account'
                                 )}
@@ -360,7 +394,7 @@ const Signup = () => {
                             </Box>
                             
                             {/* Google Sign In */}
-                            <Button
+                            {/* <Button
                                 startIcon={<GoogleIcon />}
                                 variant="outlined"
                                 fullWidth
@@ -370,24 +404,34 @@ const Signup = () => {
                                     py: 1.5,
                                     textTransform: 'none',
                                     fontSize: '1rem',
-                                    fontWeight: 'bold'
+                                    fontWeight: 'bold',
+                                    color: 'text.primary',
+                                    borderColor: '#e0e0e0',
+                                    '&:hover': {
+                                        borderColor: '#d2d2d2'
+                                    }
                                 }}
                             >
                                 Continue with Google
-                            </Button>
+                            </Button> */}
                         </Stack>
                     </Box>
                 </Stack>
             </Box>
             
-            {/* Footer */}
-            <Box sx={{ mt: 3, textAlign: 'center' }}>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    © {new Date().getFullYear()} Your Company. All rights reserved.
-                </Typography>
-            </Box>
+            {/* Error Snackbar */}
+            <Snackbar
+                open={!!submitError}
+                autoHideDuration={6000}
+                onClose={() => setSubmitError(null)}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert onClose={() => setSubmitError(null)} severity="error" sx={{ width: '100%' }}>
+                    {submitError}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 };
 
-export default Signup;
+export default Signup;

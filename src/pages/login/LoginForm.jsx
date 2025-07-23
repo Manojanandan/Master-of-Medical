@@ -322,7 +322,7 @@ const LoginForm = () => {
                             </Box>
                             
                             {/* Google Sign In */}
-                            <Button
+                            {/* <Button
                                 startIcon={<GoogleIcon />}
                                 variant="outlined"
                                 fullWidth
@@ -336,7 +336,7 @@ const LoginForm = () => {
                                 }}
                             >
                                 Continue with Google
-                            </Button>
+                            </Button> */}
                         </Stack>
                     </Box>
                 </Stack>
