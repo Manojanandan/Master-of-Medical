@@ -15,3 +15,7 @@ body {
   --primaryColor: #e2edf3,
     --secondaryColor: #009e92
 }
+
+.stsearch-box input{
+  border: none !important;
+}

@@ -80,7 +80,7 @@ const BestSeller = () => {
   
   // Transform API data to match ProductCard expected format - limit to 8 products for best sellers
   const transformedData = bestSellerData
-    .slice(0, 8) // Limit to 8 products for best sellers
+    // .slice(0, 8) // Limit to 8 products for best sellers
     .map(item => {
       const price = parseFloat(item.price || '30.00');
       const originalPrice = item.originalPrice ? parseFloat(item.originalPrice) : (price * 1.5);
@@ -117,7 +117,7 @@ const BestSeller = () => {
             display: 'grid',
             gridTemplateColumns: isMobile ? 'repeat(1, 1fr)' : isTablet ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)',
             gap: isMobile ? '20px' : '24px',
-            padding: isMobile ? '0 16px' : '0 24px',
+            padding: isMobile ? '10px 16px' : '24px 24px',
             width: '100%',
             maxWidth: '100%'
           }}>

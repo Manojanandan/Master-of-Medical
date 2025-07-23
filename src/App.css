@@ -43,3 +43,6 @@
 .slick{
   display: flex !important;
 } 
+.stsearch-box input{
+  border: none !important;
+}
