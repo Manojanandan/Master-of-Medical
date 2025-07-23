@@ -5,13 +5,13 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 
 const CartItem = () => {
-  return (
+    return (
     <Box>
       <Typography variant="body2" color="text.secondary">
         CartItem component has been integrated into CartList.jsx as CartItemCard
-      </Typography>
-    </Box>
-  );
+                    </Typography>
+        </Box>
+    );
 };
 
 export default CartItem; 

@@ -26,12 +26,12 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import StarRating from '../../../components/e_commerceComponents/StarRating';
 
 const CartList = () => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  
-  const { items, totalItems, totalAmount, loading, error } = useSelector((state) => state.cartReducer);
+
+    const { items, totalItems, totalAmount, loading, error } = useSelector((state) => state.cartReducer);
   const [localItems, setLocalItems] = useState([]);
   const [localTotals, setLocalTotals] = useState({ totalItems: 0, totalAmount: 0 });
 
@@ -59,42 +59,42 @@ const CartList = () => {
 
   // Sync local state with Redux state
   useEffect(() => {
-    if (items.length > 0 && localItems.length === 0) {
-      setLocalItems(items);
+        if (items.length > 0 && localItems.length === 0) {
+            setLocalItems(items);
       const totals = calculateTotals(items);
       setLocalTotals(totals);
     }
   }, [items, calculateTotals, localItems.length]);
 
-  // Fetch cart data on component mount
-  useEffect(() => {
-    dispatch(fetchCart());
-  }, [dispatch]);
+    // Fetch cart data on component mount
+    useEffect(() => {
+        dispatch(fetchCart());
+    }, [dispatch]);
 
-  const handleQuantityChange = useCallback((cartItemId, currentQuantity, change) => {
-    const newQuantity = currentQuantity + change;
-    
-    if (newQuantity >= 1 && newQuantity <= 10) {
-      // Update local state immediately for instant feedback
+    const handleQuantityChange = useCallback((cartItemId, currentQuantity, change) => {
+        const newQuantity = currentQuantity + change;
+        
+        if (newQuantity >= 1 && newQuantity <= 10) {
+            // Update local state immediately for instant feedback
       setLocalItems(prevItems => {
         const updatedItems = prevItems.map(item => 
-          item._id === cartItemId 
-            ? { ...item, quantity: newQuantity }
-            : item
-        );
-        
-        // Update local totals
+                    item._id === cartItemId 
+                        ? { ...item, quantity: newQuantity }
+                        : item
+            );
+            
+            // Update local totals
         const totals = calculateTotals(updatedItems);
         setLocalTotals(totals);
         
         return updatedItems;
-      });
-      
-      dispatch(updateCartItemQuantity({ cartItemId, quantity: newQuantity }));
-    }
+            });
+            
+            dispatch(updateCartItemQuantity({ cartItemId, quantity: newQuantity }));
+        }
   }, [dispatch, calculateTotals]);
 
-  const handleRemoveItem = useCallback((cartItemId) => {
+    const handleRemoveItem = useCallback((cartItemId) => {
     setLocalItems(prevItems => {
       const updatedItems = prevItems.filter(item => item._id !== cartItemId);
       const totals = calculateTotals(updatedItems);
@@ -102,12 +102,12 @@ const CartList = () => {
       return updatedItems;
     });
     
-    dispatch(removeFromCart(cartItemId));
+        dispatch(removeFromCart(cartItemId));
   }, [dispatch, calculateTotals]);
 
   // Loading state
-  if (loading) {
-    return (
+    if (loading) {
+        return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
         <Box sx={{ textAlign: 'center' }}>
           <CircularProgress size={60} sx={{ mb: 2 }} />
@@ -115,32 +115,32 @@ const CartList = () => {
             Loading your cart...
           </Typography>
         </Box>
-      </Box>
-    );
-  }
+            </Box>
+        );
+    }
 
   // Error state
-  if (error) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
-        <Alert severity="error" sx={{ maxWidth: '600px' }}>
-          <Typography variant="h6">Cart Error</Typography>
-          <Typography>{error}</Typography>
-          <Button 
-            variant="outlined" 
-            sx={{ mt: 2 }}
-            onClick={() => dispatch(fetchCart())}
-          >
-            Retry
-          </Button>
-        </Alert>
-      </Box>
-    );
-  }
+    if (error) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+                <Alert severity="error" sx={{ maxWidth: '600px' }}>
+                    <Typography variant="h6">Cart Error</Typography>
+                    <Typography>{error}</Typography>
+                    <Button 
+                        variant="outlined" 
+                        sx={{ mt: 2 }}
+                        onClick={() => dispatch(fetchCart())}
+                    >
+                        Retry
+                    </Button>
+                </Alert>
+            </Box>
+        );
+    }
 
   // Empty cart state
-  if (items.length === 0) {
-    return (
+    if (items.length === 0) {
+        return (
       <Box sx={{ 
         display: 'flex', 
         flexDirection: 'column',
@@ -156,11 +156,11 @@ const CartList = () => {
         <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
           Looks like you haven't added any items to your cart yet.
         </Typography>
-        <Button 
+                        <Button 
           variant="contained" 
           size="large"
           startIcon={<ArrowBackIcon />}
-          onClick={() => navigate('/ecommerceDashboard')}
+                            onClick={() => navigate('/ecommerceDashboard')}
           sx={{ 
             borderRadius: 2,
             px: 4,
@@ -170,16 +170,16 @@ const CartList = () => {
           }}
         >
           Continue Shopping
-        </Button>
-      </Box>
-    );
-  }
+                        </Button>
+                    </Box>
+        );
+    }
 
   // Use local state for rendering
-  const displayItems = localItems.length > 0 ? localItems : items;
+    const displayItems = localItems.length > 0 ? localItems : items;
   const displayTotals = localTotals.totalItems > 0 ? localTotals : calculateTotals(items);
 
-  return (
+    return (
     <Grid container spacing={3}>
       {/* Cart Items Section */}
       <Grid item xs={12} lg={8}>
@@ -188,10 +188,10 @@ const CartList = () => {
             <Typography variant="h5" sx={{ fontWeight: 600 }}>
               Shopping Cart ({displayTotals.totalItems} items)
             </Typography>
-          </Box>
-          
+                    </Box>
+                    
           <Box sx={{ maxHeight: '600px', overflowY: 'auto' }}>
-            {displayItems.map((item, index) => (
+                    {displayItems.map((item, index) => (
               <CartItemCard
                 key={item._id}
                 item={item}
@@ -200,7 +200,7 @@ const CartList = () => {
                 isLast={index === displayItems.length - 1}
               />
             ))}
-          </Box>
+                                        </Box>
         </Paper>
       </Grid>
 
@@ -210,7 +210,7 @@ const CartList = () => {
           <CardContent sx={{ p: 3 }}>
             <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
               Order Summary
-            </Typography>
+                                    </Typography>
 
             {/* Price Breakdown */}
             <Box sx={{ mb: 3 }}>
@@ -220,18 +220,18 @@ const CartList = () => {
                 </Typography>
                 <Typography variant="body2" fontWeight={500}>
                   ₹{displayTotals.subtotal.toFixed(2)}
-                </Typography>
-              </Box>
+                            </Typography>
+                        </Box>
               
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                 <Typography variant="body2" color="text.secondary">
                   GST (18%)
-                </Typography>
+          </Typography>
                 <Typography variant="body2" fontWeight={500}>
                   ₹{displayTotals.gst.toFixed(2)}
-                </Typography>
-              </Box>
-              
+          </Typography>
+        </Box>
+
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                 <Typography variant="body2" color="text.secondary">
                   Shipping
@@ -242,29 +242,29 @@ const CartList = () => {
                   ) : (
                     `₹${displayTotals.shipping.toFixed(2)}`
                   )}
-                </Typography>
-              </Box>
-              
+          </Typography>
+        </Box>
+
               {displayTotals.subtotal < FREE_SHIPPING_THRESHOLD && (
                 <Box sx={{ mt: 1 }}>
                   <Typography variant="caption" color="success.main">
                     Add ₹{(FREE_SHIPPING_THRESHOLD - displayTotals.subtotal).toFixed(2)} more for FREE shipping
-                  </Typography>
-                </Box>
+          </Typography>
+        </Box>
               )}
             </Box>
 
             <Divider sx={{ my: 2 }} />
 
-            {/* Total */}
+        {/* Total */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
               <Typography variant="h6" fontWeight={600}>
-                Total
-              </Typography>
+            Total
+          </Typography>
               <Typography variant="h6" fontWeight={600} color="primary">
                 ₹{displayTotals.total.toFixed(2)}
-              </Typography>
-            </Box>
+          </Typography>
+        </Box>
 
             {/* Checkout Button */}
             <Button
@@ -342,10 +342,10 @@ const CartItemCard = ({ item, onQuantityChange, onRemoveItem, isLast }) => {
 
         {/* Product Details */}
         <Grid item xs={12} sm={9} md={7}>
-          <Box>
+                  <Box>
             <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, lineHeight: 1.3 }}>
               {item.product?.name || 'Product Name'}
-            </Typography>
+                    </Typography>
             
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
               {item.product?.description || 'Product description'}
@@ -389,7 +389,7 @@ const CartItemCard = ({ item, onQuantityChange, onRemoveItem, isLast }) => {
               fontWeight: 600
             }}>
               {item.quantity}
-            </Typography>
+              </Typography>
             
             <IconButton
               size="small"

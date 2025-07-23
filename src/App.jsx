@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import StatusCheck from "./components/StatusCheck";
 import AnimatedPage from "./components/AnimatedPage";
+import useScrollToTop from "./hooks/useScrollToTop";
 import "./styles/animations.css";
 import EcommerceHomePage from "./pages/eCommerce/homePage/HomePage.jsx";
 import Products from "./pages/Products";
@@ -21,6 +22,8 @@ import CookiesPolicy from "./pages/eCommerce/cookiesPolicy/CookiesPolicy.jsx";
 import OrderTracking from "./pages/eCommerce/orderTracking/OrderTracking.jsx";
 import ProductDetail from "./pages/eCommerce/ProductDetail.jsx";
 import CustomerProfile from "./pages/eCommerce/Profile.jsx";
+import AboutUs from "./pages/eCommerce/AboutUs.jsx";
+import Blog from "./pages/eCommerce/Blog.jsx";
 import VendorLayout from './pages/vendor/dashboard/index.jsx'
 import ProtectedRoute from "./pages/routes/ProtectedRoute.jsx";
 import Overview from "./pages/vendor/pages/Overview.jsx";
@@ -32,6 +35,8 @@ import ForgotPassword from "./pages/login/forgotPassword/ForgotPassword.jsx";
 import ThankYou from "./pages/eCommerce/ThankYou.jsx";
 
 const App = () => {
+  // Use the scroll to top hook
+  useScrollToTop();
 
   return (
     <>
@@ -129,6 +134,16 @@ const App = () => {
           <Route path="/ecommerceDashboard/orderTracking" element={
             <AnimatedPage animationType="slide" direction="up" timeout={600}>
               <OrderTracking />
+            </AnimatedPage>
+          } />
+          <Route path="/ecommerceDashboard/about-us" element={
+            <AnimatedPage animationType="slide" direction="up" timeout={600}>
+              <AboutUs />
+            </AnimatedPage>
+          } />
+          <Route path="/ecommerceDashboard/blog" element={
+            <AnimatedPage animationType="slide" direction="up" timeout={600}>
+              <Blog />
             </AnimatedPage>
           } />
           <Route path="/ecommerceDashboard/thank-you" element={
