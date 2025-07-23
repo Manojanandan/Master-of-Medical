@@ -21,7 +21,7 @@ const CookiesPolicy = () => {
 }
 
 export default CookiesPolicy */
-/* 
+
 import React from 'react';
 import { Box, Typography, Container, Paper } from '@mui/material';
 import BreadCrumbs from '../../../components/e_commerceComponents/BreadCrumbs';
@@ -154,8 +154,8 @@ const CookiesPolicy = () => {
   );
 };
 
-export default CookiesPolicy; */
-import React from 'react';
+export default CookiesPolicy;
+/* import React from 'react';
 import { Box, Typography, Container, Paper } from '@mui/material';
 
 const CookiesPolicy = () => {
@@ -293,4 +293,4 @@ const CookiesPolicy = () => {
   );
 };
 
-export default CookiesPolicy;
+export default CookiesPolicy; */
