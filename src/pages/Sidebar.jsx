@@ -4,7 +4,6 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import GridViewIcon from '@mui/icons-material/GridView';
 
-
 const Sidebar = () => {
   const [openIndex, setOpenIndex] = useState(null);
 

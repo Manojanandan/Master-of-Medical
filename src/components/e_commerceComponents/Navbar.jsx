@@ -129,7 +129,9 @@ const Navbar = () => {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
+                cursor: "pointer",
               }}
+              onClick={() => navigate("/ecommerceDashboard")}
             >
               <img
                 src={Logo}
@@ -332,13 +334,41 @@ const Navbar = () => {
       {/* Left side menu */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
         {["Home", "Shop", "About Us","Blog", "Contact"].map((item, idx) => (
-          <Box key={idx} sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+          <Box 
+            key={idx} 
+            sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "pointer" }}
+            onClick={() => {
+              switch(item) {
+                case "Home":
+                  navigate("/");
+                  break;
+                case "Shop":
+                  navigate("/ecommerceDashboard/products");
+                  break;
+                case "About Us":
+                  navigate("/ecommerceDashboard/about-us");
+                  break;
+                case "Blog":
+                  navigate("/ecommerceDashboard/blog");
+                  break;
+                case "Contact":
+                  navigate("/ecommerceDashboard/contact");
+                  break;
+                default:
+                  break;
+              }
+            }}
+          >
             <Typography
               sx={{
                 fontSize: "14px",
                 fontWeight: item === "Home" ? "bold" : "bold",
                 color: item === "Home" ? "black" : "black",
                 cursor: "pointer",
+                "&:hover": {
+                  color: "#1976d2",
+                  textDecoration: "underline"
+                }
               }}
             >
               {item}
@@ -350,8 +380,22 @@ const Navbar = () => {
 
       {/* Right side menu */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "pointer" }}>
-          <Typography sx={{ fontSize: "14px", fontWeight: 500 }}>Trending Products</Typography>
+        <Box 
+          sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "pointer" }}
+          onClick={() => navigate("/ecommerceDashboard/products")}
+        >
+          <Typography 
+            sx={{ 
+              fontSize: "14px", 
+              fontWeight: 500,
+              "&:hover": {
+                color: "#1976d2",
+                textDecoration: "underline"
+              }
+            }}
+          >
+            Trending Products
+          </Typography>
           <ExpandMoreIcon sx={{ fontSize: "18px" }} />
         </Box>
 {/*  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "pointer" }}>

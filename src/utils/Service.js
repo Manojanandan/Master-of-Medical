@@ -68,6 +68,7 @@ export const getPublicProducts = async(params = {}) =>{
     
     // Add filter parameters
     if (params.category) queryParams.append('category', params.category);
+    if (params.subCategory) queryParams.append('subCategory', params.subCategory);
     if (params.brand) queryParams.append('brandName', params.brand); // API expects brandName
     if (params.minPrice) queryParams.append('minPrice', params.minPrice);
     if (params.maxPrice) queryParams.append('maxPrice', params.maxPrice);
@@ -194,4 +195,9 @@ export const getAllReviews = async(params = {}) =>{
     const url = queryString ? `review/get-all-review?${queryString}` : 'review/get-all-review';
     
     return await instance.get(url)
+}
+
+// Categories and Subcategories APIs
+export const getAllCategoriesAndSubcategories = async() =>{
+    return await instance.get('product/get-all-catagory-subcatagory')
 }

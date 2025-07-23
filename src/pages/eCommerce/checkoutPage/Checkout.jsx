@@ -211,7 +211,7 @@ const Checkout = () => {
       };
 
       const response = await createOrder(orderData);
-      
+
       if (response.data.success) {
         // Navigate to thank you page
         navigate('/ecommerceDashboard/thankyou', { 
@@ -292,7 +292,7 @@ const Checkout = () => {
             fontSize: '16px'
           }}
         >
-          Continue Shopping
+            Continue Shopping
         </Button>
       </Box>
     );
@@ -388,7 +388,7 @@ const Checkout = () => {
                           >
                             <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
                               <Radio
-                                value={address._id || address.id}
+                          value={address._id || address.id}
                                 sx={{ mt: -0.5 }}
                               />
                               <Box sx={{ flex: 1 }}>
@@ -396,7 +396,7 @@ const Checkout = () => {
                                   <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
                                     Address {index + 1}
                                   </Typography>
-                                  {selectedAddress?._id === address._id || selectedAddress?.id === address.id && (
+                          {selectedAddress?._id === address._id || selectedAddress?.id === address.id && (
                                     <Chip label="Selected" size="small" color="primary" />
                                   )}
                                 </Box>
@@ -472,13 +472,13 @@ const Checkout = () => {
                       </Box>
                       <Typography variant="body2" color="text.secondary">
                         Qty: {item.quantity} × ₹{item.price?.toFixed(2)}
-                      </Typography>
+        </Typography>
                     </Box>
                     
                     <Typography variant="h6" sx={{ fontWeight: 600, ml: 2 }}>
                       ₹{(item.price * item.quantity).toFixed(2)}
-                    </Typography>
-                  </Box>
+          </Typography>
+        </Box>
                 ))}
               </Box>
             </CardContent>
@@ -504,31 +504,31 @@ const Checkout = () => {
                   </Typography>
                   <Typography variant="body2" fontWeight={500}>
                     ₹{totals.subtotal.toFixed(2)}
-                  </Typography>
-                </Box>
-                
+          </Typography>
+        </Box>
+
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                   <Typography variant="body2" color="text.secondary">
                     GST (18%)
                   </Typography>
                   <Typography variant="body2" fontWeight={500}>
                     ₹{totals.gst.toFixed(2)}
-                  </Typography>
+          </Typography>
                 </Box>
                 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                   <Typography variant="body2" color="text.secondary">
                     Shipping
-                  </Typography>
+          </Typography>
                   <Typography variant="body2" fontWeight={500}>
                     {totals.shipping === 0 ? (
                       <Chip label="FREE" size="small" color="success" />
                     ) : (
                       `₹${totals.shipping.toFixed(2)}`
                     )}
-                  </Typography>
-                </Box>
-                
+          </Typography>
+        </Box>
+
                 {totals.subtotal < FREE_SHIPPING_THRESHOLD && (
                   <Box sx={{ mt: 1 }}>
                     <Typography variant="caption" color="success.main">
@@ -548,33 +548,33 @@ const Checkout = () => {
                 <Typography variant="h6" fontWeight={600} color="primary">
                   ₹{totals.total.toFixed(2)}
                 </Typography>
-              </Box>
+        </Box>
 
               {/* Terms and Conditions */}
               <Box sx={{ mb: 3 }}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
+          <FormControlLabel
+            control={
+              <Checkbox
                       checked={termsAccepted}
                       onChange={handleTermsChange}
                       color="primary"
-                    />
-                  }
-                  label={
+              />
+            }
+            label={
                     <Typography variant="body2">
                       I agree to the{' '}
                       <a href="#" style={{ color: theme.palette.primary.main, textDecoration: 'underline' }}>
-                        terms and conditions
-                      </a>
-                    </Typography>
-                  }
-                />
-              </Box>
+                  terms and conditions
+                </a>
+              </Typography>
+            }
+          />
+        </Box>
 
-              {/* Place Order Button */}
-              <Button
-                variant="contained"
-                fullWidth
+        {/* Place Order Button */}
+        <Button
+          variant="contained"
+          fullWidth
                 size="large"
                 onClick={handleConfirmOrder}
                 disabled={!canPlaceOrder}
@@ -605,9 +605,9 @@ const Checkout = () => {
                 }}
               >
                 Continue Shopping
-              </Button>
-            </CardContent>
-          </Card>
+        </Button>
+      </CardContent>
+    </Card>
         </Grid>
       </Grid>
 
