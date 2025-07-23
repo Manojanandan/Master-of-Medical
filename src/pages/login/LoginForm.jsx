@@ -91,13 +91,13 @@ const LoginForm = () => {
             isValid = false;
         }
 
-        if (!formData.password) {
-            newErrors.passwordError = "Password is required";
-            isValid = false;
-        } else if (!passwordRegex.test(formData.password)) {
-            newErrors.passwordError = "Password must be at least 8 characters with one letter, number, and special character";
-            isValid = false;
-        }
+        // if (!formData.password) {
+        //     newErrors.passwordError = "Password is required";
+        //     isValid = false;
+        // } else if (!passwordRegex.test(formData.password)) {
+        //     newErrors.passwordError = "Password must be at least 8 characters with one letter, number, and special character";
+        //     isValid = false;
+        // }
 
         setErrorMsg(newErrors);
         return isValid;
