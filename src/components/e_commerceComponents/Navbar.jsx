@@ -340,7 +340,7 @@ const Navbar = () => {
             onClick={() => {
               switch(item) {
                 case "Home":
-                  navigate("/");
+                  navigate("/ecommerceDashboard");
                   break;
                 case "Shop":
                   navigate("/ecommerceDashboard/products");

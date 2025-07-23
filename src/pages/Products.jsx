@@ -93,7 +93,7 @@ const Products = () => {
 
   // Local state
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-  const [priceRange, setPriceRange] = useState([0, 30]);
+  const [priceRange, setPriceRange] = useState([10, 10000]);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
   const [itemsPerPage, setItemsPerPage] = useState(20);
   const [categories, setCategories] = useState([]);
@@ -159,6 +159,8 @@ const Products = () => {
       // Update price range if min/max price are in URL
       if (urlFilters.minPrice && urlFilters.maxPrice) {
         setPriceRange([parseInt(urlFilters.minPrice), parseInt(urlFilters.maxPrice)]);
+      } else {
+        setPriceRange([10, 10000]);
       }
       
       // Dispatch filters to trigger products API call
@@ -320,7 +322,6 @@ const Products = () => {
       bgcolor: 'white',
       borderRadius: 3,
       p: 4,
-      boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
       border: '1px solid rgba(0,0,0,0.06)',
       height: 'fit-content'
     }}>
@@ -382,9 +383,9 @@ const Products = () => {
           onChange={handlePriceRangeChange}
           onChangeCommitted={handlePriceRangeCommit}
           valueLabelDisplay="auto"
-          min={0}
-          max={100}
-          step={1}
+          min={10}
+          max={10000}
+          step={100}
           sx={{ 
             mb: 3,
             '& .MuiSlider-track': {
@@ -665,7 +666,7 @@ const Products = () => {
                     onDelete={() => {
                       handleRemoveFilter('minPrice');
                       handleRemoveFilter('maxPrice');
-                      setPriceRange([0, 30]);
+                      setPriceRange([10, 10000]);
                     }}
                     color="primary"
                     size="small"
@@ -1090,7 +1091,7 @@ const Products = () => {
                       onDelete={() => {
                         handleRemoveFilter('minPrice');
                         handleRemoveFilter('maxPrice');
-                        setPriceRange([0, 30]);
+                        setPriceRange([10, 10000]);
                       }}
                       color="primary"
                       size="small"

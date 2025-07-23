@@ -7,7 +7,7 @@ const Index = () => {
   return (
     <div>
        <Navbar />
-       <div style={{width:'100%',marginTop:'7%'}}>
+       <div style={{width:'100%',marginTop:'10%'}}>
             <Outlet />
        </div>
        <Footer />
