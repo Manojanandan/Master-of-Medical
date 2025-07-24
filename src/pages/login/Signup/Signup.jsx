@@ -314,45 +314,57 @@ const Signup = () => {
                             </Box>
                             
                             {/* Terms Checkbox */}
-                            <FormControlLabel
-                                control={
-                                    <Checkbox 
-                                        checked={checked} 
-                                        onChange={(e) => setChecked(e.target.checked)}
-                                        color="primary"
-                                    />
-                                }
-                                label={
-                                    <Typography variant="body2">
-                                        I agree to the{' '}
-                                        <Link 
-                                            to="/terms" 
-                                            style={{ 
-                                                color: '#009e92',
-                                                textDecoration: 'none',
-                                                borderBottom: '1.5px solid #009e92'
+                            <Box sx={{ mt: 1 }}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox 
+                                            checked={checked} 
+                                            onChange={(e) => setChecked(e.target.checked)}
+                                            color="primary"
+                                            sx={{
+                                                alignSelf: 'flex-start',
+                                            }}
+                                        />
+                                    }
+                                    label={
+                                        <Typography 
+                                            variant="body2" 
+                                            sx={{ 
+                                                lineHeight: 1.5,
+                                                mt: 1.5
                                             }}
                                         >
-                                            Terms of Use
-                                        </Link>{' '}
-                                        and{' '}
-                                        <Link 
-                                            to="/privacy" 
-                                            style={{ 
-                                                color: '#009e92',
-                                                textDecoration: 'none',
-                                                borderBottom: '1.5px solid #009e92'
-                                            }}
-                                        >
-                                            Privacy Policy
-                                        </Link>
-                                    </Typography>
-                                }
-                                sx={{ 
-                                    mt: 1,
-                                    alignItems: 'flex-start'
-                                }}
-                            />
+                                            I agree to the{' '}
+                                            <Link 
+                                                to="/terms" 
+                                                style={{ 
+                                                    color: '#009e92',
+                                                    textDecoration: 'none',
+                                                    borderBottom: '1.5px solid #009e92'
+                                                }}
+                                            >
+                                                Terms of Use
+                                            </Link>{' '}
+                                            and{' '}
+                                            <Link 
+                                                to="/privacy" 
+                                                style={{ 
+                                                    color: '#009e92',
+                                                    textDecoration: 'none',
+                                                    borderBottom: '1.5px solid #009e92'
+                                                }}
+                                            >
+                                                Privacy Policy
+                                            </Link>
+                                        </Typography>
+                                    }
+                                    sx={{ 
+                                        alignItems: 'flex-start',
+                                        margin: 0,
+                                        width: '100%'
+                                    }}
+                                />
+                            </Box>
                             
                             {/* Submit Button */}
                             <Button
@@ -385,13 +397,13 @@ const Signup = () => {
                             </Button>
                             
                             {/* Divider */}
-                            <Box sx={{ display: 'flex', alignItems: 'center', my: 2 }}>
+                            {/* <Box sx={{ display: 'flex', alignItems: 'center', my: 2 }}>
                                 <Divider sx={{ flexGrow: 1 }} />
                                 <Typography variant="body2" sx={{ px: 2, color: 'text.secondary' }}>
                                     OR
                                 </Typography>
                                 <Divider sx={{ flexGrow: 1 }} />
-                            </Box>
+                            </Box> */}
                             
                             {/* Google Sign In */}
                             {/* <Button
