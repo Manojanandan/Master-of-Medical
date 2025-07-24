@@ -20,6 +20,9 @@ const StatusCheck = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [userData, setUserData] = useState(null);
 
+
+  console.log(userData , "userDataaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+
   useEffect(() => {
     // Immediately check if we're on a profile page and hide popup if so
     if (shouldPreventPopup()) {
@@ -150,8 +153,7 @@ const StatusCheck = () => {
     // First check local status
     if (isUserStatusPending()) {
       // Get user info from token
-      const user = getUserInfoFromToken();
-      
+      const user = getUserInfoFromToken();      
       // Also check sessionStorage for user data
       const sessionUserData = sessionStorage.getItem('userData');
       let parsedUserData = null;
@@ -174,6 +176,7 @@ const StatusCheck = () => {
         if (apiResponse && apiResponse.success) {
           const currentStatus = apiResponse.data?.status || apiResponse.data?.approvalStatus;
           console.log('Current status from API:', currentStatus);
+          console.log('API Response data:', apiResponse.data);
           
           if (currentStatus === 'approved' || currentStatus === 'active') {
             console.log('✅ User has been approved! Hiding popup and updating session data');
@@ -190,7 +193,8 @@ const StatusCheck = () => {
             return;
           } else if (currentStatus === 'pending') {
             console.log('✅ User status is still pending, showing popup');
-            setUserData(currentUser);
+            // Use API response data instead of currentUser to get the correct type
+            setUserData(apiResponse.data);
             setShowPopup(true);
           } else {
             console.log('❌ Unknown status:', currentStatus);
@@ -274,7 +278,7 @@ const StatusCheck = () => {
             <div className="account-details">
               <div className="detail-item">
                 <span className="detail-label">Account Type:</span>
-                <span className="detail-value">{userData?.role || userData?.type || 'customer'}</span>
+                <span className="detail-value">{userData?.type || '-'}</span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">Email:</span>

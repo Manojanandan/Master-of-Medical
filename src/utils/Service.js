@@ -166,9 +166,12 @@ export const getAllOrders = async(params = {}) =>{
     // Add query parameters
     if (params.status) queryParams.append('status', params.status);
     if (params.customerId) queryParams.append('customerId', params.customerId);
+    if (params.vendorId) queryParams.append('vendorId', params.vendorId);
     if (params.page) queryParams.append('page', params.page);
     if (params.limit) queryParams.append('limit', params.limit);
     if (params.search) queryParams.append('search', params.search);
+    if (params.dateFrom) queryParams.append('dateFrom', params.dateFrom);
+    if (params.dateTo) queryParams.append('dateTo', params.dateTo);
     
     const queryString = queryParams.toString();
     const url = queryString ? `order/get-all-orders?${queryString}` : 'order/get-all-orders';
@@ -198,6 +201,14 @@ export const getAllReviews = async(params = {}) =>{
 }
 
 // Categories and Subcategories APIs
+export const getAllCategories = async() =>{
+    return await instance.get('product/get-all-catagory')
+}
+
+export const getAllSubcategories = async(categoryId) =>{
+    return await instance.get(`product/get-all-sub-catagory/${categoryId}`)
+}
+
 export const getAllCategoriesAndSubcategories = async() =>{
     return await instance.get('product/get-all-catagory-subcatagory')
 }
