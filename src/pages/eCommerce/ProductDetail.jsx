@@ -315,15 +315,15 @@ const ProductDetail = () => {
   const parsedAdditionalInfo = getParsedAdditionalInfo();
 
   return (
-    <Box sx={{ p: { xs: 1, md: 4 }, width: '90%', mx: 'auto' }}>
+    <Box sx={{ py: { xs: 1, md: 4 }, width: '90%', mx: 'auto' }}>
       {/* Back to Products Button */}
-      <Button
+      {/* <Button
         startIcon={<ArrowBack />}
         onClick={() => navigate('/ecommerceDashboard')}
         sx={{ mb: 3, color: 'text.secondary' }}
       >
         Back to Products
-      </Button>
+      </Button> */}
       
       <Box
         sx={{
@@ -548,7 +548,7 @@ const ProductDetail = () => {
           )}
 
           {/* Action Buttons */}
-          <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+          <Box sx={{ display: 'flex', gap: 2, mb: 3, width: "50%" }}>
             {isProductInCart() ? (
               // Product is in cart - show remove button
               <Button
