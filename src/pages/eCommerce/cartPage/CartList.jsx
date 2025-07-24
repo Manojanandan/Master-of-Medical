@@ -26,12 +26,12 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import StarRating from '../../../components/e_commerceComponents/StarRating';
 
 const CartList = () => {
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-    const { items, totalItems, totalAmount, loading, error } = useSelector((state) => state.cartReducer);
+  const { items, totalItems, totalAmount, loading, error } = useSelector((state) => state.cartReducer);
   const [localItems, setLocalItems] = useState([]);
   const [localTotals, setLocalTotals] = useState({ totalItems: 0, totalAmount: 0 });
 
@@ -59,55 +59,55 @@ const CartList = () => {
 
   // Sync local state with Redux state
   useEffect(() => {
-        if (items.length > 0 && localItems.length === 0) {
-            setLocalItems(items);
+    if (items.length > 0 && localItems.length === 0) {
+      setLocalItems(items);
       const totals = calculateTotals(items);
       setLocalTotals(totals);
     }
   }, [items, calculateTotals, localItems.length]);
 
-    // Fetch cart data on component mount
-    useEffect(() => {
-        dispatch(fetchCart());
-    }, [dispatch]);
+  // Fetch cart data on component mount
+  useEffect(() => {
+    dispatch(fetchCart());
+  }, [dispatch]);
 
-    const handleQuantityChange = useCallback((cartItemId, currentQuantity, change) => {
-        const newQuantity = currentQuantity + change;
-        
-        if (newQuantity >= 1 && newQuantity <= 10) {
-            // Update local state immediately for instant feedback
+  const handleQuantityChange = useCallback((cartItemId, currentQuantity, change) => {
+    const newQuantity = currentQuantity + change;
+
+    if (newQuantity >= 1 && newQuantity <= 10) {
+      // Update local state immediately for instant feedback
       setLocalItems(prevItems => {
-        const updatedItems = prevItems.map(item => 
-                    item._id === cartItemId 
-                        ? { ...item, quantity: newQuantity }
-                        : item
-            );
-            
-            // Update local totals
+        const updatedItems = prevItems.map(item =>
+          item._id === cartItemId
+            ? { ...item, quantity: newQuantity }
+            : item
+        );
+
+        // Update local totals
         const totals = calculateTotals(updatedItems);
         setLocalTotals(totals);
-        
+
         return updatedItems;
-            });
-            
-            dispatch(updateCartItemQuantity({ cartItemId, quantity: newQuantity }));
-        }
+      });
+
+      dispatch(updateCartItemQuantity({ cartItemId, quantity: newQuantity }));
+    }
   }, [dispatch, calculateTotals]);
 
-    const handleRemoveItem = useCallback((cartItemId) => {
+  const handleRemoveItem = useCallback((cartItemId) => {
     setLocalItems(prevItems => {
       const updatedItems = prevItems.filter(item => item._id !== cartItemId);
       const totals = calculateTotals(updatedItems);
       setLocalTotals(totals);
       return updatedItems;
     });
-    
-        dispatch(removeFromCart(cartItemId));
+
+    dispatch(removeFromCart(cartItemId));
   }, [dispatch, calculateTotals]);
 
   // Loading state
-    if (loading) {
-        return (
+  if (loading) {
+    return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
         <Box sx={{ textAlign: 'center' }}>
           <CircularProgress size={60} sx={{ mb: 2 }} />
@@ -115,37 +115,37 @@ const CartList = () => {
             Loading your cart...
           </Typography>
         </Box>
-            </Box>
-        );
-    }
+      </Box>
+    );
+  }
 
   // Error state
-    if (error) {
-        return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
-                <Alert severity="error" sx={{ maxWidth: '600px' }}>
-                    <Typography variant="h6">Cart Error</Typography>
-                    <Typography>{error}</Typography>
-                    <Button 
-                        variant="outlined" 
-                        sx={{ mt: 2 }}
-                        onClick={() => dispatch(fetchCart())}
-                    >
-                        Retry
-                    </Button>
-                </Alert>
-            </Box>
-        );
-    }
+  if (error) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+        <Alert severity="error" sx={{ maxWidth: '600px' }}>
+          <Typography variant="h6">Cart Error</Typography>
+          <Typography>{error}</Typography>
+          <Button
+            variant="outlined"
+            sx={{ mt: 2 }}
+            onClick={() => dispatch(fetchCart())}
+          >
+            Retry
+          </Button>
+        </Alert>
+      </Box>
+    );
+  }
 
   // Empty cart state
-    if (items.length === 0) {
-        return (
-      <Box sx={{ 
-        display: 'flex', 
+  if (items.length === 0) {
+    return (
+      <Box sx={{
+        display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center', 
-        alignItems: 'center', 
+        justifyContent: 'center',
+        alignItems: 'center',
         minHeight: '400px',
         textAlign: 'center'
       }}>
@@ -156,12 +156,12 @@ const CartList = () => {
         <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
           Looks like you haven't added any items to your cart yet.
         </Typography>
-                        <Button 
-          variant="contained" 
+        <Button
+          variant="contained"
           size="large"
           startIcon={<ArrowBackIcon />}
-                            onClick={() => navigate('/ecommerceDashboard')}
-          sx={{ 
+          onClick={() => navigate('/ecommerceDashboard')}
+          sx={{
             borderRadius: 2,
             px: 4,
             py: 1.5,
@@ -170,28 +170,37 @@ const CartList = () => {
           }}
         >
           Continue Shopping
-                        </Button>
-                    </Box>
-        );
-    }
+        </Button>
+      </Box>
+    );
+  }
 
   // Use local state for rendering
-    const displayItems = localItems.length > 0 ? localItems : items;
+  const displayItems = localItems.length > 0 ? localItems : items;
   const displayTotals = localTotals.totalItems > 0 ? localTotals : calculateTotals(items);
 
-    return (
-    <Grid container spacing={3}>
+  return (
+    <Box sx={{
+      display: 'flex',
+      flexDirection: { xs: 'column', lg: 'row' },
+      gap: 3,
+      alignItems: 'flex-start'
+    }}>
       {/* Cart Items Section */}
-      <Grid item xs={12} lg={8}>
+      <Box sx={{
+        flex: { xs: 'none', lg: 1 },
+        width: '100%',
+        minWidth: 0
+      }}>
         <Paper elevation={2} sx={{ borderRadius: 2, overflow: 'hidden' }}>
           <Box sx={{ p: 3, borderBottom: '1px solid #e0e0e0' }}>
             <Typography variant="h5" sx={{ fontWeight: 600 }}>
               Shopping Cart ({displayTotals.totalItems} items)
             </Typography>
-                    </Box>
-                    
+          </Box>
+
           <Box sx={{ maxHeight: '600px', overflowY: 'auto' }}>
-                    {displayItems.map((item, index) => (
+            {displayItems.map((item, index) => (
               <CartItemCard
                 key={item._id}
                 item={item}
@@ -200,17 +209,22 @@ const CartList = () => {
                 isLast={index === displayItems.length - 1}
               />
             ))}
-                                        </Box>
+          </Box>
         </Paper>
-      </Grid>
+      </Box>
 
       {/* Order Summary Section */}
-      <Grid item xs={12} lg={4}>
-        <Card elevation={2} sx={{ borderRadius: 2, position: 'sticky', top: 20 }}>
+      <Box sx={{
+        flex: { xs: 'none', lg: '0 0 400px' },
+        width: '100%',
+        position: { xs: 'static', lg: 'sticky' },
+        top: { lg: 20 }
+      }}>
+        <Card elevation={2} sx={{ borderRadius: 2 }}>
           <CardContent sx={{ p: 3 }}>
             <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
               Order Summary
-                                    </Typography>
+            </Typography>
 
             {/* Price Breakdown */}
             <Box sx={{ mb: 3 }}>
@@ -220,17 +234,17 @@ const CartList = () => {
                 </Typography>
                 <Typography variant="body2" fontWeight={500}>
                   ₹{displayTotals.subtotal.toFixed(2)}
-                            </Typography>
-                        </Box>
-              
+                </Typography>
+              </Box>
+
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                 <Typography variant="body2" color="text.secondary">
                   GST (18%)
-          </Typography>
+                </Typography>
                 <Typography variant="body2" fontWeight={500}>
                   ₹{displayTotals.gst.toFixed(2)}
-          </Typography>
-        </Box>
+                </Typography>
+              </Box>
 
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                 <Typography variant="body2" color="text.secondary">
@@ -242,29 +256,29 @@ const CartList = () => {
                   ) : (
                     `₹${displayTotals.shipping.toFixed(2)}`
                   )}
-          </Typography>
-        </Box>
+                </Typography>
+              </Box>
 
               {displayTotals.subtotal < FREE_SHIPPING_THRESHOLD && (
                 <Box sx={{ mt: 1 }}>
                   <Typography variant="caption" color="success.main">
                     Add ₹{(FREE_SHIPPING_THRESHOLD - displayTotals.subtotal).toFixed(2)} more for FREE shipping
-          </Typography>
-        </Box>
+                  </Typography>
+                </Box>
               )}
             </Box>
 
             <Divider sx={{ my: 2 }} />
 
-        {/* Total */}
+            {/* Total */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
               <Typography variant="h6" fontWeight={600}>
-            Total
-          </Typography>
+                Total
+              </Typography>
               <Typography variant="h6" fontWeight={600} color="primary">
                 ₹{displayTotals.total.toFixed(2)}
-          </Typography>
-        </Box>
+              </Typography>
+            </Box>
 
             {/* Checkout Button */}
             <Button
@@ -302,8 +316,8 @@ const CartList = () => {
             </Button>
           </CardContent>
         </Card>
-      </Grid>
-    </Grid>
+      </Box>
+    </Box>
   );
 };
 
@@ -314,11 +328,19 @@ const CartItemCard = ({ item, onQuantityChange, onRemoveItem, isLast }) => {
 
   return (
     <Box sx={{
-      p: 3,
+      p: { xs: 2, sm: 3 },
       borderBottom: isLast ? 'none' : '1px solid #e0e0e0',
-      '&:hover': { bgcolor: '#fafafa' }
+      '&:hover': {
+        bgcolor: '#fafafa',
+        transform: 'translateY(-1px)',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        transition: 'all 0.2s ease-in-out'
+      },
+      transition: 'all 0.2s ease-in-out',
+      borderRadius: 1,
+      mx: { xs: 1, sm: 0 }
     }}>
-      <Grid container spacing={3}>
+      <Grid container spacing={3} alignItems="center">
         {/* Product Image */}
         <Grid item xs={12} sm={3} md={2}>
           <Box sx={{
@@ -326,7 +348,8 @@ const CartItemCard = ({ item, onQuantityChange, onRemoveItem, isLast }) => {
             height: isMobile ? '120px' : '100px',
             borderRadius: 2,
             overflow: 'hidden',
-            bgcolor: '#f5f5f5'
+            bgcolor: '#f5f5f5',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
           }}>
             <img
               src={item.product?.thumbnailImage || 'https://via.placeholder.com/150x100?text=Product'}
@@ -342,12 +365,42 @@ const CartItemCard = ({ item, onQuantityChange, onRemoveItem, isLast }) => {
 
         {/* Product Details */}
         <Grid item xs={12} sm={9} md={7}>
-                  <Box>
-            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, lineHeight: 1.3 }}>
+          <Box sx={{ minWidth: 0, pr: 1 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 600,
+                mb: 1,
+                lineHeight: 1.3,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                wordBreak: 'break-word',
+                color: 'text.primary'
+              }}
+              title={item.product?.name || 'Product Name'}
+            >
               {item.product?.name || 'Product Name'}
-                    </Typography>
-            
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            </Typography>
+
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                mb: 1,
+                maxWidth: '250px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                display: '-webkit-box',
+                WebkitLineClamp: 1,
+                WebkitBoxOrient: 'vertical',
+                lineHeight: 1.4,
+                fontStyle: 'italic'
+              }}
+              title={item.product?.description || 'Product description'}
+            >
               {item.product?.description || 'Product description'}
             </Typography>
 
@@ -357,12 +410,19 @@ const CartItemCard = ({ item, onQuantityChange, onRemoveItem, isLast }) => {
                 rating={item.product?.averageRating || 0}
                 reviewCount={item.product?.reviewCount || 0}
                 size="small"
-                showReviewCount={true}
+                showReviewCount={false}
               />
             </Box>
 
             {/* Price */}
-            <Typography variant="h6" color="primary" sx={{ fontWeight: 600 }}>
+            <Typography
+              variant="h6"
+              color="primary"
+              sx={{
+                fontWeight: 700,
+                fontSize: { xs: '1rem', sm: '1.25rem' }
+              }}
+            >
               ₹{item.price?.toFixed(2) || '0.00'}
             </Typography>
           </Box>
@@ -370,34 +430,62 @@ const CartItemCard = ({ item, onQuantityChange, onRemoveItem, isLast }) => {
 
         {/* Quantity Controls */}
         <Grid item xs={12} sm={6} md={2}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            justifyContent: { xs: 'center', sm: 'flex-start' }
+          }}>
             <IconButton
               size="small"
               onClick={() => onQuantityChange(item._id, item.quantity, -1)}
               disabled={item.quantity <= 1}
               sx={{
                 border: '1px solid #e0e0e0',
-                '&:hover': { bgcolor: '#f5f5f5' }
+                '&:hover': {
+                  bgcolor: 'primary.light',
+                  borderColor: 'primary.main',
+                  color: 'primary.main'
+                },
+                '&:disabled': {
+                  opacity: 0.5,
+                  bgcolor: '#f5f5f5'
+                },
+                transition: 'all 0.2s ease'
               }}
             >
               <RemoveIcon fontSize="small" />
             </IconButton>
-            
-            <Typography variant="body1" sx={{ 
-              minWidth: '40px', 
-              textAlign: 'center',
-              fontWeight: 600
-            }}>
+
+            <Typography
+              variant="body1"
+              sx={{
+                minWidth: '40px',
+                textAlign: 'center',
+                fontWeight: 700,
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                color: 'text.primary'
+              }}
+            >
               {item.quantity}
-              </Typography>
-            
+            </Typography>
+
             <IconButton
               size="small"
               onClick={() => onQuantityChange(item._id, item.quantity, 1)}
               disabled={item.quantity >= 10}
               sx={{
                 border: '1px solid #e0e0e0',
-                '&:hover': { bgcolor: '#f5f5f5' }
+                '&:hover': {
+                  bgcolor: 'primary.light',
+                  borderColor: 'primary.main',
+                  color: 'primary.main'
+                },
+                '&:disabled': {
+                  opacity: 0.5,
+                  bgcolor: '#f5f5f5'
+                },
+                transition: 'all 0.2s ease'
               }}
             >
               <AddIcon fontSize="small" />
@@ -407,17 +495,36 @@ const CartItemCard = ({ item, onQuantityChange, onRemoveItem, isLast }) => {
 
         {/* Total Price & Remove */}
         <Grid item xs={12} sm={6} md={1}>
-          <Box sx={{ textAlign: 'right' }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+          <Box sx={{
+            textAlign: { xs: 'center', sm: 'right' },
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: { xs: 'center', sm: 'flex-end' },
+            gap: 1
+          }}>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 700,
+                color: 'primary.main',
+                fontSize: { xs: '1rem', sm: '1.25rem' }
+              }}
+            >
               ₹{(item.price * item.quantity).toFixed(2)}
             </Typography>
-            
+
             <IconButton
               size="small"
               onClick={() => onRemoveItem(item._id)}
               sx={{
                 color: 'error.main',
-                '&:hover': { bgcolor: 'error.light', color: 'white' }
+                '&:hover': {
+                  bgcolor: 'error.light',
+                  color: 'white',
+                  transform: 'scale(1.1)'
+                },
+                transition: 'all 0.2s ease',
+                borderRadius: '50%'
               }}
             >
               <DeleteOutlineIcon fontSize="small" />
