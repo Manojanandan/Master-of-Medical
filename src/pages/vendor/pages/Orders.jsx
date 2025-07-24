@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   Box,
   Typography,
@@ -18,23 +19,19 @@ import {
   InputLabel,
   Button,
   Stack,
+  CircularProgress,
+  Alert,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
-
-// Mock order data
-const mockOrders = Array.from({ length: 37 }, (_, i) => ({
-  id: 1000 + i,
-  customer: `Customer ${i + 1}`,
-  product: `Product ${((i % 5) + 1)}`,
-  date: `2024-07-${(i % 28) + 1}`,
-  status: ['Pending', 'Shipped', 'Delivered', 'Cancelled'][i % 4],
-  amount: (Math.random() * 1000 + 100).toFixed(2),
-}));
+import { fetchVendorOrders, clearError } from '../reducers/VendorOrdersReducer';
 
 const statusOptions = ['All', 'Pending', 'Shipped', 'Delivered', 'Cancelled'];
 
 const Orders = () => {
+  const dispatch = useDispatch();
+  const { orders, loading, error, totalOrders, currentPage, totalPages } = useSelector((state) => state.vendorOrdersReducer);
+  
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('All');
   const [page, setPage] = useState(0);
@@ -42,23 +39,60 @@ const Orders = () => {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
 
-  // Filtered data
-  const filteredOrders = mockOrders.filter(order => {
-    const matchesSearch =
-      order.customer.toLowerCase().includes(search.toLowerCase()) ||
-      order.product.toLowerCase().includes(search.toLowerCase()) ||
-      order.id.toString().includes(search);
-    const matchesStatus = status === 'All' || order.status === status;
-    const matchesDate = (!dateFrom || order.date >= dateFrom) && (!dateTo || order.date <= dateTo);
-    return matchesSearch && matchesStatus && matchesDate;
-  });
+  // Fetch orders on component mount and when filters change
+  useEffect(() => {
+    const params = {
+      page: page + 1, // API uses 1-based pagination
+      limit: rowsPerPage,
+    };
 
-  // Pagination
-  const paginatedOrders = filteredOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    // Add filters if they're not default values
+    if (search) params.search = search;
+    if (status !== 'All') params.status = status;
+    if (dateFrom) params.dateFrom = dateFrom;
+    if (dateTo) params.dateTo = dateTo;
+
+    dispatch(fetchVendorOrders(params));
+  }, [dispatch, page, rowsPerPage, search, status, dateFrom, dateTo]);
+
+  // Clear error when component unmounts
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, [dispatch]);
+
+  // Handle page change
+  const handlePageChange = (_, newPage) => {
+    setPage(newPage);
+  };
+
+  // Handle rows per page change
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  // Handle reset filters
+  const handleResetFilters = () => {
+    setStatus('All');
+    setDateFrom('');
+    setDateTo('');
+    setSearch('');
+    setPage(0);
+  };
 
   return (
     <Box sx={{ background: '#f7f8fa', minHeight: '100vh', width: '100%', p: { xs: 1, sm: 3 } }}>
       <Typography variant="h4" sx={{ fontWeight: 700, mb: 3 }}>Orders</Typography>
+      
+      {/* Error Alert */}
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }} onClose={() => dispatch(clearError())}>
+          {error}
+        </Alert>
+      )}
+      
       {/* Filters and Search */}
       <Paper sx={{ p: 2, mb: 3, borderRadius: 3, boxShadow: 2, display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
         <TextField
@@ -102,7 +136,15 @@ const Orders = () => {
           onChange={e => setDateTo(e.target.value)}
           sx={{ minWidth: 120 }}
         />
-        <Button variant="outlined" color="primary" startIcon={<FilterAltIcon />} sx={{ fontWeight: 600, borderRadius: 2 }} onClick={() => { setStatus('All'); setDateFrom(''); setDateTo(''); setSearch(''); }}>Reset</Button>
+        <Button 
+          variant="outlined" 
+          color="primary" 
+          startIcon={<FilterAltIcon />} 
+          sx={{ fontWeight: 600, borderRadius: 2 }} 
+          onClick={handleResetFilters}
+        >
+          Reset
+        </Button>
       </Paper>
       {/* Orders Table */}
       <Paper sx={{ borderRadius: 3, boxShadow: 2 }}>
@@ -120,19 +162,25 @@ const Orders = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {paginatedOrders.length === 0 ? (
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
+                    <CircularProgress />
+                  </TableCell>
+                </TableRow>
+              ) : orders.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} align="center" sx={{ py: 6, color: 'grey.500' }}>
                     No orders found.
                   </TableCell>
                 </TableRow>
               ) : (
-                paginatedOrders.map(order => (
+                orders.map(order => (
                   <TableRow key={order.id} hover sx={{ transition: 'background 0.2s', '&:hover': { background: '#f1f2f7' } }}>
                     <TableCell sx={{ fontWeight: 600 }}>{order.id}</TableCell>
-                    <TableCell>{order.customer}</TableCell>
-                    <TableCell>{order.product}</TableCell>
-                    <TableCell>{order.date}</TableCell>
+                    <TableCell>{order.customer?.name || order.customerName || 'N/A'}</TableCell>
+                    <TableCell>{order.product?.name || order.productName || 'N/A'}</TableCell>
+                    <TableCell>{new Date(order.createdAt || order.date).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <Box sx={{
                         display: 'inline-block',
@@ -147,7 +195,7 @@ const Orders = () => {
                         textAlign: 'center',
                       }}>{order.status}</Box>
                     </TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>{order.amount}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>₹{order.totalAmount || order.amount || '0.00'}</TableCell>
                     <TableCell align="center">
                       <Button variant="outlined" size="small" sx={{ borderRadius: 2, fontWeight: 600 }}>View</Button>
                     </TableCell>
@@ -159,11 +207,11 @@ const Orders = () => {
         </TableContainer>
         <TablePagination
           component="div"
-          count={filteredOrders.length}
+          count={totalOrders}
           page={page}
-          onPageChange={(_, newPage) => setPage(newPage)}
+          onPageChange={handlePageChange}
           rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={e => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0); }}
+          onRowsPerPageChange={handleRowsPerPageChange}
           rowsPerPageOptions={[10, 20, 50]}
           sx={{ px: 2, py: 1, borderTop: '1px solid #eee' }}
         />
