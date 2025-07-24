@@ -147,58 +147,40 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
       )}
 
       <Box component="form" onSubmit={handleSubmit}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, color: '#333' }}>
-                Overall Rating *
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, color: '#333' }}>
+            Overall Rating *
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            <Rating
+              name="rating"
+              value={rating}
+              onChange={handleRatingChange}
+              size="large"
+              precision={0.5}
+              sx={{
+                fontSize: '2.5rem',
+                '& .MuiRating-iconFilled': {
+                  color: '#FFD700',
+                },
+                '& .MuiRating-iconHover': {
+                  color: '#FFD700',
+                },
+                mr: 2
+              }}
+            />
+            {rating > 0 && (
+              <Typography variant="h6" sx={{ fontWeight: 600, color: '#1976d2' }}>
+                {getRatingLabel(Math.round(rating))}
               </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <Rating
-                  name="rating"
-                  value={rating}
-                  onChange={handleRatingChange}
-                  size="large"
-                  precision={0.5}
-                  sx={{
-                    '& .MuiRating-iconFilled': {
-                      color: '#FFD700',
-                    },
-                    '& .MuiRating-iconHover': {
-                      color: '#FFD700',
-                    },
-                    mr: 2
-                  }}
-                />
-                {rating > 0 && (
-                  <Typography variant="body1" sx={{ fontWeight: 600, color: '#1976d2' }}>
-                    {getRatingLabel(Math.round(rating))}
-                  </Typography>
-                )}
-              </Box>
-              {errors.rating && (
-                <Typography variant="caption" color="error" sx={{ display: 'block', mt: 1 }}>
-                  {errors.rating}
-                </Typography>
-              )}
-            </Box>
-          </Grid>
-          
-          <Grid item xs={12} md={6}>
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, color: '#333' }}>
-                Rating Guide
-              </Typography>
-              <Box sx={{ fontSize: '14px', color: '#666' }}>
-                <Box sx={{ mb: 1 }}>⭐ Poor - Not recommended</Box>
-                <Box sx={{ mb: 1 }}>⭐⭐ Fair - Below average</Box>
-                <Box sx={{ mb: 1 }}>⭐⭐⭐ Good - Satisfactory</Box>
-                <Box sx={{ mb: 1 }}>⭐⭐⭐⭐ Very Good - Above average</Box>
-                <Box>⭐⭐⭐⭐⭐ Excellent - Highly recommended</Box>
-              </Box>
-            </Box>
-          </Grid>
-        </Grid>
+            )}
+          </Box>
+          {errors.rating && (
+            <Typography variant="caption" color="error" sx={{ display: 'block', mt: 1 }}>
+              {errors.rating}
+            </Typography>
+          )}
+        </Box>
 
         <Box sx={{ mb: 3 }}>
           <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, color: '#333' }}>
