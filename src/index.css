@@ -1,7 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: "Inter", sans-serif !important;
 }
 
 html,
@@ -25,10 +28,26 @@ body::-webkit-scrollbar {
 }
 
 :root {
-  --primaryColor: #e2edf3,
-    --secondaryColor: #009e92
+  --primaryColor: #e2edf3;
+    --secondaryColor: #009e92;
+  --primary-button-Color: #16A34A;
+  --secondary-button-Color: #0017E4;
 }
 
 .stsearch-box input{
   border: none !important;
+}
+
+.primary-button {
+  background-color: var(--primary-button-Color) !important;
+}
+
+.secondary-button {
+  color: #fff !important;
+  background-color: var(--secondary-button-Color) !important;
+}
+
+.secondary-outline-button{
+  border: 1px solid var(--secondary-button-Color) !important;
+  color: var(--secondary-button-Color);
 }

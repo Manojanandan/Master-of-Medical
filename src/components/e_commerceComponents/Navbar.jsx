@@ -4,7 +4,8 @@ import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import PersonIcon from "@mui/icons-material/Person";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
+// import AddShoppingCartIcon from "@mui/icons-material";import { ShoppingCartOutlined } from "@mui/icons-material";
+import { ShoppingCartOutlined } from "@mui/icons-material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   AppBar,
@@ -317,7 +318,7 @@ const Navbar = () => {
               onClick={() => navigate("/ecommerceDashboard/cart")}
             >
               <Badge badgeContent={totalItems || 0} color="secondary">
-                <AddShoppingCartIcon color="action" sx={{ fontSize: "2rem" }} />
+                <ShoppingCartOutlined color="action" sx={{ fontSize: "2rem" }} />
               </Badge>
             </Box>
           </Box>
