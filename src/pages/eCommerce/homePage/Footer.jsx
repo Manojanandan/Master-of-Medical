@@ -46,7 +46,7 @@ const Footer = () => {
                 component="h6"
                 sx={{ marginBottom: '2px',fontWeight:'bold' }}
               >
-                Join our newsletter for £10 offs
+                Join our newsletter 
               </Typography>
               <Typography variant="p" component="p" sx={{ fontSize: '14px',color: '#9a9fa8' }}>
                 Register how to get latest updates on promotions & coupons.Don't worry,we are not spam!
@@ -418,6 +418,11 @@ const Footer = () => {
                   style={{ textDecoration: 'underline', marginRight: '6px' }} onClick={()=>navigate('/ecommerceDashboard/privacyPolicy')}
                 >
                   Privacy Policy
+                </span>{' '}
+                <span
+                  style={{ textDecoration: 'underline', marginRight: '6px' }} onClick={()=>navigate('/ecommerceDashboard/cookiesPolicy')}
+                >
+                  Cookies Policy
                 </span>{' '}
                 <span
                   style={{ textDecoration: 'underline', marginRight: '6px' }} onClick={()=>navigate('/ecommerceDashboard/orderTracking')}

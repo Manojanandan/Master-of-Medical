@@ -1,38 +1,15 @@
-/* import { Box, Typography } from '@mui/material'
-import React from 'react'
-import BreadCrumbs from '../../../components/e_commerceComponents/BreadCrumbs'
-
-const Termsofuse = () => {
-  return (
-    <Box sx={{ height: 'auto', width: '100%', }}>
-      <BreadCrumbs title={"TermsOfUse"} />
-      <Box sx={{ height: '100%', width: '90%', margin: '2% auto' }}>
-        <Typography variant='h5' sx={{ fontWeight: 'bold', margin: '1% 0' }}>Note</Typography>
-        <Typography variant='p' sx={{ fontSize: '16px', }}>By accessing and using the M.O.M platform, you agree to the following:</Typography><br />
-        <Typography variant='p' sx={{ fontSize: '16px', lineHeight: '50px', marginLeft: '2%' }}>1. 	All users must register with accurate and updated information.</Typography><br />
-        <Typography variant='p' sx={{ fontSize: '16px', lineHeight: '50px', marginLeft: '2%' }}>2.	Buyers must use the platform for institutional or business use only.</Typography><br />
-        <Typography variant='p' sx={{ fontSize: '16px', lineHeight: '50px', marginLeft: '2%' }}>3.	Sellers are responsible for ensuring their product listings, inventory, and pricing are accurate and compliant with applicable laws.</Typography><br />
-        <Typography variant='p' sx={{ fontSize: '16px', lineHeight: '50px', marginLeft: '2%' }}>4.	Any misuse of the platform, false information, or breach of these terms may lead to suspension or legal action.</Typography><br />
-        <Typography variant='p' sx={{ fontSize: '16px', lineHeight: '50px' }}>We reserve the right to update these terms as necessary.</Typography><br />
-
-      </Box>
-    </Box>
-  )
-}
-
-export default Termsofuse */
-
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Typography, Container, Paper } from '@mui/material';
-import BreadCrumbs from '../../../components/e_commerceComponents/BreadCrumbs';
 
-const Termsofuse = () => {
+const TermsOfUse = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#f5f5f5', py: 4 }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: '#ffffff' }}>
       <Container maxWidth="lg">
-        <BreadCrumbs title="Terms of Use" />
-        <Paper elevation={3} sx={{ p: { xs: 3, md: 5 }, mt: 3, borderRadius: 2 }}>
+        <Paper elevation={0} sx={{ p: { xs: 3, md: 5 },  borderRadius: 2 }}>
           <Typography
             variant="h4"
             sx={{
@@ -43,14 +20,14 @@ const Termsofuse = () => {
               fontSize: { xs: '1.8rem', md: '2.5rem' },
             }}
           >
-            Terms and Conditions
+            Terms of Use
           </Typography>
           <Typography
             variant="h6"
             sx={{
               fontWeight: 'medium',
               mb: 2,
-              color: '#424242',
+              color: '#1a237e',
               fontSize: { xs: '1.2rem', md: '1.5rem' },
             }}
           >
@@ -65,7 +42,7 @@ const Termsofuse = () => {
               lineHeight: 1.8,
             }}
           >
-            By accessing and using the M.O.M platform, you agree to comply with the following terms and conditions:
+            At Master of Medical, your compliance with these terms is our priority.
           </Typography>
           <Box sx={{ pl: { xs: 2, md: 4 }, mb: 4 }}>
             <Typography
@@ -80,7 +57,7 @@ const Termsofuse = () => {
               }}
             >
               <Box component="span" sx={{ mr: 2, color: '#1a237e' }}>1.</Box>
-              All users must register with accurate and updated information.
+              We collect only necessary information to deliver services—such as name, contact, business info, and payment data.
             </Typography>
             <Typography
               variant="body1"
@@ -94,7 +71,7 @@ const Termsofuse = () => {
               }}
             >
               <Box component="span" sx={{ mr: 2, color: '#1a237e' }}>2.</Box>
-              Buyers must use the platform for institutional or business use only.
+              All user data is encrypted and stored securely.
             </Typography>
             <Typography
               variant="body1"
@@ -108,7 +85,7 @@ const Termsofuse = () => {
               }}
             >
               <Box component="span" sx={{ mr: 2, color: '#1a237e' }}>3.</Box>
-              Sellers are responsible for ensuring their product listings, inventory, and pricing are accurate and compliant with applicable laws.
+              We do not sell or share your information with third parties for advertising.
             </Typography>
             <Typography
               variant="body1"
@@ -122,7 +99,7 @@ const Termsofuse = () => {
               }}
             >
               <Box component="span" sx={{ mr: 2, color: '#1a237e' }}>4.</Box>
-              Any misuse of the platform, false information, or breach of these terms may lead to suspension or legal action.
+              Data is used solely to process orders, support logistics, and improve user experience.
             </Typography>
             <Typography
               variant="body1"
@@ -133,7 +110,7 @@ const Termsofuse = () => {
                 lineHeight: 2,
               }}
             >
-              We reserve the right to update these terms as necessary.
+              You can request to review or delete your data anytime by contacting our support team.
             </Typography>
           </Box>
           <Typography
@@ -153,4 +130,4 @@ const Termsofuse = () => {
   );
 };
 
-export default Termsofuse;
+export default TermsOfUse;
