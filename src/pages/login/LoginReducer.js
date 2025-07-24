@@ -2,6 +2,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { userLogin } from "../../utils/Service";
 
 export const loginUser = createAsyncThunk("Login User",async({data,type})=>{
+    console.log(type);
+    
     return await userLogin(data,type).then((response) => response.data)
 })
 
@@ -20,6 +22,7 @@ export const loginReducer = createSlice({
     extraReducers: (builder)=>{
         builder.addCase(loginUser.pending,(state)=>{
             state.loader = true;
+            console.log('Login API loading');
         })
         builder.addCase(loginUser.fulfilled,(state,action)=>{
             state.loader= false
