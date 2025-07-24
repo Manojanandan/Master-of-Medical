@@ -146,7 +146,7 @@ const App = () => {
               <Blog />
             </AnimatedPage>
           } />
-          <Route path="/ecommerceDashboard/thank-you" element={
+          <Route path="/ecommerceDashboard/thankyou" element={
             <AnimatedPage animationType="zoom" timeout={800}>
               <ThankYou />
             </AnimatedPage>

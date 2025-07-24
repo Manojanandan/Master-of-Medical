@@ -214,25 +214,25 @@ const Checkout = () => {
       const orderData = {
         customerId: userId,
         customerInfo: {
-          name: user?.name || localUser?.name || 'Customer',
-          email: user?.email || localUser?.email || '',
-          phone: user?.phone || localUser?.phone || '',
+          name: user?.name || 'Customer',
+          email: user?.email || '',
+          phone: user?.phone || '',
           address: selectedAddress
         },
-        productInfo: cart.map(item => ({
-          productId: item.Product.id,
-          name: item.Product.name,
-          price: parseFloat(item.Product.price),
+        productInfo: items.map(item => ({
+          productId: item.product?.id || item._id,
+          name: item.product?.name || 'Product',
+          price: parseFloat(item.price),
           quantity: item.quantity,
-          subTotal: parseFloat(item.Product.price) * item.quantity,
-          gst: parseFloat(subTotal) * 0.18,
-          total: parseFloat(subTotal) + parseFloat(gstAmount)
+          subTotal: parseFloat(item.price) * item.quantity,
+          gst: parseFloat(item.price) * item.quantity * GST_RATE,
+          total: parseFloat(item.price) * item.quantity * (1 + GST_RATE)
         })),
-        subTotal: subTotal,
-        gstAmount: gstAmount,
-        totalCost: totalCost,
+        subTotal: totals.subtotal,
+        gstAmount: totals.gst,
+        totalCost: totals.total,
         status: 'pending'
-      };
+      };
 
       const response = await createOrder(orderData);
 
@@ -333,428 +333,440 @@ const Checkout = () => {
   }
 
   return (
-    <Box>
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "flex-start",
+        minHeight: "100vh",
+        py: 4,
+        px: 2,
+        bgcolor: "#f5f5f5",
+      }}
+    >
+      <Box sx={{ width: "90%", maxWidth: "1400px" }}>
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
 
-      <Grid container spacing={3}>
-        {/* Left Column - Address Selection & Order Details */}
-        <Grid item xs={12} lg={8}>
-          {/* Address Selection */}
-          <Card elevation={0} sx={{ borderRadius: 2, mb: 3 }}>
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-                <LocationOnIcon sx={{ mr: 2, color: "primary.main" }} />
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  Delivery Address
-                </Typography>
-              </Box>
-
-              {addresses.length === 0 ? (
-                <Box sx={{ textAlign: "center", py: 4 }}>
-                  <LocationOnIcon
-                    sx={{ fontSize: 60, color: "text.secondary", mb: 2 }}
-                  />
-                  <Typography variant="h6" sx={{ mb: 1 }}>
-                    No addresses found
+        <Grid container spacing={3}>
+          {/* Left Column - Address Selection & Order Details */}
+          <Grid item xs={12} lg={8}>
+            {/* Address Selection */}
+            <Card elevation={0} sx={{ borderRadius: 2, mb: 3 }}>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+                  <LocationOnIcon sx={{ mr: 2, color: "primary.main" }} />
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    Delivery Address
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mb: 3 }}
-                  >
-                    Please add a delivery address to continue with checkout.
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={() => openAddressDialog()}
-                    sx={{ borderRadius: 2, textTransform: "none" }}
-                  >
-                    Add Address
-                  </Button>
                 </Box>
-              ) : (
-                <Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      mb: 2,
-                    }}
-                  >
-                    <Typography variant="body2" color="text.secondary">
-                      Select a delivery address
+
+                {addresses.length === 0 ? (
+                  <Box sx={{ textAlign: "center", py: 4 }}>
+                    <LocationOnIcon
+                      sx={{ fontSize: 60, color: "text.secondary", mb: 2 }}
+                    />
+                    <Typography variant="h6" sx={{ mb: 1 }}>
+                      No addresses found
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 3 }}
+                    >
+                      Please add a delivery address to continue with checkout.
                     </Typography>
                     <Button
-                      variant="outlined"
-                      size="small"
+                      variant="contained"
                       startIcon={<AddIcon />}
                       onClick={() => openAddressDialog()}
                       sx={{ borderRadius: 2, textTransform: "none" }}
                     >
-                      Add New Address
+                      Add Address
                     </Button>
                   </Box>
-
-                  <RadioGroup
-                    value={selectedAddress?._id || selectedAddress?.id || ""}
-                    onChange={(e) => {
-                      const address = addresses.find(
-                        (addr) =>
-                          addr._id === e.target.value ||
-                          addr.id === e.target.value
-                      );
-                      handleAddressSelect(address);
-                    }}
-                  >
-                    <Grid container spacing={2}>
-                      {addresses.map((address, index) => (
-                        <Grid
-                          item
-                          xs={12}
-                          sm={6}
-                          key={address._id || address.id}
-                        >
-                          <Paper
-                            elevation={
-                              selectedAddress?._id === address._id ||
-                              selectedAddress?.id === address.id
-                                ? 3
-                                : 1
-                            }
-                            sx={{
-                              p: 2,
-                              border:
-                                selectedAddress?._id === address._id ||
-                                selectedAddress?.id === address.id
-                                  ? "2px solid"
-                                  : "1px solid",
-                              borderColor:
-                                selectedAddress?._id === address._id ||
-                                selectedAddress?.id === address.id
-                                  ? "primary.main"
-                                  : "#e0e0e0",
-                              borderRadius: 2,
-                              cursor: "pointer",
-                              transition: "all 0.2s ease",
-                              "&:hover": {
-                                borderColor: "primary.main",
-                                boxShadow: 2,
-                              },
-                            }}
-                            onClick={() => handleAddressSelect(address)}
-                          >
-                            <Box
-                              sx={{ display: "flex", alignItems: "flex-start" }}
-                            >
-                              <Radio
-                                value={address._id || address.id}
-                                sx={{ mt: -0.5 }}
-                              />
-                              <Box sx={{ flex: 1 }}>
-                                <Box
-                                  sx={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "flex-start",
-                                    mb: 1,
-                                  }}
-                                >
-                                  <Typography
-                                    variant="subtitle2"
-                                    sx={{ fontWeight: 600 }}
-                                  >
-                                    Address {index + 1}
-                                  </Typography>
-                                  {selectedAddress?._id === address._id ||
-                                    (selectedAddress?.id === address.id && (
-                                      <Chip
-                                        label="Selected"
-                                        size="small"
-                                        color="primary"
-                                      />
-                                    ))}
-                                </Box>
-                                <Typography variant="body2" sx={{ mb: 0.5 }}>
-                                  {address.address}
-                                </Typography>
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                >
-                                  {address.city}, {address.state}
-                                </Typography>
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                >
-                                  {address.country} - {address.postalCode}
-                                </Typography>
-                              </Box>
-                            </Box>
-                          </Paper>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </RadioGroup>
-                </Box>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Order Items */}
-          <Card elevation={0} sx={{ borderRadius: 2 }}>
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-                <ShoppingCartIcon sx={{ mr: 2, color: "primary.main" }} />
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  Order Items ({totals.totalItems})
-                </Typography>
-              </Box>
-
-              <Box sx={{ maxHeight: "400px", overflowY: "auto" }}>
-                {items.map((item, index) => (
-                  <Box
-                    key={item._id || index}
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      py: 2,
-                      borderBottom:
-                        index < items.length - 1 ? "1px solid #e0e0e0" : "none",
-                    }}
-                  >
+                ) : (
+                  <Box>
                     <Box
                       sx={{
-                        width: 80,
-                        height: 80,
-                        borderRadius: 2,
-                        overflow: "hidden",
-                        bgcolor: "#f5f5f5",
-                        mr: 2,
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        mb: 2,
                       }}
                     >
-                      <img
-                        src={
-                          item.product?.thumbnailImage ||
-                          "https://via.placeholder.com/80x80?text=Product"
-                        }
-                        alt={item.product?.name || "Product"}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </Box>
-
-                    <Box sx={{ flex: 1 }}>
-                      <Typography
-                        variant="subtitle1"
-                        sx={{ fontWeight: 600, mb: 0.5 }}
-                      >
-                        {item.product?.name || "Product Name"}
-                      </Typography>
-                      <Box sx={{ mb: 1 }}>
-                        <StarRating
-                          rating={item.product?.averageRating || 0}
-                          reviewCount={item.product?.reviewCount || 0}
-                          size="small"
-                          showReviewCount={true}
-                        />
-                      </Box>
                       <Typography variant="body2" color="text.secondary">
-                        Qty: {item.quantity} × ₹{item.price?.toFixed(2)}
+                        Select a delivery address
                       </Typography>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        startIcon={<AddIcon />}
+                        onClick={() => openAddressDialog()}
+                        sx={{ borderRadius: 2, textTransform: "none" }}
+                      >
+                        Add New Address
+                      </Button>
                     </Box>
 
-                    <Typography variant="h6" sx={{ fontWeight: 600, ml: 2 }}>
-                      ₹{(item.price * item.quantity).toFixed(2)}
-                    </Typography>
-                  </Box>
-                ))}
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Right Column - Order Summary */}
-        <Grid item xs={12} lg={4}>
-          <Card
-            elevation={0}
-            sx={{ borderRadius: 2, position: "sticky", top: 20 }}
-          >
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-                <PaymentIcon sx={{ mr: 2, color: "primary.main" }} />
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  Order Summary
-                </Typography>
-              </Box>
-
-              {/* Price Breakdown */}
-              <Box sx={{ mb: 3 }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    mb: 1,
-                  }}
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    Subtotal ({totals.totalItems} items)
-                  </Typography>
-                  <Typography variant="body2" fontWeight={500}>
-                    ₹{totals.subtotal.toFixed(2)}
-                  </Typography>
-                </Box>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    mb: 1,
-                  }}
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    GST (18%)
-                  </Typography>
-                  <Typography variant="body2" fontWeight={500}>
-                    ₹{totals.gst.toFixed(2)}
-                  </Typography>
-                </Box>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    mb: 1,
-                  }}
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    Shipping
-                  </Typography>
-                  <Typography variant="body2" fontWeight={500}>
-                    {totals.shipping === 0 ? (
-                      <Chip label="FREE" size="small" color="success" />
-                    ) : (
-                      `₹${totals.shipping.toFixed(2)}`
-                    )}
-                  </Typography>
-                </Box>
-
-                {totals.subtotal < FREE_SHIPPING_THRESHOLD && (
-                  <Box sx={{ mt: 1 }}>
-                    <Typography variant="caption" color="success.main">
-                      Add ₹
-                      {(FREE_SHIPPING_THRESHOLD - totals.subtotal).toFixed(2)}{" "}
-                      more for FREE shipping
-                    </Typography>
+                    <RadioGroup
+                      value={selectedAddress?._id || selectedAddress?.id || ""}
+                      onChange={(e) => {
+                        const address = addresses.find(
+                          (addr) =>
+                            addr._id === e.target.value ||
+                            addr.id === e.target.value
+                        );
+                        handleAddressSelect(address);
+                      }}
+                    >
+                      <Grid container spacing={2}>
+                        {addresses.map((address, index) => (
+                          <Grid
+                            item
+                            xs={12}
+                            sm={6}
+                            key={address._id || address.id}
+                          >
+                            <Paper
+                              elevation={
+                                selectedAddress?._id === address._id ||
+                                selectedAddress?.id === address.id
+                                  ? 3
+                                  : 1
+                              }
+                              sx={{
+                                p: 2,
+                                border:
+                                  selectedAddress?._id === address._id ||
+                                  selectedAddress?.id === address.id
+                                    ? "2px solid"
+                                    : "1px solid",
+                                borderColor:
+                                  selectedAddress?._id === address._id ||
+                                  selectedAddress?.id === address.id
+                                    ? "primary.main"
+                                    : "#e0e0e0",
+                                borderRadius: 2,
+                                cursor: "pointer",
+                                transition: "all 0.2s ease",
+                                "&:hover": {
+                                  borderColor: "primary.main",
+                                  boxShadow: 2,
+                                },
+                              }}
+                              onClick={() => handleAddressSelect(address)}
+                            >
+                              <Box
+                                sx={{ display: "flex", alignItems: "flex-start" }}
+                              >
+                                <Radio
+                                  value={address._id || address.id}
+                                  sx={{ mt: -0.5 }}
+                                />
+                                <Box sx={{ flex: 1 }}>
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      justifyContent: "space-between",
+                                      alignItems: "flex-start",
+                                      mb: 1,
+                                    }}
+                                  >
+                                    <Typography
+                                      variant="subtitle2"
+                                      sx={{ fontWeight: 600 }}
+                                    >
+                                      Address {index + 1}
+                                    </Typography>
+                                    {selectedAddress?._id === address._id ||
+                                      (selectedAddress?.id === address.id && (
+                                        <Chip
+                                          label="Selected"
+                                          size="small"
+                                          color="primary"
+                                        />
+                                      ))}
+                                  </Box>
+                                  <Typography variant="body2" sx={{ mb: 0.5 }}>
+                                    {address.address}
+                                  </Typography>
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                  >
+                                    {address.city}, {address.state}
+                                  </Typography>
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                  >
+                                    {address.country} - {address.postalCode}
+                                  </Typography>
+                                </Box>
+                              </Box>
+                            </Paper>
+                          </Grid>
+                        ))}
+                      </Grid>
+                    </RadioGroup>
                   </Box>
                 )}
-              </Box>
+              </CardContent>
+            </Card>
 
-              <Divider sx={{ my: 2 }} />
+            {/* Order Items */}
+            <Card elevation={0} sx={{ borderRadius: 2 }}>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+                  <ShoppingCartIcon sx={{ mr: 2, color: "primary.main" }} />
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    Order Items ({totals.totalItems})
+                  </Typography>
+                </Box>
 
-              {/* Total */}
-              <Box
-                sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}
-              >
-                <Typography variant="h6" fontWeight={600}>
-                  Total
-                </Typography>
-                <Typography variant="h6" fontWeight={600} color="primary">
-                  ₹{totals.total.toFixed(2)}
-                </Typography>
-              </Box>
-
-              {/* Terms and Conditions */}
-              <Box sx={{ mb: 3 }}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={termsAccepted}
-                      onChange={handleTermsChange}
-                      color="primary"
-                    />
-                  }
-                  label={
-                    <Typography variant="body2">
-                      I agree to the{" "}
-                      <a
-                        href="#"
-                        style={{
-                          color: theme.palette.primary.main,
-                          textDecoration: "underline",
+                <Box sx={{ maxHeight: "400px", overflowY: "auto" }}>
+                  {items.map((item, index) => (
+                    <Box
+                      key={item._id || index}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        py: 2,
+                        borderBottom:
+                          index < items.length - 1 ? "1px solid #e0e0e0" : "none",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 80,
+                          height: 80,
+                          borderRadius: 2,
+                          overflow: "hidden",
+                          bgcolor: "#f5f5f5",
+                          mr: 2,
                         }}
                       >
-                        terms and conditions
-                      </a>
+                        <img
+                          src={
+                            item.product?.thumbnailImage ||
+                            "https://via.placeholder.com/80x80?text=Product"
+                          }
+                          alt={item.product?.name || "Product"}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                        />
+                      </Box>
+
+                      <Box sx={{ flex: 1 }}>
+                        <Typography
+                          variant="subtitle1"
+                          sx={{ fontWeight: 600, mb: 0.5 }}
+                        >
+                          {item.product?.name || "Product Name"}
+                        </Typography>
+                        <Box sx={{ mb: 1 }}>
+                          <StarRating
+                            rating={item.product?.averageRating || 0}
+                            reviewCount={item.product?.reviewCount || 0}
+                            size="small"
+                            showReviewCount={true}
+                          />
+                        </Box>
+                        <Typography variant="body2" color="text.secondary">
+                          Qty: {item.quantity} × ₹{item.price?.toFixed(2)}
+                        </Typography>
+                      </Box>
+
+                      <Typography variant="h6" sx={{ fontWeight: 600, ml: 2 }}>
+                        ₹{(item.price * item.quantity).toFixed(2)}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Right Column - Order Summary */}
+          <Grid item xs={12} lg={4}>
+            <Card
+              elevation={0}
+              sx={{ borderRadius: 2, position: "sticky", top: 20 }}
+            >
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+                  <PaymentIcon sx={{ mr: 2, color: "primary.main" }} />
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    Order Summary
+                  </Typography>
+                </Box>
+
+                {/* Price Breakdown */}
+                <Box sx={{ mb: 3 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mb: 1,
+                    }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      Subtotal ({totals.totalItems} items)
                     </Typography>
+                    <Typography variant="body2" fontWeight={500}>
+                      ₹{totals.subtotal.toFixed(2)}
+                    </Typography>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mb: 1,
+                    }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      GST (18%)
+                    </Typography>
+                    <Typography variant="body2" fontWeight={500}>
+                      ₹{totals.gst.toFixed(2)}
+                    </Typography>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mb: 1,
+                    }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      Shipping
+                    </Typography>
+                    <Typography variant="body2" fontWeight={500}>
+                      {totals.shipping === 0 ? (
+                        <Chip label="FREE" size="small" color="success" />
+                      ) : (
+                        `₹${totals.shipping.toFixed(2)}`
+                      )}
+                    </Typography>
+                  </Box>
+
+                  {totals.subtotal < FREE_SHIPPING_THRESHOLD && (
+                    <Box sx={{ mt: 1 }}>
+                      <Typography variant="caption" color="success.main">
+                        Add ₹
+                        {(FREE_SHIPPING_THRESHOLD - totals.subtotal).toFixed(2)}{" "}
+                        more for FREE shipping
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+
+                <Divider sx={{ my: 2 }} />
+
+                {/* Total */}
+                <Box
+                  sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}
+                >
+                  <Typography variant="h6" fontWeight={600}>
+                    Total
+                  </Typography>
+                  <Typography variant="h6" fontWeight={600} color="primary">
+                    ₹{totals.total.toFixed(2)}
+                  </Typography>
+                </Box>
+
+                {/* Terms and Conditions */}
+                <Box sx={{ mb: 3 }}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={termsAccepted}
+                        onChange={handleTermsChange}
+                        color="primary"
+                      />
+                    }
+                    label={
+                      <Typography variant="body2">
+                        I agree to the{" "}
+                        <a
+                          href="#"
+                          style={{
+                            color: theme.palette.primary.main,
+                            textDecoration: "underline",
+                          }}
+                        >
+                          terms and conditions
+                        </a>
+                      </Typography>
+                    }
+                  />
+                </Box>
+
+                {/* Place Order Button */}
+                <Button
+                  variant="contained"
+                  fullWidth
+                  size="large"
+                  onClick={handleConfirmOrder}
+                  disabled={!canPlaceOrder}
+                  startIcon={
+                    orderLoading ? (
+                      <CircularProgress size={20} color="inherit" />
+                    ) : (
+                      <LocalShippingIcon />
+                    )
                   }
-                />
-              </Box>
+                  sx={{
+                    borderRadius: 2,
+                    py: 1.5,
+                    textTransform: "none",
+                    fontSize: "16px",
+                    fontWeight: 600,
+                  }}
+                >
+                  {orderLoading ? "Placing Order..." : "Place Order"}
+                </Button>
 
-              {/* Place Order Button */}
-              <Button
-                variant="contained"
-                fullWidth
-                size="large"
-                onClick={handleConfirmOrder}
-                disabled={!canPlaceOrder}
-                startIcon={
-                  orderLoading ? (
-                    <CircularProgress size={20} color="inherit" />
-                  ) : (
-                    <LocalShippingIcon />
-                  )
-                }
-                sx={{
-                  borderRadius: 2,
-                  py: 1.5,
-                  textTransform: "none",
-                  fontSize: "16px",
-                  fontWeight: 600,
-                }}
-              >
-                {orderLoading ? "Placing Order..." : "Place Order"}
-              </Button>
-
-              {/* Continue Shopping */}
-              <Button
-                variant="outlined"
-                fullWidth
-                size="large"
-                onClick={() => navigate("/ecommerceDashboard")}
-                sx={{
-                  mt: 2,
-                  borderRadius: 2,
-                  py: 1.5,
-                  textTransform: "none",
-                  fontSize: "16px",
-                }}
-              >
-                Continue Shopping
-              </Button>
-            </CardContent>
-          </Card>
+                {/* Continue Shopping */}
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  size="large"
+                  onClick={() => navigate("/ecommerceDashboard")}
+                  sx={{
+                    mt: 2,
+                    borderRadius: 2,
+                    py: 1.5,
+                    textTransform: "none",
+                    fontSize: "16px",
+                  }}
+                >
+                  Continue Shopping
+                </Button>
+              </CardContent>
+            </Card>
+          </Grid>
         </Grid>
-      </Grid>
 
-      {/* Address Dialog */}
-      <AddressDialog
-        addressDialogOpen={addressDialogOpen}
-        closeAddressDialog={closeAddressDialog}
-        editingAddress={editingAddress}
-        addressForm={addressForm}
-        handleAddressInputChange={handleAddressInputChange}
-        handleSaveAddress={handleSaveAddress}
-      />
+        {/* Address Dialog */}
+        <AddressDialog
+          addressDialogOpen={addressDialogOpen}
+          closeAddressDialog={closeAddressDialog}
+          editingAddress={editingAddress}
+          addressForm={addressForm}
+          handleAddressInputChange={handleAddressInputChange}
+          handleSaveAddress={handleSaveAddress}
+        />
+      </Box>
     </Box>
   );
 };
