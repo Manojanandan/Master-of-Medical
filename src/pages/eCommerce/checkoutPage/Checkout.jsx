@@ -310,7 +310,7 @@ const Checkout = () => {
         {/* Left Column - Address Selection & Order Details */}
         <Grid item xs={12} lg={8}>
           {/* Address Selection */}
-          <Card elevation={2} sx={{ borderRadius: 2, mb: 3 }}>
+          <Card elevation={0} sx={{ borderRadius: 2, mb: 3 }}>
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                 <LocationOnIcon sx={{ mr: 2, color: 'primary.main' }} />
@@ -422,7 +422,7 @@ const Checkout = () => {
           </Card>
 
           {/* Order Items */}
-          <Card elevation={2} sx={{ borderRadius: 2 }}>
+          <Card elevation={0} sx={{ borderRadius: 2 }}>
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                 <ShoppingCartIcon sx={{ mr: 2, color: 'primary.main' }} />
@@ -487,7 +487,7 @@ const Checkout = () => {
 
         {/* Right Column - Order Summary */}
         <Grid item xs={12} lg={4}>
-          <Card elevation={2} sx={{ borderRadius: 2, position: 'sticky', top: 20 }}>
+          <Card elevation={0} sx={{ borderRadius: 2, position: 'sticky', top: 20 }}>
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                 <PaymentIcon sx={{ mr: 2, color: 'primary.main' }} />

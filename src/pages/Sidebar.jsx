@@ -45,9 +45,9 @@ const Sidebar = () => {
   return (
     <List disablePadding>
       <ListItemButton sx={{padding:'7px 16px'}}>
-        <ListItemIcon>
+        {/* <ListItemIcon>
           <GridViewIcon />
-        </ListItemIcon>
+        </ListItemIcon> */}
         <ListItemText primary="All Categories" />
       </ListItemButton>
       <Divider />
@@ -70,7 +70,7 @@ const Sidebar = () => {
               onClick={() => handleClick(i)}
               sx={{ padding: "5px 16px" }}
             >
-              <ListItemIcon />
+              {/* <ListItemIcon /> */}
               <ListItemText primary={category.name} />
               {category.SubCategories && category.SubCategories.length > 0 && (
                 openIndex === i ? <ExpandLess /> : <ExpandMore />
@@ -86,7 +86,7 @@ const Sidebar = () => {
                     sx={{ padding: "5px 16px 5px 30px" }}
                     onClick={() => handleSubcategoryClick(subcategory.id)}
                   >
-                    <ListItemIcon />
+                    {/* <ListItemIcon /> */}
                     <ListItemText primary={subcategory.name} />
                   </ListItemButton>
                 ))}

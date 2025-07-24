@@ -48,19 +48,22 @@ const HomePage = () => {
         width: '100%',
         borderBottom: 'solid 1.5px #2424',
         display: 'flex',
+        alignItems: "start",
         justifyContent: 'space-around',
         padding: isMobile ? '10px' : '20px',
+        paddingBottom: "6vh",
         flexWrap: isMobile ? 'wrap' : 'wrap-reverse',
         gap: '20px'
       }}>
         {/* Sidebar */}
         <Box sx={{
-          height: isMobile ? '300px' : '500px',
+          height: isMobile ? '300px' : 'auto',
           width: isMobile ? '100%' : isTablet ? '30%' : '25%',
           border: 'solid 1px #2424',
           borderRadius: '10px',
           overflowY: 'scroll',
-          minWidth: isMobile ? 'auto' : '250px'
+          minWidth: isMobile ? 'auto' : '250px',
+          
         }}>
           <Sidebar />
         </Box>
@@ -68,9 +71,9 @@ const HomePage = () => {
         {/* Slider */}
         <Box sx={{
           height: isMobile ? '250px' : '450px',
-          width: isMobile ? '100%' : isTablet ? '65%' : '65%',
+          width: isMobile ? '100%' : isTablet ? '65%' : '70%',
           borderRadius: '15px',
-          margin: isMobile ? '0' : '2rem 0'
+          margin: isMobile ? '0' : '0'
         }}>
           <Slider {...settings}>
             <div className='slide'>
