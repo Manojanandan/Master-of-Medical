@@ -12,8 +12,8 @@ export const createCustomer = async(data) =>{
 
 //login creation
 export const userLogin = async(data,type) =>{
-    if(type === 'user' || type === 'customer'){
-        return await  instance.post(`user/login/customer`,data)
+    if(type === 'vendor' || type === 'customer'){
+        return await  instance.post(`user/login/${type}`,data)
 
     }
 

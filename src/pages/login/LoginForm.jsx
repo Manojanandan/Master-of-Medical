@@ -106,14 +106,16 @@ const LoginForm = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        
         if (!validateForm()) return;
 
         const payload = {
             email: formData.email,
             password: formData.password,
         };
+        console.log("dddd", payload);
 
-        dispatch(loginUser({ data: payload, type }));
+        dispatch(loginUser({ data: payload, type: type == "vendor" ? "vendor" : "customer" }));
         setOpenModal(true);
     };
 
