@@ -16,12 +16,13 @@ const VendorNavbar = () => {
       position="fixed"
       elevation={0}
       sx={{
-        background: '#fff',
-        color: '#222',
-        boxShadow: '0 2px 8px 0 rgba(0,0,0,0.03)',
+        background: '#ffffff',
+        color: '#333',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',
         zIndex: (theme) => theme.zIndex.drawer + 2,
         height: { xs: 56, sm: 64 },
         justifyContent: 'center',
+        borderBottom: '1px solid #e0e0e0',
       }}
     >
       <Toolbar sx={{ justifyContent: 'space-between', minHeight: { xs: 56, sm: 64 } }}>

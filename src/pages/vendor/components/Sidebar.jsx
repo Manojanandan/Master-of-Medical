@@ -46,23 +46,30 @@ const Sidebar = ({ collapsed, onToggle, isMobile, mobileOpen }) => {
                 to={item.path}
                 end={item.path === '/vendorDashboard'}
                 sx={{
-                  minHeight: 48,
+                  minHeight: 56,
                   justifyContent: (collapsed && !isMobile) ? 'center' : 'initial',
                   px: 2.5,
-                  my: 1,
-                  borderRadius: '12px',
-                  color: 'grey.400',
+                  my: 0.5,
+                  borderRadius: '8px',
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  transition: 'all 0.2s ease',
                   '&:hover': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
                     color: 'white',
+                    transform: 'translateX(4px)',
                   },
                   '&.active': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.15)',
                     color: 'white',
-                    fontWeight: 'bold',
+                    fontWeight: 600,
+                    borderLeft: '3px solid #fff',
+                    '& .MuiListItemIcon-root': {
+                      color: 'white',
+                    }
                   },
                   '& .MuiListItemIcon-root': {
                       color: 'inherit',
+                      transition: 'color 0.2s ease',
                   }
                 }}
               >
@@ -87,22 +94,24 @@ const Sidebar = ({ collapsed, onToggle, isMobile, mobileOpen }) => {
             <ListItemButton
               onClick={handleLogout}
               sx={{
-                minHeight: 48,
+                minHeight: 56,
                 justifyContent: (collapsed && !isMobile) ? 'center' : 'initial',
                 px: 2.5,
-                my: 1,
-                borderRadius: '12px',
-                color: 'grey.400',
+                my: 0.5,
+                borderRadius: '8px',
+                color: 'rgba(255, 255, 255, 0.7)',
+                transition: 'all 0.2s ease',
                 '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
                   color: 'white',
+                  transform: 'translateX(4px)',
                   '& .MuiSvgIcon-root': {
                     color: 'white',
                   },
                 },
                 '& .MuiSvgIcon-root': {
-                  color: 'grey.400',
-                  transition: 'color 0.2s',
+                  color: 'inherit',
+                  transition: 'color 0.2s ease',
                 },
               }}
             >
@@ -171,14 +180,15 @@ const Sidebar = ({ collapsed, onToggle, isMobile, mobileOpen }) => {
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
-            backgroundColor: '#000000',
+            backgroundColor: '#1a1a1a',
             color: 'white',
             transition: theme.transitions.create('width', {
                 easing: theme.transitions.easing.sharp,
                 duration: theme.transitions.duration.enteringScreen,
             }),
             overflowX: 'hidden',
-            borderRight: 'none',
+            borderRight: '1px solid #333',
+            boxShadow: '2px 0 8px rgba(0,0,0,0.1)',
           },
         }}
       >
