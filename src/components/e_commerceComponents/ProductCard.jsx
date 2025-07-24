@@ -100,10 +100,10 @@ const ProductCard = ({offer,image,badge,title,rating,price,originalPrice,id,onCl
         position: 'relative',
         overflow: 'hidden',
         transition: 'all 0.3s ease',
-            '&:hover': {
-          boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
-          transform: 'translateY(-4px)',
-            }
+          //   '&:hover': {
+          // boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+          // transform: 'translateY(-4px)',
+          //   }
           }}
           onClick={onClick}
         >
@@ -194,7 +194,7 @@ const ProductCard = ({offer,image,badge,title,rating,price,originalPrice,id,onCl
           <StarRating 
             rating={averageRating || rating || 0}
             reviewCount={reviewCount || 0}
-            size={isMobile ? 'small' : 'medium'}
+            size={isMobile ? 'small' : 'large'}
             showReviewCount={true}
           />
         </Box>
@@ -241,15 +241,16 @@ const ProductCard = ({offer,image,badge,title,rating,price,originalPrice,id,onCl
                   onClick={handleDecreaseQuantity}
                   disabled={loading}
                   sx={{
-                border: '1px solid #2196F3',
-                color: '#2196F3',
+                // border: '1px solid #2196F3',
+                // color: '#2196F3',
                 width: isMobile ? '28px' : '32px',
                 height: isMobile ? '28px' : '32px',
-                    '&:hover': {
-                  backgroundColor: '#2196F3',
-                      color: 'white'
-                    }
+                  //   '&:hover': {
+                  // backgroundColor: '#2196F3',
+                  //     color: 'white'
+                  //   }
                   }}
+                  className='secondary-outline-button'
                 >
               <RemoveIcon fontSize="small" />
                 </IconButton>
@@ -259,7 +260,7 @@ const ProductCard = ({offer,image,badge,title,rating,price,originalPrice,id,onCl
                     minWidth: '30px',
                     textAlign: 'center',
                     fontWeight: 'bold',
-                color: '#2196F3',
+                color: 'var(--secondary-button-Color)',
                 fontSize: isMobile ? '14px' : '16px',
                   }}
                 >
@@ -270,15 +271,16 @@ const ProductCard = ({offer,image,badge,title,rating,price,originalPrice,id,onCl
                   onClick={handleIncreaseQuantity}
                   disabled={loading}
                   sx={{
-                border: '1px solid #2196F3',
-                color: '#2196F3',
+                // border: '1px solid #2196F3',
+                // color: '#2196F3',
                 width: isMobile ? '28px' : '32px',
                 height: isMobile ? '28px' : '32px',
-                    '&:hover': {
-                  backgroundColor: '#2196F3',
-                      color: 'white'
-                    }
+                  //   '&:hover': {
+                  // backgroundColor: '#2196F3',
+                  //     color: 'white'
+                  //   }
                   }}
+                  className='secondary-outline-button'
                 >
               <AddIcon fontSize="small" />
                 </IconButton>
@@ -294,16 +296,17 @@ const ProductCard = ({offer,image,badge,title,rating,price,originalPrice,id,onCl
               borderRadius: '24px',
               fontWeight: 'bold',
               textTransform: 'capitalize',
-              borderColor: '#2196F3',
-              color: '#2196F3',
+              // borderColor: '#2196F3',
+              // color: '#2196F3',
               fontSize: isMobile ? '12px' : '14px',
               padding: isMobile ? '6px 12px' : '8px 16px',
-              '&:hover': {
-                backgroundColor: '#2196F3',
-                color: 'white',
-                borderColor: '#2196F3',
-              }
+              // '&:hover': {
+              //   backgroundColor: '#2196F3',
+              //   color: 'white',
+              //   borderColor: '#2196F3',
+              // }
             }} 
+                  className='secondary-outline-button'
                 onClick={handleAddToCart}
               >
                 {loading ? 'Adding...' : 'Add to cart'}

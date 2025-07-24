@@ -117,7 +117,7 @@ const Navbar = () => {
           <Box
             sx={{
               height: "auto",
-              width: "25%",
+              // width: "25%",
               display: "flex",
               justifyContent: "flex-start",
               alignItems: "center",
@@ -183,7 +183,7 @@ const Navbar = () => {
                 variant="outlined"
                 size="small"
                 sx={{
-                  width: "80%",
+                  width: "100%",
                   "& .MuiOutlinedInput-root": {
                     borderRadius: "6px",
                     backgroundColor: "#f5f5f5",
@@ -211,12 +211,29 @@ const Navbar = () => {
           <Box
             sx={{
               height: "auto",
-              width: "18%",
+              // width: "15%",
+              gap: "40px",
               display: "flex",
-              justifyContent: "space-around",
+              justifyContent: "space-between",
               alignItems: "center",
             }}
           >
+          
+            <Box
+              sx={{
+                height: "auto",
+                width: "10%",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                cursor: "pointer",
+              }}
+              onClick={() => navigate("/ecommerceDashboard/cart")}
+            >
+              <Badge badgeContent={totalItems || 0} color="secondary">
+                <ShoppingCartOutlined color="action" sx={{ fontSize: "2rem" }} />
+              </Badge>
+            </Box>
             <Box
               sx={{
                 height: "auto",
@@ -306,27 +323,12 @@ const Navbar = () => {
               </MenuItem>
             </Menu>
 
-            <Box
-              sx={{
-                height: "auto",
-                width: "10%",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                cursor: "pointer",
-              }}
-              onClick={() => navigate("/ecommerceDashboard/cart")}
-            >
-              <Badge badgeContent={totalItems || 0} color="secondary">
-                <ShoppingCartOutlined color="action" sx={{ fontSize: "2rem" }} />
-              </Badge>
-            </Box>
           </Box>
         </Toolbar>
         <Toolbar
           sx={{
-            height: "auto",
-            width: "75%",
+            height: "14px",
+            width: "72%",
             display: "flex",
             justifyContent: "space-between",
           }}

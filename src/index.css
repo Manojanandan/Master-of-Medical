@@ -49,5 +49,9 @@ body::-webkit-scrollbar {
 
 .secondary-outline-button{
   border: 1px solid var(--secondary-button-Color) !important;
-  color: var(--secondary-button-Color);
+  color: var(--secondary-button-Color) !important;
+}
+.secondary-outline-button:hover {
+  background-color: var(--secondary-button-Color) !important;
+  color: #fff !important;
 }
