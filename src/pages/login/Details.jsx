@@ -44,7 +44,7 @@ const Details = () => {
     const [allData, setAlldata] = useState({
         addressLine1: "", addressLine2: "", number: "", city: "", state: "", pincode: "", vendorType: "", country: ""
     });
-    const [errorMsg, setErrorMsg] = useState({ addressLine1Error: '', numberError: "", cityError: "", stateError: "", pincodeError: "", vendorTypeError: "",countryError: "" });
+    const [errorMsg, setErrorMsg] = useState({ addressLine1Error: '', numberError: "", cityError: "", stateError: "", pincodeError: "", vendorTypeError: "",countryError: "", general: "" });
     
     // Country, State, City dropdown states
     const [country, setCountry] = useState(null);
@@ -96,20 +96,7 @@ const Details = () => {
         cfAuthorization: "",
     })
     const [featureImage, setFeatureImage] = useState(null);
-    let tempData = [];
-    try {
-        const raw = sessionStorage.getItem("tempData");
-        if (raw) {
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed)) {
-                tempData = parsed;
-            } else if (parsed && typeof parsed === 'object') {
-                tempData = [parsed];
-            }
-        }
-    } catch (e) {
-        tempData = [];
-    }
+    const tempData = JSON.parse(sessionStorage.getItem("tempData"));
 
     // Add useEffect to track success state changes
     useEffect(() => {
@@ -219,6 +206,75 @@ const Details = () => {
     }
 
     const handleSubmit = () => {
+        // Enhanced validation for customer creation
+        if (type === "user" || type === "customer") {
+            const name = tempData && tempData[0] ? tempData[0].userName : '';
+            const email = tempData && tempData[0] ? tempData[0].email : '';
+            const phone = allData.number;
+            const password = tempData && tempData[0] ? tempData[0].password : '';
+            const address = `${allData.addressLine1}, ${allData.addressLine2}`;
+            const city = allData.city;
+            const state = allData.state;
+            const country = allData.country;
+            const postalCode = allData.pincode;
+
+            // Validate all fields
+            if (!name) {
+                setErrorMsg({ ...errorMsg, general: "Name is required." });
+                return;
+            }
+            if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+                setErrorMsg({ ...errorMsg, general: "A valid email is required." });
+                return;
+            }
+            if (!phone || !/^\d{10,15}$/.test(phone)) {
+                setErrorMsg({ ...errorMsg, general: "A valid phone number is required (10-15 digits)." });
+                return;
+            }
+            if (!password || password.length < 8) {
+                setErrorMsg({ ...errorMsg, general: "Password is required (min 8 characters)." });
+                return;
+            }
+            if (!allData.addressLine1) {
+                setErrorMsg({ ...errorMsg, addressLine1Error: "Address Line 1 is required" });
+                return;
+            }
+            if (!country) {
+                setErrorMsg({ ...errorMsg, countryError: "Country is required" });
+                return;
+            }
+            if (!currentState || !state) {
+                setErrorMsg({ ...errorMsg, stateError: "State is required" });
+                return;
+            }
+            if (!currentCity || !city) {
+                setErrorMsg({ ...errorMsg, cityError: "City is required" });
+                return;
+            }
+            if (!postalCode || !/^\d{4,10}$/.test(postalCode)) {
+                setErrorMsg({ ...errorMsg, pincodeError: "A valid pincode is required (4-10 digits)." });
+                return;
+            }
+
+            setErrorMsg({ addressLine1Error: '', numberError: '', cityError: '', stateError: '', pincodeError: '', vendorTypeError: '', countryError: '', general: '' });
+
+            const customerData = {
+                name,
+                email,
+                phone,
+                password,
+                address,
+                city,
+                state,
+                country,
+                postalCode
+            };
+            dispatch(registerCustomer(customerData));
+            setOpenModal(true);
+            return;
+        }
+
+        
         if (allData.addressLine1 === "") {
             setErrorMsg({ ...errorMsg, addressLine1Error: "Address Line 1 is required" });
         } else if (allData.number === "") {
@@ -241,10 +297,10 @@ const Details = () => {
             if (type === "user" || type === "customer") {
                 // Handle customer creation
                 const customerData = {
-                    name: tempData[0].userName,
-                    email: tempData[0].email,
+                    name: tempData && tempData[0] ? tempData[0].userName : '',
+                    email: tempData && tempData[0] ? tempData[0].email : '',
                     phone: allData.number,
-                    password: tempData[0].password,
+                    password: tempData && tempData[0] ? tempData[0].password : '',
                     address: `${allData.addressLine1}, ${allData.addressLine2}`,
                     city: allData.city,
                     state: allData.state,
@@ -263,9 +319,9 @@ const Details = () => {
                 formData.append('city', allData.city);
                 formData.append('state', allData.state);
                 formData.append('postalCode', allData.pincode);
-                formData.append('name', tempData[0].userName);
-                formData.append('email', tempData[0].email);
-                formData.append('password', tempData[0].password);
+                formData.append('name', tempData && tempData[0] ? tempData[0].userName : '');
+                formData.append('email', tempData && tempData[0] ? tempData[0].email : '');
+                formData.append('password', tempData && tempData[0] ? tempData[0].password : '');
                 formData.append('country', allData.country);
                 formData.append('type', allData.vendorType);
                 const fileData = Object.fromEntries(
@@ -286,7 +342,6 @@ const Details = () => {
     const handleClose = () => {
         setOpenModal(false);
     }
-
     return (
         <React.Fragment>
             <Backdrop
@@ -305,7 +360,7 @@ const Details = () => {
                     {message}
                 </Alert>
             </Snackbar>}
-            <Box sx={{ height: '100%', width: '100%',backgroundColor:'#f2f3f5',padding:'4% 0' }}>
+            <Box sx={{ height: '100%', width: '100%',backgroundColor:'#f2f3f5',padding:'5% 0' }}>
                 <Box sx={{ border: 'solid 1.5px #fff', height: 'auto', margin: '0% auto', backgroundColor: '#fff', borderRadius: '15px', width: '65%' }}>
                     <Stack direction='column'>
                         <Typography variant='p' sx={{ margin: '2% auto', textTransform: 'capitalize',fontSize:'2rem' }}>User Details</Typography>
@@ -320,11 +375,11 @@ const Details = () => {
                         <Grid container columnSpacing={2}>
                             <Grid item size={12} >
                                 <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '1% 0 1%' }}>Name</Typography>
-                                <TextField disabled fullWidth id="name" size="small" value={tempData[0]?.userName || ''} onChange={handleChange} />
+                                <TextField disabled fullWidth id="name" size="small" value={tempData && tempData[0] ? tempData[0].userName : ''} onChange={handleChange} />
                             </Grid>
                             <Grid item size={6} >
                                 <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 1%' }}>Email</Typography>
-                                <TextField disabled fullWidth id="email" size="small" value={tempData[0]?.email || ''} onChange={handleChange} />
+                                <TextField disabled fullWidth id="email" size="small" value={tempData && tempData[0] ? tempData[0].email : ''} onChange={handleChange} />
                             </Grid>
                              <Grid item size={6} >
                                 <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 1%' }}>Contact Number<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
