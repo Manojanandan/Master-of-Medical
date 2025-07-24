@@ -13,6 +13,7 @@ import {
   IconButton,
   Snackbar,
   Alert,
+  CircularProgress,
 } from '@mui/material';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -23,6 +24,7 @@ import DeleteIcon from '@mui/icons-material/Close';
 import { useDispatch, useSelector } from 'react-redux';
 import { createProductData, clearError, clearSuccess } from '../reducers/ProductReducer';
 import { useNavigate } from 'react-router-dom';
+import { getAllCategoriesAndSubcategories } from '../../../utils/Service';
 
 const MAX_FILES = 5;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -74,6 +76,8 @@ const AddProduct = () => {
   const [thumbnailError, setThumbnailError] = useState('');
   const [formError, setFormError] = useState({});
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
   const fileInputRef = useRef();
   const thumbnailInputRef = useRef();
 
@@ -83,6 +87,44 @@ const AddProduct = () => {
 
   // Navigation
   const navigate = useNavigate();
+
+  // Load categories on component mount
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        const response = await getAllCategoriesAndSubcategories();
+        console.log('Full API response:', response);
+        console.log('Response data:', response.data);
+        console.log('Response data type:', typeof response.data);
+        console.log('Is response.data an array?', Array.isArray(response.data));
+        
+        // Ensure categories is an array
+        const categoriesData = Array.isArray(response.data) ? response.data : 
+                              Array.isArray(response.data?.categories) ? response.data.categories :
+                              Array.isArray(response.data?.data) ? response.data.data :
+                              Array.isArray(response.data?.result) ? response.data.result :
+                              Array.isArray(response.data?.items) ? response.data.items : [];
+        
+        console.log('Processed categories:', categoriesData);
+        console.log('First category structure:', categoriesData[0]);
+        console.log('Available category IDs:', categoriesData.map(cat => ({ id: cat.id, name: cat.name })));
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error('Error loading categories:', error);
+        setSnackbar({ 
+          open: true, 
+          message: 'Failed to load categories. Please try again.', 
+          severity: 'error' 
+        });
+        setCategories([]); // Set empty array on error
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    loadCategories();
+  }, []);
 
   // Handle success and error messages
   useEffect(() => {
@@ -229,8 +271,19 @@ const AddProduct = () => {
   };
 
   const handleCategoryChange = (e) => {
-    setCategory(e.target.value);
+    const selectedValue = e.target.value;
+    console.log('Category changed to:', selectedValue);
+    setCategory(selectedValue);
     setSubcategory(''); // Reset subcategory when category changes
+  };
+
+  // Get subcategories for selected category
+  const getSubcategoriesForCategory = (selectedCategory) => {
+    if (!selectedCategory || !Array.isArray(categories) || !categories.length) return [];
+    const categoryData = categories.find(cat => cat.id === selectedCategory || cat._id === selectedCategory || cat.name === selectedCategory);
+    console.log('Selected category:', selectedCategory);
+    console.log('Found category data:', categoryData);
+    return categoryData ? (Array.isArray(categoryData.SubCategories) ? categoryData.SubCategories : []) : [];
   };
 
   return (
@@ -254,18 +307,21 @@ const AddProduct = () => {
             {/* Category */}
             <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 48%' }, minWidth: 220 }}>
               <FormControl fullWidth size="small">
-                <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.1rem' }} id="category-label">Category</InputLabel>
+                <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.1rem' }} id="category-label">
+                  Category {loadingCategories && <CircularProgress size={16} sx={{ ml: 1 }} />}
+                </InputLabel>
                 <Select
                   labelId="category-label"
-                  value={category}
+                  value={category || ''}
                   label="Category"
                   onChange={handleCategoryChange}
                   error={!!formError.category}
+                  disabled={loadingCategories}
                 >
                   <MenuItem value="">Select Category</MenuItem>
-                  <MenuItem value="medical">Medical</MenuItem>
-                  <MenuItem value="surgical">Surgical</MenuItem>
-                  <MenuItem value="equipment">Equipment</MenuItem>
+                  {Array.isArray(categories) && categories.map(cat => (
+                    <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem>
+                  ))}
                 </Select>
                 {formError.category && <Typography color="error" fontSize={13}>{formError.category}</Typography>}
               </FormControl>
@@ -276,16 +332,23 @@ const AddProduct = () => {
                 <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.1rem' }} id="subcategory-label">Subcategory</InputLabel>
                 <Select
                   labelId="subcategory-label"
-                  value={subcategory}
+                  value={subcategory || ''}
                   label="Subcategory"
-                  onChange={e => setSubcategory(e.target.value)}
+                  onChange={e => {
+                    console.log('Subcategory changed to:', e.target.value);
+                    setSubcategory(e.target.value);
+                  }}
                   error={!!formError.subcategory}
-                  disabled={!category}
+                  disabled={!category || loadingCategories}
                 >
                   <MenuItem value="">Select Subcategory</MenuItem>
-                  {category && SUBCATEGORY_OPTIONS[category].map(opt => (
-                    <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
-                  ))}
+                  {(() => {
+                    const subcategories = getSubcategoriesForCategory(category);
+                    console.log('Available subcategories for category', category, ':', subcategories);
+                    return subcategories.map(subcat => (
+                      <MenuItem key={subcat.id} value={subcat.id}>{subcat.name}</MenuItem>
+                    ));
+                  })()}
                 </Select>
                 {formError.subcategory && <Typography color="error" fontSize={13}>{formError.subcategory}</Typography>}
               </FormControl>

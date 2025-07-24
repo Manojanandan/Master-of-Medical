@@ -26,6 +26,8 @@ export const fetchVendorOrders = createAsyncThunk(
       };
       
       const response = await getAllOrders(orderParams);
+      console.log('Orders API response:', response);
+      console.log('Orders data:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error fetching vendor orders:', error);
@@ -76,10 +78,18 @@ const vendorOrdersSlice = createSlice({
         state.success = true;
         
         if (action.payload.success) {
-          state.orders = action.payload.data?.orders || action.payload.data || [];
-          state.totalOrders = action.payload.data?.totalOrders || action.payload.data?.length || 0;
-          state.currentPage = action.payload.data?.currentPage || 1;
-          state.totalPages = action.payload.data?.totalPages || 1;
+          // Handle the actual API response structure
+          console.log('Processing orders payload:', action.payload);
+          state.orders = action.payload.data || [];
+          state.totalOrders = action.payload.pagination?.total || action.payload.data?.length || 0;
+          state.currentPage = action.payload.pagination?.page || 1;
+          state.totalPages = action.payload.pagination?.totalPages || 1;
+          console.log('Processed orders state:', {
+            ordersCount: state.orders.length,
+            totalOrders: state.totalOrders,
+            currentPage: state.currentPage,
+            totalPages: state.totalPages
+          });
         } else {
           state.error = action.payload.message || 'Failed to fetch orders';
           state.orders = [];
