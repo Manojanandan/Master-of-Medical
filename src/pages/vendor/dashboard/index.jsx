@@ -26,7 +26,13 @@ const VendorDashboardLayout = () => {
   return (
     <>
       <VendorNavbar />
-      <Box sx={{ display: 'flex', pt: { xs: '56px', sm: '64px' }, minHeight: '100vh', background: '#fafbfc' }}>
+      <Box sx={{ 
+        display: 'flex', 
+        pt: { xs: '56px', sm: '64px' }, 
+        minHeight: '100vh', 
+        background: '#f8f9fa',
+        transition: 'all 0.3s ease'
+      }}>
         <Sidebar
           collapsed={collapsed && !isMobile}
           isMobile={isMobile}
@@ -37,8 +43,11 @@ const VendorDashboardLayout = () => {
           component="main" 
           sx={{ 
             flexGrow: 1, 
-            p: 3, 
+            p: { xs: 1, sm: 2, md: 3 }, 
             width: '100%',
+            transition: 'all 0.3s ease',
+            background: '#f8f9fa',
+            minHeight: '100vh',
           }}
         >
           <Outlet />

@@ -1,7 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: "Inter", sans-serif !important;
 }
 
 html,
@@ -9,9 +12,46 @@ body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for all elements */
+*::-webkit-scrollbar {
+  display: none;
 }
 
 :root {
-  --primaryColor: #e2edf3,
-    --secondaryColor: #009e92
+  --primaryColor: #e2edf3;
+    --secondaryColor: #009e92;
+  --primary-button-Color: #16A34A;
+  --secondary-button-Color: #0017E4;
+}
+
+.stsearch-box input{
+  border: none !important;
+}
+
+.primary-button {
+  background-color: var(--primary-button-Color) !important;
+}
+
+.secondary-button {
+  color: #fff !important;
+  background-color: var(--secondary-button-Color) !important;
+}
+
+.secondary-outline-button{
+  border: 1px solid var(--secondary-button-Color) !important;
+  color: var(--secondary-button-Color) !important;
+}
+.secondary-outline-button:hover {
+  background-color: var(--secondary-button-Color) !important;
+  color: #fff !important;
 }

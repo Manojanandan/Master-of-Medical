@@ -1,6 +1,6 @@
 import React from 'react'
 import TitleSection from '../../../components/e_commerceComponents/TitleSection'
-import { Box, Typography } from '@mui/material'
+import { Box, Typography, useTheme, useMediaQuery } from '@mui/material'
 import ProductCard from '../../../components/e_commerceComponents/ProductCard'
 import { getAllProductsPublic } from '../../../utils/Service'
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +8,10 @@ import { useDispatch } from 'react-redux';
 import { fetchCart } from '../../../redux/CartReducer';
 
 const BestSeller = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+  
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [bestSellerData, setBestSellerData] = React.useState([]);
@@ -76,7 +80,7 @@ const BestSeller = () => {
   
   // Transform API data to match ProductCard expected format - limit to 8 products for best sellers
   const transformedData = bestSellerData
-    .slice(0, 8) // Limit to 8 products for best sellers
+    // .slice(0, 8) // Limit to 8 products for best sellers
     .map(item => {
       const price = parseFloat(item.price || '30.00');
       const originalPrice = item.originalPrice ? parseFloat(item.originalPrice) : (price * 1.5);
@@ -90,6 +94,8 @@ const BestSeller = () => {
         originalPrice: originalPrice.toFixed(2),
         description: item.description || "Product description goes here",
         id: item.id, // Use the actual ID from API response
+        averageRating: item.averageRating || '0.0',
+        reviewCount: item.reviewCount || 0,
       };
     });
   
@@ -98,14 +104,25 @@ const BestSeller = () => {
   
   return (
     <React.Fragment>
-      <Box sx={{ height: 'auto', width: '100%', margin: '3% 0', }}>
+      <Box sx={{ 
+        height: 'auto', 
+        width: '100%', 
+        margin: isMobile ? '4% 0' : '3% 0', 
+      }}>
         <TitleSection title={"Best Sellers"} subTitle={"Don't miss this current offers until end of March"} />
         {loadingData ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
             <Typography>Loading best sellers...</Typography>
           </Box>
         ) : transformedData.length > 0 ? (
-          <Box sx={{ display: 'flex', justifyContent: 'flex-start', margin: '1% 3% 1%', width: '95%', flexWrap: 'wrap', gap: '4%' }}>
+          <Box sx={{ 
+            display: 'grid',
+            gridTemplateColumns: isMobile ? 'repeat(1, 1fr)' : isTablet ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)',
+            gap: isMobile ? '20px' : '24px',
+            padding: isMobile ? '10px 16px' : '24px 24px',
+            width: '100%',
+            maxWidth: '100%'
+          }}>
             {transformedData.map((product, index) => (
               <ProductCard 
                 key={index} 
@@ -117,6 +134,8 @@ const BestSeller = () => {
                 price={product.price} 
                 originalPrice={product.originalPrice}
                 id={product.id}
+                averageRating={product.averageRating}
+                reviewCount={product.reviewCount}
                 onClick={() => handleProductClick(product.id)} 
               />
             ))}

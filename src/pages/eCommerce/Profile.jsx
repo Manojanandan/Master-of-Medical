@@ -1,74 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Profile.module.css';
-import {
-  Box,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Typography,
-  Container,
-  Paper,
-  Grid,
-  TextField,
-  Button,
-  Alert,
-  Snackbar,
-  CircularProgress,
-  Divider,
-  Avatar,
-  Card,
-  CardContent,
-  IconButton,
-  Chip,
-  Tabs,
-  Tab,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  ListItemSecondaryAction,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TablePagination,
-  InputAdornment,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Tooltip,
-  Fade,
-  Grow,
-  Slide,
-  Zoom
-} from '@mui/material';
-import {
-  Person as PersonIcon,
-  ShoppingBag as OrdersIcon,
-  Logout as LogoutIcon,
-  Edit as EditIcon,
-  Save as SaveIcon,
-  Cancel as CancelIcon,
-  LocationOn as LocationIcon,
-  Phone as PhoneIcon,
-  Email as EmailIcon,
-  Home as HomeIcon,
-  Add as AddIcon,
-  Delete as DeleteIcon,
-  LocationCity as AddressIcon,
-  Search as SearchIcon,
-  FilterList as FilterIcon,
-  Visibility as ViewIcon,
-  ArrowBack as ArrowBackIcon,
-  ArrowForward as ArrowForwardIcon,
-  FirstPage as FirstPageIcon,
-  LastPage as LastPageIcon
-} from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { getUserInfoFromToken } from '../../utils/jwtUtils';
 import { 
@@ -81,9 +12,16 @@ import {
   getAllOrders
 } from '../../utils/Service';
 
+// Import tab components
+import ProfileTab from './profileTabs/ProfileTab';
+import OrdersTab from './profileTabs/OrdersTab';
+import AddressesTab from './profileTabs/AddressesTab';
+import AddressDialog from './profileTabs/AddressDialog';
+import OrderDetailsDialog from './profileTabs/OrderDetailsDialog';
+
 const Profile = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeSection, setActiveSection] = useState('profile');
   const [loading, setLoading] = useState(false);
   const [fetchingData, setFetchingData] = useState(true);
   const [message, setMessage] = useState('');
@@ -356,11 +294,11 @@ const Profile = () => {
     navigate('/login');
   };
 
-  const handleTabChange = (event, newValue) => {
-    if (newValue === 3) { // Logout tab
+  const handleSectionChange = (section) => {
+    if (section === 'logout') {
       handleLogout();
     } else {
-      setActiveTab(newValue);
+      setActiveSection(section);
     }
   };
 
@@ -575,946 +513,156 @@ const Profile = () => {
   };
 
   const renderProfileContent = () => (
-    <Box sx={{ maxWidth: 800, mx: 'auto' }}>
-      {fetchingData ? (
-        <Box sx={{ textAlign: 'center', py: 8 }}>
-          <CircularProgress size={60} sx={{ mb: 3 }} />
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Loading Profile Data...
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Please wait while we fetch your profile information.
-          </Typography>
-        </Box>
-      ) : (
-        <>
-          {/* Header */}
-          <Box sx={{ mb: 4, textAlign: 'center' }}>
-            <Avatar 
-              sx={{ 
-                width: 80, 
-                height: 80, 
-                bgcolor: '#1976d2', 
-                fontSize: '2rem',
-                mx: 'auto',
-                mb: 2
-              }}
-            >
-              {profileData.name ? profileData.name.charAt(0).toUpperCase() : <PersonIcon />}
-            </Avatar>
-            <Typography variant="h4" component="h1" sx={{ fontWeight: 600, mb: 1 }}>
-              {profileData.name || 'User Profile'}
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-              Manage your account information and preferences
-            </Typography>
-            
-            {!isEditing ? (
-              <Button
-                variant="contained"
-                startIcon={<EditIcon />}
-                onClick={() => setIsEditing(true)}
-                sx={{ borderRadius: 2, px: 3 }}
-                className={styles.button}
-              >
-                Edit Profile
-              </Button>
-            ) : (
-              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
-                <Button
-                  variant="outlined"
-                  startIcon={<CancelIcon />}
-                  onClick={handleCancel}
-                  disabled={loading}
-                  sx={{ borderRadius: 2, px: 3 }}
-                  className={styles.button}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="contained"
-                  startIcon={loading ? <CircularProgress size={20} /> : <SaveIcon />}
-                  onClick={handleSave}
-                  disabled={loading}
-                  sx={{ borderRadius: 2, px: 3 }}
-                  className={styles.button}
-                >
-                  {loading ? 'Saving...' : 'Save Changes'}
-                </Button>
-              </Box>
-            )}
-          </Box>
-
-          {/* Profile Form */}
-          <Zoom in={true} timeout={800}>
-            <Card sx={{ mb: 3 }} className={styles.card}>
-            <CardContent sx={{ p: 4 }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-                <PersonIcon color="primary" />
-                Personal Information
-              </Typography>
-              
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    label="Full Name"
-                    value={profileData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
-                    disabled={!isEditing}
-                    className={styles.inputField}
-                    InputProps={{
-                      startAdornment: <PersonIcon sx={{ mr: 1, color: 'text.secondary' }} />
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    label="Email Address"
-                    value={profileData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    disabled={!isEditing}
-                    InputProps={{
-                      startAdornment: <EmailIcon sx={{ mr: 1, color: 'text.secondary' }} />
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    label="Phone Number"
-                    value={profileData.phone}
-                    onChange={(e) => handleInputChange('phone', e.target.value)}
-                    disabled={!isEditing}
-                    InputProps={{
-                      startAdornment: <PhoneIcon sx={{ mr: 1, color: 'text.secondary' }} />
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    label="Country"
-                    value={profileData.country}
-                    onChange={(e) => handleInputChange('country', e.target.value)}
-                    disabled={!isEditing}
-                    InputProps={{
-                      startAdornment: <LocationIcon sx={{ mr: 1, color: 'text.secondary' }} />
-                    }}
-                  />
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-        </Zoom>
-
-          {/* Address Information */}
-          <Zoom in={true} timeout={1000}>
-            <Card className={styles.card}>
-            <CardContent sx={{ p: 4 }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-                <HomeIcon color="primary" />
-                Address Information
-              </Typography>
-              
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Street Address"
-                    value={profileData.address}
-                    onChange={(e) => handleInputChange('address', e.target.value)}
-                    disabled={!isEditing}
-                    multiline
-                    rows={3}
-                    InputProps={{
-                      startAdornment: <HomeIcon sx={{ mr: 1, color: 'text.secondary', alignSelf: 'flex-start', mt: 1 }} />
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <TextField
-                    fullWidth
-                    label="City"
-                    value={profileData.city}
-                    onChange={(e) => handleInputChange('city', e.target.value)}
-                    disabled={!isEditing}
-                  />
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <TextField
-                    fullWidth
-                    label="State/Province"
-                    value={profileData.state}
-                    onChange={(e) => handleInputChange('state', e.target.value)}
-                    disabled={!isEditing}
-                  />
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <TextField
-                    fullWidth
-                    label="Postal Code"
-                    value={profileData.postalCode}
-                    onChange={(e) => handleInputChange('postalCode', e.target.value)}
-                    disabled={!isEditing}
-                  />
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-        </Zoom>
-        </>
-      )}
-    </Box>
+    <ProfileTab
+      fetchingData={fetchingData}
+      profileData={profileData}
+      isEditing={isEditing}
+      loading={loading}
+      handleInputChange={handleInputChange}
+      handleSave={handleSave}
+      handleCancel={handleCancel}
+      setIsEditing={setIsEditing}
+    />
   );
 
   const renderOrdersContent = () => (
-    <Box sx={{ width: '100%' }}>
-      <Typography variant="h4" component="h1" sx={{ fontWeight: 600, mb: 3 }}>
-        Order History
-      </Typography>
-
-      {/* Filters and Search */}
-      <Slide direction="up" in={true} timeout={600}>
-        <Card sx={{ mb: 3 }} className={styles.filterSection}>
-        <CardContent sx={{ p: 3 }}>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={4}>
-              <TextField
-                fullWidth
-                label="Search Orders"
-                placeholder="Search by order ID, product name..."
-                value={orderFilters.search}
-                onChange={(e) => handleSearchInputChange(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handleSearchSubmit();
-                  }
-                }}
-                className={styles.inputField}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <Button
-                        size="small"
-                        onClick={handleSearchSubmit}
-                        disabled={fetchingOrders}
-                        className={styles.button}
-                      >
-                        Search
-                      </Button>
-                    </InputAdornment>
-                  )
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <FormControl fullWidth>
-                <InputLabel>Status Filter</InputLabel>
-                <Select
-                  value={orderFilters.status}
-                  onChange={(e) => handleOrderFilterChange('status', e.target.value)}
-                  label="Status Filter"
-                >
-                  <MenuItem value="">All Status</MenuItem>
-                  <MenuItem value="pending">Pending</MenuItem>
-                  <MenuItem value="confirmed">Confirmed</MenuItem>
-                  <MenuItem value="shipped">Shipped</MenuItem>
-                  <MenuItem value="delivered">Delivered</MenuItem>
-                  <MenuItem value="cancelled">Cancelled</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={2}>
-              <Button
-                fullWidth
-                variant="outlined"
-                startIcon={<FilterIcon />}
-                onClick={handleSearchSubmit}
-                disabled={fetchingOrders}
-                className={styles.button}
-              >
-                Apply Filters
-              </Button>
-            </Grid>
-            <Grid item xs={12} md={2}>
-              <Button
-                fullWidth
-                variant="outlined"
-                color="secondary"
-                onClick={handleClearFilters}
-                disabled={fetchingOrders}
-                className={styles.button}
-              >
-                Clear Filters
-              </Button>
-            </Grid>
-            <Grid item xs={12} md={2}>
-              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'right' }}>
-                Total Orders: {orderPagination.total}
-              </Typography>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
-      </Slide>
-
-      {/* Orders Table */}
-      <Fade in={true} timeout={800}>
-        <Card className={styles.card}>
-        <CardContent sx={{ p: 0 }}>
-          {fetchingOrders ? (
-            <Box sx={{ textAlign: 'center', py: 8 }}>
-              <CircularProgress size={60} sx={{ mb: 3 }} />
-              <Typography variant="h6" sx={{ mb: 2 }}>
-                Loading Orders...
-              </Typography>
-            </Box>
-          ) : orders.length === 0 ? (
-            <Box sx={{ textAlign: 'center', py: 8 }}>
-              <OrdersIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
-              <Typography variant="h6" sx={{ mb: 2 }}>
-                No Orders Found
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                {orderFilters.search || orderFilters.status 
-                  ? 'No orders match your current filters. Try adjusting your search criteria.'
-                  : 'Your order history will appear here once you make your first purchase.'
-                }
-              </Typography>
-              {!orderFilters.search && !orderFilters.status && (
-                <Button 
-                  variant="contained" 
-                  onClick={() => navigate('/ecommerceDashboard')}
-                  sx={{ borderRadius: 2, px: 3 }}
-                >
-                  Start Shopping
-                </Button>
-              )}
-            </Box>
-          ) : (
-            <>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                      <TableCell sx={{ fontWeight: 600 }}>Order ID</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>Date</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>Products</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>Total Amount</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-                      <TableCell sx={{ fontWeight: 600 }}>Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {orders.map((order, index) => (
-                      <TableRow key={order.id} hover className={styles.tableRow} style={{ animationDelay: `${index * 0.1}s` }}>
-                        <TableCell>
-                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                            #{order.id}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2">
-                            {formatDate(order.createdAt)}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Box>
-                            {order.productInfo?.slice(0, 2).map((product, index) => (
-                              <Typography key={index} variant="body2" sx={{ mb: 0.5 }}>
-                                {product.name} (x{product.quantity})
-                              </Typography>
-                            ))}
-                            {order.productInfo?.length > 2 && (
-                              <Typography variant="body2" color="text.secondary">
-                                +{order.productInfo.length - 2} more items
-                              </Typography>
-                            )}
-                          </Box>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                            {formatCurrency(order.totalCost)}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Chip
-                            label={order.status}
-                            color={getStatusColor(order.status)}
-                            size="small"
-                            sx={{ textTransform: 'capitalize' }}
-                            className={styles.statusChip}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Tooltip title="View Order Details">
-                            <IconButton
-                              size="small"
-                              onClick={() => openOrderDialog(order)}
-                              sx={{ color: '#1976d2' }}
-                            >
-                              <ViewIcon />
-                            </IconButton>
-                          </Tooltip>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-
-              {/* Pagination */}
-              {orderPagination.totalPages > 1 && (
-                <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Showing {((orderPagination.page - 1) * orderPagination.limit) + 1} to{' '}
-                    {Math.min(orderPagination.page * orderPagination.limit, orderPagination.total)} of{' '}
-                    {orderPagination.total} orders
-                  </Typography>
-                  
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-                    <IconButton
-                      onClick={() => handleOrderPageChange(1)}
-                      disabled={orderPagination.page === 1}
-                      size="small"
-                      className={styles.paginationButton}
-                    >
-                      <FirstPageIcon />
-                    </IconButton>
-                    <IconButton
-                      onClick={() => handleOrderPageChange(orderPagination.page - 1)}
-                      disabled={orderPagination.page === 1}
-                      size="small"
-                      className={styles.paginationButton}
-                    >
-                      <ArrowBackIcon />
-                    </IconButton>
-                    
-                    <Box sx={{ display: 'flex', alignItems: 'center', px: 2 }}>
-                      <Typography variant="body2">
-                        Page {orderPagination.page} of {orderPagination.totalPages}
-                      </Typography>
-                    </Box>
-                    
-                    <IconButton
-                      onClick={() => handleOrderPageChange(orderPagination.page + 1)}
-                      disabled={orderPagination.page === orderPagination.totalPages}
-                      size="small"
-                      className={styles.paginationButton}
-                    >
-                      <ArrowForwardIcon />
-                    </IconButton>
-                    <IconButton
-                      onClick={() => handleOrderPageChange(orderPagination.totalPages)}
-                      disabled={orderPagination.page === orderPagination.totalPages}
-                      size="small"
-                      className={styles.paginationButton}
-                    >
-                      <LastPageIcon />
-                    </IconButton>
-                  </Box>
-                </Box>
-              )}
-            </>
-          )}
-        </CardContent>
-      </Card>
-      </Fade>
-    </Box>
+    <OrdersTab
+      orders={orders}
+      fetchingOrders={fetchingOrders}
+      orderFilters={orderFilters}
+      orderPagination={orderPagination}
+      handleOrderFilterChange={handleOrderFilterChange}
+      handleSearchInputChange={handleSearchInputChange}
+      handleSearchSubmit={handleSearchSubmit}
+      handleClearFilters={handleClearFilters}
+      handleOrderPageChange={handleOrderPageChange}
+      openOrderDialog={openOrderDialog}
+      getStatusColor={getStatusColor}
+      formatDate={formatDate}
+      formatCurrency={formatCurrency}
+    />
   );
 
   const renderAddressesContent = () => (
-    <Box sx={{ width: '100%' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 600 }}>
-          My Addresses
-        </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => openAddressDialog()}
-          sx={{ borderRadius: 2, px: 3 }}
-        >
-          Add New Address
-        </Button>
-      </Box>
-
-      {fetchingAddresses ? (
-        <Box sx={{ textAlign: 'center', py: 8 }}>
-          <CircularProgress size={60} sx={{ mb: 3 }} />
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Loading Addresses...
-          </Typography>
-        </Box>
-      ) : addresses.length === 0 ? (
-        <Card>
-          <CardContent sx={{ p: 4, textAlign: 'center' }}>
-            <AddressIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              No Addresses Found
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-              You haven't added any addresses yet. Add your first address to get started.
-            </Typography>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => openAddressDialog()}
-              sx={{ borderRadius: 2, px: 3 }}
-            >
-              Add Your First Address
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  {addresses.map((address, index) => (
-          <Card key={address.id || address._id || index} sx={{ width: '100%' }} className={`${styles.card} ${styles.staggerItem}`} style={{ animationDelay: `${index * 0.1}s` }}>
-              <CardContent sx={{ p: 3 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <LocationIcon color="primary" />
-                    Address {index + 1}
-                  </Typography>
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-                    <IconButton
-                      size="small"
-                      onClick={() => openAddressDialog(address)}
-                      sx={{ color: '#1976d2' }}
-                      className={styles.button}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => handleDeleteAddress(address.id || address._id)}
-                      sx={{ color: '#d32f2f' }}
-                      className={styles.button}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Box>
-                </Box>
-                
-                <Typography 
-                  variant="body1" 
-                  sx={{ 
-                    mb: 1, 
-                    fontWeight: 500,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap'
-                  }}
-                  title={address.address}
-                >
-                  {address.address}
-                </Typography>
-                
-                <Typography 
-                  variant="body2" 
-                  color="text.secondary" 
-                  sx={{ 
-                    mb: 0.5,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap'
-                  }}
-                  title={`${address.city}, ${address.state}`}
-                >
-                  {address.city}, {address.state}
-                </Typography>
-                
-                <Typography 
-                  variant="body2" 
-                  color="text.secondary" 
-                  sx={{ 
-                    mb: 0.5,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap'
-                  }}
-                  title={address.country}
-                >
-                  {address.country}
-                </Typography>
-                
-                <Typography 
-                  variant="body2" 
-                  color="text.secondary"
-                  sx={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap'
-                  }}
-                  title={address.postalCode}
-                >
-                  {address.postalCode}
-                </Typography>
-              </CardContent>
-            </Card>
-          ))}
-        </Box>
-      )}
-    </Box>
+    <AddressesTab
+      addresses={addresses}
+      fetchingAddresses={fetchingAddresses}
+      openAddressDialog={openAddressDialog}
+      handleDeleteAddress={handleDeleteAddress}
+    />
   );
 
   return (
-    <Box sx={{ backgroundColor: '#f5f5f5', minHeight: 'calc(100vh - 200px)' }} className={styles.profileContainer}>
-      <Container maxWidth="xl" sx={{ py: 4 }}>
-        {/* User Info Header */}
-        <Fade in={true} timeout={800}>
-          <Card sx={{ mb: 4, p: 3, textAlign: 'center' }} className={styles.userInfoCard}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-            <Avatar 
-              sx={{ 
-                width: 64, 
-                height: 64, 
-                bgcolor: '#1976d2',
-                mr: 3,
-                fontSize: '1.5rem'
-              }}
-            >
-              {profileData.name ? profileData.name.charAt(0).toUpperCase() : <PersonIcon />}
-            </Avatar>
-            <Box sx={{ textAlign: 'left' }}>
-              <Typography variant="h5" sx={{ fontWeight: 600, mb: 0.5 }}>
-                {profileData.name || 'User'}
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
-                {profileData.email || 'user@example.com'}
-              </Typography>
-              <Chip 
-                label="Customer Account" 
-                size="small" 
-                color="primary" 
-                variant="outlined"
-              />
-            </Box>
-                      </Box>
-          </Card>
-        </Fade>
+    <div className={styles.profileContainer}>
+      <div className={styles.layout}>
+        {/* Sidebar */}
+        <div className={styles.sidebar}>
+          {/* User Info Section */}
+          <div className={styles.userInfo}>
+            <div className={styles.userInfoContent}>
+              <div className={styles.userAvatar}>
+                <svg className={styles.userAvatarIcon} viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>
+              <div>
+                <p className={styles.welcomeText}>Welcome back,</p>
+                <p className={styles.userEmail}>{profileData.email || 'user@example.com'}</p>
+              </div>
+            </div>
+          </div>
 
-        {/* Tabs */}
-        <Slide direction="up" in={true} timeout={1000}>
-          <Card sx={{ mb: 4 }} className={styles.tabsCard}>
-          <Tabs 
-            value={activeTab} 
-            onChange={handleTabChange}
-            variant="fullWidth"
-            sx={{
-              '& .MuiTab-root': {
-                minHeight: 64,
-                fontSize: '1rem',
-                fontWeight: 500,
-                textTransform: 'none',
-                '&.Mui-selected': {
-                  color: '#1976d2',
-                  fontWeight: 600,
-                }
-              },
-              '& .MuiTabs-indicator': {
-                backgroundColor: '#1976d2',
-                height: 3
-              }
-            }}
-          >
-            <Tab 
-              icon={<PersonIcon />} 
-              label="Profile" 
-              iconPosition="start"
-            />
-            <Tab 
-              icon={<OrdersIcon />} 
-              label="Orders" 
-              iconPosition="start"
-            />
-            <Tab 
-              icon={<AddressIcon />} 
-              label="Addresses" 
-              iconPosition="start"
-            />
-            <Tab 
-              icon={<LogoutIcon />} 
-              label="Logout" 
-              iconPosition="start"
-            />
-          </Tabs>
-        </Card>
-        </Slide>
+          {/* Navigation Menu */}
+          <ul className={styles.navMenu}>
+            <li className={styles.navItem}>
+              <button 
+                className={`${styles.navButton} ${activeSection === 'profile' ? styles.active : ''}`}
+                onClick={() => handleSectionChange('profile')}
+              >
+                <span className={styles.navText}>Dashboard</span>
+              </button>
+            </li>
+            
+            <li className={styles.navItem}>
+              <button 
+                className={`${styles.navButton} ${activeSection === 'orders' ? styles.active : ''}`}
+                onClick={() => handleSectionChange('orders')}
+              >
+                <span className={styles.navText}>Orders</span>
+              </button>
+            </li>
+            
+            <li className={styles.navItem}>
+              <button 
+                className={`${styles.navButton} ${activeSection === 'addresses' ? styles.active : ''}`}
+                onClick={() => handleSectionChange('addresses')}
+              >
+                <span className={styles.navText}>Addresses</span>
+              </button>
+            </li>
+            
+            <div className={styles.divider}></div>
+            
+            <li className={styles.navItem}>
+              <button 
+                className={styles.logoutButton}
+                onClick={() => handleSectionChange('logout')}
+              >
+                <svg className={styles.logoutIcon} viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                </svg>
+                <span className={styles.navText}>Log out</span>
+              </button>
+            </li>
+          </ul>
+        </div>
 
-        {/* Tab Content */}
-        <Grow in={true} timeout={1200}>
-          <Box className={styles.contentContainer}>
-                      {activeTab === 0 && renderProfileContent()}
-            {activeTab === 1 && renderOrdersContent()}
-            {activeTab === 2 && renderAddressesContent()}
-          </Box>
-        </Grow>
-      </Container>
-
-      {/* Address Dialog */}
-      <Dialog 
-        open={addressDialogOpen} 
-        onClose={closeAddressDialog}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>
-          {editingAddress ? 'Edit Address' : 'Add New Address'}
-        </DialogTitle>
-        <DialogContent>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Street Address"
-                value={addressForm.address}
-                onChange={(e) => handleAddressInputChange('address', e.target.value)}
-                multiline
-                rows={3}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="City"
-                value={addressForm.city}
-                onChange={(e) => handleAddressInputChange('city', e.target.value)}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="State/Province"
-                value={addressForm.state}
-                onChange={(e) => handleAddressInputChange('state', e.target.value)}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Country"
-                value={addressForm.country}
-                onChange={(e) => handleAddressInputChange('country', e.target.value)}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Postal Code"
-                value={addressForm.postalCode}
-                onChange={(e) => handleAddressInputChange('postalCode', e.target.value)}
-                required
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions sx={{ p: 3 }}>
-          <Button onClick={closeAddressDialog} variant="outlined">
-            Cancel
-          </Button>
-          <Button onClick={handleSaveAddress} variant="contained">
-            {editingAddress ? 'Update Address' : 'Add Address'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Order Details Dialog */}
-      <Dialog 
-        open={orderDialogOpen} 
-        onClose={closeOrderDialog}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <OrdersIcon color="primary" />
-            Order Details - #{selectedOrder?.id}
-          </Box>
-        </DialogTitle>
-        <DialogContent>
-          {selectedOrder && (
-            <Box sx={{ mt: 2 }}>
-              {/* Order Summary */}
-              <Card sx={{ mb: 3 }}>
-                <CardContent>
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                    Order Summary
-                  </Typography>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} md={6}>
-                      <Typography variant="body2" color="text.secondary">
-                        Order Date
-                      </Typography>
-                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                        {formatDate(selectedOrder.createdAt)}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <Typography variant="body2" color="text.secondary">
-                        Status
-                      </Typography>
-                      <Chip
-                        label={selectedOrder.status}
-                        color={getStatusColor(selectedOrder.status)}
-                        sx={{ textTransform: 'capitalize' }}
-                      />
-                    </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
-
-              {/* Customer Information */}
-              <Card sx={{ mb: 3 }}>
-                <CardContent>
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                    Customer Information
-                  </Typography>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} md={6}>
-                      <Typography variant="body2" color="text.secondary">
-                        Name
-                      </Typography>
-                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                        {selectedOrder.customerInfo?.name}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <Typography variant="body2" color="text.secondary">
-                        Email
-                      </Typography>
-                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                        {selectedOrder.customerInfo?.email}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Typography variant="body2" color="text.secondary">
-                        Delivery Address
-                      </Typography>
-                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                        {selectedOrder.customerInfo?.address?.address}, {selectedOrder.customerInfo?.address?.city}, {selectedOrder.customerInfo?.address?.state}, {selectedOrder.customerInfo?.address?.country} - {selectedOrder.customerInfo?.address?.postalCode}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
-
-              {/* Products */}
-              <Card sx={{ mb: 3 }}>
-                <CardContent>
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                    Products
-                  </Typography>
-                  <TableContainer>
-                    <Table>
-                      <TableHead>
-                        <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                          <TableCell sx={{ fontWeight: 600 }}>Product</TableCell>
-                          <TableCell sx={{ fontWeight: 600 }}>Price</TableCell>
-                          <TableCell sx={{ fontWeight: 600 }}>Quantity</TableCell>
-                          <TableCell sx={{ fontWeight: 600 }}>Total</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {selectedOrder.productInfo?.map((product, index) => (
-                          <TableRow key={index}>
-                            <TableCell>
-                              <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                                {product.name}
-                              </Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Typography variant="body2">
-                                {formatCurrency(product.price)}
-                              </Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Typography variant="body2">
-                                {product.quantity}
-                              </Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                                {formatCurrency(product.total)}
-                              </Typography>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </CardContent>
-              </Card>
-
-              {/* Order Total */}
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                    Order Total
-                  </Typography>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} md={6}>
-                      <Typography variant="body2" color="text.secondary">
-                        Subtotal
-                      </Typography>
-                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                        {formatCurrency(selectedOrder.subTotal)}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <Typography variant="body2" color="text.secondary">
-                        GST Amount
-                      </Typography>
-                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                        {formatCurrency(selectedOrder.gstAmount)}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Divider sx={{ my: 2 }} />
-                      <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
-                        Total Amount: {formatCurrency(selectedOrder.totalCost)}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions sx={{ p: 3 }}>
-          <Button onClick={closeOrderDialog} variant="outlined">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
+        {/* Main Content */}
+        <div className={styles.mainContent}>
+          <div className={styles.contentContainer}>
+            {activeSection === 'profile' && renderProfileContent()}
+            {activeSection === 'orders' && renderOrdersContent()}
+            {activeSection === 'addresses' && renderAddressesContent()}
+          </div>
+        </div>
+      </div>
 
       {/* Snackbar for messages */}
-      <Snackbar
-        open={showMessage}
-        autoHideDuration={6000}
-        onClose={() => setShowMessage(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={() => setShowMessage(false)} 
-          severity={severity} 
-          sx={{ width: '100%' }}
-        >
-          {message}
-        </Alert>
-      </Snackbar>
-    </Box>
+      {showMessage && (
+        <div className={styles.snackbar}>
+          <div className={`${styles.alert} ${styles[severity]}`}>
+            <span>{message}</span>
+            <button 
+              className={styles.closeButton}
+              onClick={() => setShowMessage(false)}
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Address Dialog */}
+      <AddressDialog
+        addressDialogOpen={addressDialogOpen}
+        closeAddressDialog={closeAddressDialog}
+        editingAddress={editingAddress}
+        addressForm={addressForm}
+        handleAddressInputChange={handleAddressInputChange}
+        handleSaveAddress={handleSaveAddress}
+      />
+
+      {/* Order Details Dialog */}
+      <OrderDetailsDialog
+        orderDialogOpen={orderDialogOpen}
+        closeOrderDialog={closeOrderDialog}
+        selectedOrder={selectedOrder}
+        getStatusColor={getStatusColor}
+        formatDate={formatDate}
+        formatCurrency={formatCurrency}
+      />
+
+    </div>
   );
 };
 

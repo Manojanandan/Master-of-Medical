@@ -68,27 +68,28 @@ export const getUserInfoFromToken = () => {
 // Check if user status is pending
 export const isUserStatusPending = () => {
   const user = getUserInfoFromToken();
-  if (!user) return false;
   
-  // Also check sessionStorage for additional user data
+  // Check sessionStorage for user data (this is the primary source for status)
   const sessionUserData = sessionStorage.getItem('userData');
-  let additionalData = null;
+  let userData = null;
   
   if (sessionUserData) {
     try {
-      additionalData = JSON.parse(sessionUserData);
+      userData = JSON.parse(sessionUserData);
     } catch (error) {
       console.error('Error parsing session user data:', error);
     }
   }
   
-  // Check status from both sources
-  const status = user.status || additionalData?.status || additionalData?.approvalStatus || additionalData?.isApproved;
+  // Check status from sessionStorage first (most reliable for new signups)
+  const status = userData?.status || userData?.approvalStatus || userData?.isApproved || user?.status;
   
   console.log('User status check:', {
-    userStatus: user.status,
-    additionalStatus: additionalData?.status,
-    finalStatus: status
+    userData: userData,
+    userStatus: user?.status,
+    sessionStatus: userData?.status,
+    finalStatus: status,
+    isPending: status === 'pending' || status === false || status === 'false'
   });
   
   return status === 'pending' || status === false || status === 'false';

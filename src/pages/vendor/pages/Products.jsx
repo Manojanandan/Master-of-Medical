@@ -1,22 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Grid, 
-  Button, 
-  Pagination, 
-  Card, 
-  CardContent, 
-  CardActions, 
-  Link, 
-  CircularProgress, 
-  Snackbar, 
-  Alert,
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  CardMedia,
+  CardActions,
+  Button,
   Chip,
-  CardMedia
+  TextField,
+  InputAdornment,
+  Pagination,
+  Grid,
+  IconButton,
+  Menu,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Select,
+  Alert,
+  Snackbar,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  CircularProgress
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import {
+  Search,
+  FilterList,
+  MoreVert,
+  Edit,
+  Delete,
+  Visibility as VisibilityIcon,
+  Add as AddIcon
+} from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllProducts, clearError } from '../reducers/ProductReducer';
@@ -85,7 +103,7 @@ const Products = () => {
   }
 
   return (
-    <Box sx={{ background: '#f7f8fa', minHeight: '100vh', p: { xs: 1, sm: 3 }, maxWidth: 1400, mx: 'auto' }}>
+    <Box sx={{ background: '#f8f9fa', minHeight: '100vh', p: { xs: 1, sm: 2, md: 3 }, width: '100%' }}>
       <Snackbar open={!!error} autoHideDuration={3000} onClose={() => dispatch(clearError())}>
         <Alert severity="error" sx={{ width: '100%' }}>
           {error?.message || 'Failed to fetch products'}
@@ -93,27 +111,48 @@ const Products = () => {
       </Snackbar>
       
       {/* Header with Add Product Button */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 700, color: '#222' }}>
-          My Products
-        </Typography>
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        mb: 4,
+        flexWrap: 'wrap',
+        gap: 2
+      }}>
+        <Box>
+          <Typography variant="h4" sx={{ 
+            fontWeight: 700, 
+            color: '#2c3e50',
+            fontSize: { xs: '1.75rem', sm: '2.125rem' },
+            letterSpacing: '-0.02em'
+          }}>
+            My Products
+          </Typography>
+          <Typography variant="body1" sx={{ 
+            color: '#666', 
+            mt: 0.5,
+            fontSize: '0.875rem'
+          }}>
+            Manage your product catalog
+          </Typography>
+        </Box>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           sx={{
-            background: '#13bfa6',
+            background: '#2c3e50',
             borderRadius: '8px',
             fontWeight: 600,
             px: 3,
             py: 1.5,
             fontSize: '1rem',
-            boxShadow: 2,
+            boxShadow: '0 4px 12px rgba(44, 62, 80, 0.15)',
             '&:hover': { 
-              background: '#0fa98f',
-              transform: 'translateY(-1px)',
-              boxShadow: 4
+              background: '#34495e',
+              transform: 'translateY(-2px)',
+              boxShadow: '0 6px 20px rgba(44, 62, 80, 0.25)'
             },
-            transition: 'all 0.2s ease-in-out'
+            transition: 'all 0.3s ease-in-out'
           }}
           onClick={() => navigate('/vendorDashboard/products/add')}
         >
@@ -123,32 +162,105 @@ const Products = () => {
 
       {/* Products Count */}
       {productsList.length > 0 && (
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="body1" color="text.secondary">
+        <Box sx={{ 
+          mb: 3, 
+          p: 2, 
+          background: '#ffffff', 
+          borderRadius: 2, 
+          border: '1px solid #e0e0e0',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 1
+        }}>
+          <Typography variant="body1" sx={{ 
+            color: '#666',
+            fontWeight: 500,
+            fontSize: '0.875rem'
+          }}>
             Showing {productsList.length} of {products?.pagination?.total || productsList.length} product{(products?.pagination?.total || productsList.length) !== 1 ? 's' : ''}
           </Typography>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <Typography variant="body2" sx={{ color: '#999', fontSize: '0.75rem' }}>
+              Sort by:
+            </Typography>
+            <Select
+              size="small"
+              value="latest"
+              sx={{ 
+                minWidth: 120,
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#e0e0e0'
+                }
+              }}
+            >
+              <MenuItem value="latest">Latest</MenuItem>
+              <MenuItem value="oldest">Oldest</MenuItem>
+              <MenuItem value="price-high">Price: High to Low</MenuItem>
+              <MenuItem value="price-low">Price: Low to High</MenuItem>
+            </Select>
+          </Box>
         </Box>
       )}
 
       {/* Products Grid */}
       {productsList.length === 0 && !loading ? (
-        <Box sx={{ textAlign: 'center', py: 8 }}>
-          <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
+        <Box sx={{ 
+          textAlign: 'center', 
+          py: 8,
+          background: '#ffffff',
+          borderRadius: 3,
+          border: '1px solid #e0e0e0',
+          mx: 'auto',
+          maxWidth: 500
+        }}>
+          <Box sx={{ 
+            width: 80, 
+            height: 80, 
+            borderRadius: '50%', 
+            background: '#f8f9fa', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            mx: 'auto',
+            mb: 3
+          }}>
+            <AddIcon sx={{ fontSize: 40, color: '#999' }} />
+          </Box>
+          <Typography variant="h5" sx={{ 
+            color: '#2c3e50',
+            fontWeight: 600,
+            mb: 2
+          }}>
             No products found
           </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-            Add your first product to get started!
+          <Typography variant="body1" sx={{ 
+            color: '#666',
+            mb: 4,
+            maxWidth: 300,
+            mx: 'auto',
+            lineHeight: 1.6
+          }}>
+            Start building your product catalog by adding your first product. It only takes a few minutes!
           </Typography>
           <Button
-            variant="outlined"
+            variant="contained"
             startIcon={<AddIcon />}
             sx={{
-              borderColor: '#13bfa6',
-              color: '#13bfa6',
+              background: '#2c3e50',
+              borderRadius: '8px',
+              fontWeight: 600,
+              px: 4,
+              py: 1.5,
+              fontSize: '1rem',
+              boxShadow: '0 4px 12px rgba(44, 62, 80, 0.15)',
               '&:hover': {
-                borderColor: '#0fa98f',
-                background: 'rgba(19, 191, 166, 0.04)'
-              }
+                background: '#34495e',
+                transform: 'translateY(-2px)',
+                boxShadow: '0 6px 20px rgba(44, 62, 80, 0.25)'
+              },
+              transition: 'all 0.3s ease-in-out'
             }}
             onClick={() => navigate('/vendorDashboard/products/add')}
           >
@@ -156,53 +268,73 @@ const Products = () => {
           </Button>
         </Box>
       ) : (
-        <Grid container spacing={3} justifyContent="center">
+        <Grid container spacing={3} sx={{ width: '100%', m: 0 }}>
           {paginatedProducts.map((product) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} xl={3} key={product.id}>
+            <Grid item xs={12} sm={6} md={3} lg={3} xl={3} key={product.id}>
               <Card 
                 sx={{ 
                   borderRadius: 3, 
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)', 
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)', 
                   height: '100%', 
                   display: 'flex', 
                   flexDirection: 'column',
                   transition: 'all 0.3s ease-in-out',
+                  border: '1px solid #f0f0f0',
+                  position: 'relative',
+                  overflow: 'hidden',
                   '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.15)'
+                    transform: 'translateY(-6px)',
+                    boxShadow: '0 12px 32px rgba(0,0,0,0.12)',
+                    borderColor: '#2c3e50',
+                    '& .product-image': {
+                      transform: 'scale(1.05)'
+                    }
                   }
                 }}
               >
                 {/* Product Image */}
-                <CardMedia
-                  component="img"
-                  sx={{
-                    minWidth: 260,
-                    maxWidth: 260,
-                    minHeight: 180,
-                    maxHeight: 180,
-                    width: '100%',
-                    height: 180,
-                    objectFit: 'cover',
-                    background: '#f8fafc',
-                    borderBottom: '1px solid #f0f0f0',
-                    mx: 'auto',
-                    display: 'block'
-                  }}
-                  image={product.thumbnailImage || 'https://via.placeholder.com/300x200?text=No+Image'}
-                  alt={product.name}
-                  onError={(e) => {
-                    e.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
-                  }}
-                />
+                <Box sx={{ position: 'relative', overflow: 'hidden' }}>
+                  <CardMedia
+                    component="img"
+                    className="product-image"
+                    sx={{
+                      width: '100%',
+                      height: 200,
+                      objectFit: 'cover',
+                      background: '#f8fafc',
+                      transition: 'transform 0.3s ease-in-out'
+                    }}
+                    image={product.thumbnailImage || 'https://via.placeholder.com/300x200?text=No+Image'}
+                    alt={product.name}
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
+                    }}
+                  />
+                  {/* Status Badge */}
+                  <Box sx={{
+                    position: 'absolute',
+                    top: 12,
+                    right: 12,
+                    background: 'rgba(44, 62, 80, 0.9)',
+                    color: 'white',
+                    px: 1.5,
+                    py: 0.5,
+                    borderRadius: 2,
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    backdropFilter: 'blur(4px)'
+                  }}>
+                    Active
+                  </Box>
+                </Box>
                 
-                <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
+                <CardContent sx={{ flexGrow: 1, p: 3 }}>
                   {/* Price */}
                   <Typography 
                     variant="h5" 
                     sx={{ 
                       fontWeight: 700, 
-                      color: '#13bfa6',
+                      color: '#2c3e50',
                       mb: 1,
                       fontSize: '1.5rem'
                     }}
@@ -214,10 +346,11 @@ const Products = () => {
                   {product.priceLable && (
                     <Typography 
                       variant="body2" 
-                      color="text.secondary" 
                       sx={{ 
                         mb: 1.5,
-                        fontStyle: 'italic'
+                        color: '#666',
+                        fontStyle: 'italic',
+                        fontSize: '0.875rem'
                       }}
                     >
                       {product.priceLable}
@@ -229,42 +362,34 @@ const Products = () => {
                     variant="h6" 
                     sx={{ 
                       fontWeight: 600, 
-                      mb: 1,
+                      mb: 1.5,
                       lineHeight: 1.3,
                       display: '-webkit-box',
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: 'vertical',
                       overflow: 'hidden',
-                      textOverflow: 'ellipsis'
+                      textOverflow: 'ellipsis',
+                      color: '#333',
+                      fontSize: '1.1rem',
+                      maxWidth: '200px'
                     }}
                   >
                     {product.name}
                   </Typography>
                   
-                  {/* Brand Name */}
-                  {product.brandName && (
-                    <Typography 
-                      variant="body2" 
-                      color="text.secondary" 
-                      sx={{ 
-                        mb: 1.5,
-                        fontWeight: 500
-                      }}
-                    >
-                      Brand: {product.brandName}
-                    </Typography>
-                  )}
+
                   
                   {/* Category and Subcategory */}
-                  <Box sx={{ display: 'flex', gap: 1, mb: 1.5, flexWrap: 'wrap' }}>
+                  <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
                     <Chip 
                       label={product.category} 
                       size="small" 
                       sx={{ 
-                        background: '#e3f2fd',
-                        color: '#1976d2',
+                        background: '#f8f9fa',
+                        color: '#2c3e50',
                         fontWeight: 500,
-                        textTransform: 'capitalize'
+                        textTransform: 'capitalize',
+                        border: '1px solid #e0e0e0'
                       }} 
                     />
                     {product.subCategory && (
@@ -272,10 +397,11 @@ const Products = () => {
                         label={product.subCategory} 
                         size="small" 
                         sx={{ 
-                          background: '#f3e5f5',
-                          color: '#7b1fa2',
+                          background: '#f8f9fa',
+                          color: '#2c3e50',
                           fontWeight: 500,
-                          textTransform: 'capitalize'
+                          textTransform: 'capitalize',
+                          border: '1px solid #e0e0e0'
                         }} 
                       />
                     )}
@@ -285,15 +411,17 @@ const Products = () => {
                   {product.description && (
                     <Typography 
                       variant="body2" 
-                      color="text.secondary" 
                       sx={{ 
-                        mb: 1.5,
+                        mb: 2,
                         display: '-webkit-box',
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: 'vertical',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
-                        lineHeight: 1.4
+                        lineHeight: 1.4,
+                        color: '#666',
+                        fontSize: '0.875rem',
+                        maxWidth: '200px'
                       }}
                     >
                       {product.description}
@@ -304,10 +432,12 @@ const Products = () => {
                   {product.expiresOn && (
                     <Typography 
                       variant="caption" 
-                      color="text.secondary" 
                       sx={{ 
                         display: 'block',
-                        mb: 1
+                        mb: 2,
+                        color: '#999',
+                        fontSize: '0.75rem',
+                        fontWeight: 500
                       }}
                     >
                       Expires: {product.expiresOn}
@@ -315,23 +445,25 @@ const Products = () => {
                   )}
                 </CardContent>
                 
-                <CardActions sx={{ p: 2.5, pt: 0 }}>
+                <CardActions sx={{ p: 3, pt: 0 }}>
                   <Button
                     variant="outlined"
                     startIcon={<VisibilityIcon />}
                     fullWidth
                     sx={{
-                      borderColor: '#13bfa6',
-                      color: '#13bfa6',
+                      borderColor: '#2c3e50',
+                      color: '#2c3e50',
                       fontWeight: 600,
                       borderRadius: 2,
-                      py: 1,
+                      py: 1.5,
+                      fontSize: '0.875rem',
                       '&:hover': {
-                        borderColor: '#0fa98f',
-                        background: 'rgba(19, 191, 166, 0.04)',
-                        transform: 'translateY(-1px)'
+                        borderColor: '#34495e',
+                        background: 'rgba(44, 62, 80, 0.04)',
+                        transform: 'translateY(-1px)',
+                        boxShadow: '0 4px 12px rgba(44, 62, 80, 0.15)'
                       },
-                      transition: 'all 0.2s ease-in-out'
+                      transition: 'all 0.3s ease-in-out'
                     }}
                     onClick={() => navigate(`/vendorDashboard/products/${product.id}`)}
                   >
@@ -346,7 +478,16 @@ const Products = () => {
 
       {/* Pagination */}
       {pageCount > 1 && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5, mb: 3 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          mt: 5, 
+          mb: 3,
+          p: 3,
+          background: '#ffffff',
+          borderRadius: 2,
+          border: '1px solid #e0e0e0'
+        }}>
           <Pagination
             count={pageCount}
             page={page}
@@ -357,11 +498,19 @@ const Products = () => {
             sx={{
               '& .MuiPaginationItem-root': {
                 borderRadius: 2,
-                fontWeight: 600
+                fontWeight: 600,
+                border: '1px solid #e0e0e0',
+                '&:hover': {
+                  background: '#f8f9fa'
+                }
               },
               '& .Mui-selected': {
-                background: '#13bfa6 !important',
-                color: 'white !important'
+                background: '#2c3e50 !important',
+                color: 'white !important',
+                borderColor: '#2c3e50 !important',
+                '&:hover': {
+                  background: '#34495e !important'
+                }
               }
             }}
           />

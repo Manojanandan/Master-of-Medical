@@ -4,6 +4,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import { styled } from '@mui/material/styles';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useDispatch, useSelector } from 'react-redux';
+import { CountrySelect, StateSelect, CitySelect } from "react-country-state-city";
+import "react-country-state-city/dist/react-country-state-city.css";
+import "../../styles/countryStateCity.css";
 import PDFIcon from '../../assets/PDFIcon.png';
 import ExcelIcon from '../../assets/ExcelIcon.jpg';
 import JpegIcon from '../../assets/JpegIcon.png';
@@ -11,6 +14,8 @@ import PngIcon from '../../assets/PngIcon.png';
 import WordIcon from '../../assets/WordIcon.jpg';
 import JpgIcon from '../../assets/JpgIcon.png';
 import { registerVendor, registerCustomer } from './Signup/SignUpReducer';
+import { triggerLoginSuccess } from '../../components/StatusCheck';
+import RegistrationStepper from '../../components/RegistrationStepper';
 
 const VisuallyHiddenInput = styled('input')({
     clip: 'rect(0 0 0 0)',
@@ -37,9 +42,34 @@ const Details = () => {
 
     const [openModal, setOpenModal] = useState(false);
     const [allData, setAlldata] = useState({
-        addressLine1: "", addressLine2: "", number: "", city: "", state: "", pincode: "", vendorType: "", country: ""
+        addressLine1: "", 
+        addressLine2: "", 
+        number: "", 
+        city: "", 
+        state: "", 
+        pincode: "", 
+        vendorType: "", 
+        country: "",
+        type: "", // Add type field
+        additionalInformation: [], // Add additional information array
+        files: {}, // Add files object
+        email: "", // Add email field
+        userName: "" // Add userName field
     });
-    const [errorMsg, setErrorMsg] = useState({ addressLine1Error: '', numberError: "", cityError: "", stateError: "", pincodeError: "", vendorTypeError: "",countryError: "" });
+    const [errorMsg, setErrorMsg] = useState({ 
+        addressLine1Error: '', 
+        numberError: "", 
+        cityError: "", 
+        stateError: "", 
+        pincodeError: "", 
+        vendorTypeError: "", 
+        countryError: "" 
+    });
+    
+    // Country, State, City dropdown states
+    const [country, setCountry] = useState(null);
+    const [currentState, setCurrentState] = useState(null);
+    const [currentCity, setCurrentCity] = useState(null);
     const [manufacturingImage, setManufacturingImage] = useState({
         mdmLicense: null,
         gst: null,
@@ -86,13 +116,45 @@ const Details = () => {
         cfAuthorization: "",
     })
     const [featureImage, setFeatureImage] = useState(null);
-    const tempData = JSON.parse(sessionStorage.getItem("tempData"));
+    let tempData = [];
+    try {
+        const raw = sessionStorage.getItem("tempData");
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+                tempData = parsed;
+            } else if (parsed && typeof parsed === 'object') {
+                tempData = [parsed];
+            }
+        }
+    } catch (e) {
+        tempData = [];
+    }
+
+    // Load signup data from sessionStorage
+    useEffect(() => {
+        try {
+            const tempUserData = sessionStorage.getItem("tempUserData");
+            if (tempUserData) {
+                const parsedData = JSON.parse(tempUserData);
+                setAlldata(prev => ({
+                    ...prev,
+                    email: parsedData.email || "",
+                    userName: parsedData.userName || ""
+                }));
+            }
+        } catch (error) {
+            console.error("Error loading signup data:", error);
+        }
+    }, []);
 
     // Add useEffect to track success state changes
     useEffect(() => {
         if (success) {
             const jwt = sessionStorage.getItem("jwt");
             if (jwt) {
+                // Trigger login success event to check status immediately
+                triggerLoginSuccess();
                 if (type === "user" || type === "customer") {
                     navigate("/ecommerceDashboard");
                 } else if (type === "vendor") {
@@ -101,6 +163,114 @@ const Details = () => {
             }
         }
     }, [success, navigate, type]);
+
+    // Handle user type selection
+    const handleUserTypeChange = (userType) => {
+        setLabelChanges(userType);
+        
+        // Map user type values to labels
+        const typeLabels = {
+            "H": "Hospital",
+            "P": "Pathology Labs", 
+            "D": "Diagnostic Centres",
+            "Physio": "Physiotherapist",
+            "Re": "Rehabilitation",
+            "Pc": "Poly Clinic"
+        };
+        
+        const selectedLabel = typeLabels[userType] || userType;
+        
+        // Clear previous type data
+        setAlldata(prev => ({
+            ...prev,
+            type: selectedLabel,
+            additionalInformation: [],
+            files: {}
+        }));
+        
+        // Clear previous files
+        setManufacturingImage({
+            mdmLicense: null,
+            gst: null,
+            bis: null,
+            iso: null,
+            loanLicense: null,
+            establishmentProof: null,
+            dl: null,
+            fda: null,
+            cfDL: null,
+            cfGumasta: null,
+            cfGst: null,
+            cfEstablishmentProof: null,
+            cfAuthorization: null,
+        });
+        setManufacturingImageFile({
+            mdmLicense: null,
+            gst: null,
+            bis: null,
+            iso: null,
+            loanLicense: null,
+            establishmentProof: null,
+            dl: null,
+            fda: null,
+            cfDL: null,
+            cfGumasta: null,
+            cfGst: null,
+            cfEstablishmentProof: null,
+            cfAuthorization: null,
+        });
+        setFeatureImage(null);
+    };
+
+    // Handle additional information input changes
+    const handleAdditionalInfoChange = (fieldName, value) => {
+        setAlldata(prev => {
+            const existingIndex = prev.additionalInformation.findIndex(item => item.name === fieldName);
+            let updatedAdditionalInfo = [...prev.additionalInformation];
+            
+            if (existingIndex >= 0) {
+                updatedAdditionalInfo[existingIndex] = { name: fieldName, value };
+            } else {
+                updatedAdditionalInfo.push({ name: fieldName, value });
+            }
+            
+            return {
+                ...prev,
+                additionalInformation: updatedAdditionalInfo
+            };
+        });
+    };
+
+    // Handle file uploads for additional information
+    const handleAdditionalFileChange = (event, fieldName) => {
+        const file = event.target.files[0];
+        if (file) {
+            const previewUrl = URL.createObjectURL(file);
+            
+            // Update manufacturing image for preview
+            setManufacturingImage(prev => ({
+                ...prev,
+                [fieldName]: previewUrl
+            }));
+            
+            // Update manufacturing image file
+            setManufacturingImageFile(prev => ({
+                ...prev,
+                [fieldName]: file
+            }));
+            
+            // Update allData files
+            setAlldata(prev => ({
+                ...prev,
+                files: {
+                    ...prev.files,
+                    [fieldName]: file
+                }
+            }));
+            
+            checkingImageType(fieldName, file);
+        }
+    };
 
     const handleChange = (e) => {
         setAlldata({ ...allData, [e.target.id]: e.target.value })
@@ -113,19 +283,38 @@ const Details = () => {
         if (e.target.id === "number") {
             setErrorMsg({ ...errorMsg, numberError: "" });
         }
-        if (e.target.id === "city") {
-            setErrorMsg({ ...errorMsg, cityError: "" });
-        }
-        if (e.target.id === "state") {
-            setErrorMsg({ ...errorMsg, stateError: "" });
-        }
         if (e.target.id === "pincode") {
             setErrorMsg({ ...errorMsg, pincodeError: "" });
         }
-        if (e.target.id === "country") {
-            setErrorMsg({ ...errorMsg, countryError: "" });
-        }
     }
+
+    // Handle country selection
+    const handleCountryChange = (_country) => {
+        setCountry(_country);
+        setAlldata({ ...allData, country: _country?.name || "" });
+        setErrorMsg({ ...errorMsg, countryError: "" });
+        // Reset state and city when country changes
+        setCurrentState(null);
+        setCurrentCity(null);
+        setAlldata({ ...allData, country: _country?.name || "", state: "", city: "" });
+    };
+
+    // Handle state selection
+    const handleStateChange = (_state) => {
+        setCurrentState(_state);
+        setAlldata({ ...allData, state: _state?.name || "" });
+        setErrorMsg({ ...errorMsg, stateError: "" });
+        // Reset city when state changes
+        setCurrentCity(null);
+        setAlldata({ ...allData, state: _state?.name || "", city: "" });
+    };
+
+    // Handle city selection
+    const handleCityChange = (_city) => {
+        setCurrentCity(_city);
+        setAlldata({ ...allData, city: _city?.name || "" });
+        setErrorMsg({ ...errorMsg, cityError: "" });
+    };
 
     const handleFileChange = (event, field) => {
         const file = event.target.files[0];
@@ -179,14 +368,14 @@ const Details = () => {
             setErrorMsg({ ...errorMsg, addressLine1Error: "Address Line 1 is required" });
         } else if (allData.number === "") {
             setErrorMsg({ ...errorMsg, numberError: "Contact Number is required" });
-        } else if (allData.city === "") {
-            setErrorMsg({ ...errorMsg, cityError: "City is required" });
-        } else if (allData.state === "") {
+        } else if (!country || allData.country === "") {
+            setErrorMsg({ ...errorMsg, countryError: "Country is required" });
+        } else if (!currentState || allData.state === "") {
             setErrorMsg({ ...errorMsg, stateError: "State is required" });
+        } else if (!currentCity || allData.city === "") {
+            setErrorMsg({ ...errorMsg, cityError: "City is required" });
         } else if (allData.pincode === "") {
             setErrorMsg({ ...errorMsg, pincodeError: "Pincode is required" });
-        } else if (allData.country === "") {
-            setErrorMsg({ ...errorMsg, countryError: "Country is required" });
         } else if (type === "vendor" && allData.vendorType === "") {
             setErrorMsg({ ...errorMsg, vendorTypeError: "Vendor type is required" });
         } else {
@@ -197,17 +386,19 @@ const Details = () => {
             if (type === "user" || type === "customer") {
                 // Handle customer creation
                 const customerData = {
-                    name: tempData[0].userName,
-                    email: tempData[0].email,
+                    name: allData.userName,
+                    email: allData.email,
                     phone: allData.number,
-                    password: tempData[0].password,
+                    password: tempData[0]?.password || "", // Keep password from tempData for now
                     address: `${allData.addressLine1}, ${allData.addressLine2}`,
                     city: allData.city,
                     state: allData.state,
                     country: allData.country,
-                    postalCode: allData.pincode
+                    postalCode: allData.pincode,
+                    type: allData.type,
+                    additionalInformation: allData.additionalInformation,
+                    files: allData.files
                 };
-                
                 dispatch(registerCustomer(customerData));
                 setOpenModal(true);
             } else {
@@ -219,9 +410,9 @@ const Details = () => {
                 formData.append('city', allData.city);
                 formData.append('state', allData.state);
                 formData.append('postalCode', allData.pincode);
-                formData.append('name', tempData[0].userName);
-                formData.append('email', tempData[0].email);
-                formData.append('password', tempData[0].password);
+                formData.append('name', allData.userName);
+                formData.append('email', allData.email);
+                formData.append('password', tempData[0]?.password || ""); // Keep password from tempData for now
                 formData.append('country', allData.country);
                 formData.append('type', allData.vendorType);
                 const fileData = Object.fromEntries(
@@ -264,17 +455,23 @@ const Details = () => {
             <Box sx={{ height: '100%', width: '100%',backgroundColor:'#f2f3f5',padding:'4% 0' }}>
                 <Box sx={{ border: 'solid 1.5px #fff', height: 'auto', margin: '0% auto', backgroundColor: '#fff', borderRadius: '15px', width: '65%' }}>
                     <Stack direction='column'>
-                        <Typography variant='p' sx={{ margin: '2% auto', textTransform: 'capitalize',fontSize:'2rem' }}>{type} Details</Typography>
+                        <Typography variant='p' sx={{ margin: '2% auto', textTransform: 'capitalize',fontSize:'2rem' }}>User Details</Typography>
                     </Stack>
+                    
+                    {/* Registration Stepper */}
+                    <Box sx={{ width: '95%', margin: '0 auto 2%' }}>
+                        <RegistrationStepper currentStep={2} />
+                    </Box>
+                    
                     <Box sx={{ width: '95%', margin: '1% auto', }}>
                         <Grid container columnSpacing={2}>
                             <Grid item size={12} >
-                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '1% 0 1%' }}>Name</Typography>
-                                <TextField disabled fullWidth id="name" size="small" value={tempData[0].userName} onChange={handleChange} />
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '1% 0 1%' }}>Username</Typography>
+                                <TextField disabled fullWidth id="userName" size="small" value={allData.userName || ''} />
                             </Grid>
                             <Grid item size={6} >
                                 <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 1%' }}>Email</Typography>
-                                <TextField disabled fullWidth id="email" size="small" value={tempData[0].email} onChange={handleChange} />
+                                <TextField disabled fullWidth id="email" size="small" value={allData.email || ''} />
                             </Grid>
                              <Grid item size={6} >
                                 <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 1%' }}>Contact Number<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
@@ -288,25 +485,52 @@ const Details = () => {
                                 <TextField value={allData.addressLine2} autoComplete='off' fullWidth id="addressLine2" size="small" onChange={handleChange} />
                             </Grid>
                            
+
                             <Grid item size={6} >
-                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 1%' }}>City<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
-                                {errorMsg.cityError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.cityError}</Typography>}
-                                <TextField value={allData.city} autoComplete='off' fullWidth id="city" size="small" onChange={handleChange} />
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '5% 0 1%' }}>Country<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                {errorMsg.countryError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.countryError}</Typography>}
+                                <div style={{ marginBottom: '10px' }}>
+                                    <CountrySelect
+                                        containerClassName="form-group"
+                                        inputClassName=""
+                                        onChange={handleCountryChange}
+                                        onTextChange={(_txt) => console.log(_txt)}
+                                        placeHolder="Select Country"
+                                    />
+                                </div>
                             </Grid>
                             <Grid item size={6} >
                                 <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '5% 0 1%' }}>State<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                 {errorMsg.stateError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.stateError}</Typography>}
-                                <TextField value={allData.state} autoComplete='off' fullWidth id="state" size="small" onChange={handleChange} />
+                                <div style={{ marginBottom: '10px' }}>
+                                    <StateSelect
+                                        countryid={country?.id}
+                                        containerClassName="form-group"
+                                        inputClassName=""
+                                        onChange={handleStateChange}
+                                        onTextChange={(_txt) => console.log(_txt)}
+                                        defaultValue={currentState}
+                                        placeHolder="Select State"
+                                    />
+                                </div>
+                            </Grid>
+                            <Grid item size={6} >
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '5% 0 1%' }}>City<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                {errorMsg.cityError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.cityError}</Typography>}
+                                <div style={{ marginBottom: '10px' }}>
+                                    <CitySelect
+                                        countryid={country?.id}
+                                        stateid={currentState?.id}
+                                        onChange={handleCityChange}
+                                        defaultValue={currentCity}
+                                        placeHolder="Select City"
+                                    />
+                                </div>
                             </Grid>
                             <Grid item size={6} >
                                 <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '5% 0 1%' }}>Pincode<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                 {errorMsg.pincodeError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.pincodeError}</Typography>}
                                 <TextField value={allData.pincode} autoComplete='off' fullWidth id="pincode" size="small" onChange={handleChange} />
-                            </Grid>
-                            <Grid item size={6} >
-                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '5% 0 1%' }}>Country<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
-                                {errorMsg.countryError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.countryError}</Typography>}
-                                <TextField value={allData.country} autoComplete='off' fullWidth id="country" size="small" onChange={handleChange} />
                             </Grid>
                             {type === "user" ? (
                                 <React.Fragment>
@@ -316,14 +540,15 @@ const Details = () => {
                                             <RadioGroup
                                                 row
                                                 name="radio"
-
+                                                value={allData.type}
+                                                onChange={(e) => handleUserTypeChange(e.target.value)}
                                             >
-                                                <FormControlLabel value="H" control={<Radio />} label="Hospital" onClick={() => setLabelChanges("H")} />
-                                                <FormControlLabel value="P" control={<Radio />} label="Pathology Labs" onClick={() => setLabelChanges("P")} />
-                                                <FormControlLabel value="D" control={<Radio />} label="Diagnostic Centres" onClick={() => setLabelChanges("D")} />
-                                                <FormControlLabel value="Physio" control={<Radio />} label="Physiotherapist" onClick={() => setLabelChanges("Physio")} />
-                                                <FormControlLabel value="Re" control={<Radio />} label="Rehabilitation" onClick={() => setLabelChanges("Re")} />
-                                                <FormControlLabel value="Pc" control={<Radio />} label="Poly Clnic" onClick={() => setLabelChanges("Pc")} />
+                                                <FormControlLabel value="H" control={<Radio />} label="Hospital" />
+                                                <FormControlLabel value="P" control={<Radio />} label="Pathology Labs" />
+                                                <FormControlLabel value="D" control={<Radio />} label="Diagnostic Centres" />
+                                                <FormControlLabel value="Physio" control={<Radio />} label="Physiotherapist" />
+                                                <FormControlLabel value="Re" control={<Radio />} label="Rehabilitation" />
+                                                <FormControlLabel value="Pc" control={<Radio />} label="Poly Clinic" />
                                             </RadioGroup>
                                         </FormControl>
                                     </Grid>
@@ -331,34 +556,45 @@ const Details = () => {
                                         <>
                                             <Grid item size={6}>
                                                 <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Hospital Name</Typography>
-                                                <TextField fullWidth id="name" size="small" />
+                                                <TextField 
+                                                    fullWidth 
+                                                    id="hospitalName" 
+                                                    size="small"
+                                                    value={allData.additionalInformation.find(item => item.name === 'hospitalName')?.value || ''}
+                                                    onChange={(e) => handleAdditionalInfoChange('hospitalName', e.target.value)}
+                                                />
                                             </Grid>
                                             <Grid item size={6}>
                                                 <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Medical Council License</Typography>
-                                                <TextField fullWidth id="license" size="small" />
+                                                <TextField 
+                                                    fullWidth 
+                                                    id="medicalCouncilLicense" 
+                                                    size="small"
+                                                    value={allData.additionalInformation.find(item => item.name === 'medicalCouncilLicense')?.value || ''}
+                                                    onChange={(e) => handleAdditionalInfoChange('medicalCouncilLicense', e.target.value)}
+                                                />
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Hospital Registeration Certificate</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Hospital Registration Certificate</Typography>
                                                 <Button
                                                     sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                                                     component="label"
                                                     variant="contained"
                                                     tabIndex={-1}
                                                     startIcon={<CloudUploadIcon />}
-
                                                 >
                                                     Upload
                                                     <VisuallyHiddenInput
                                                         type="file"
-                                                        accept="image/png, image/jpeg" // Restrict file types to PNG and JPEG
-                                                        onChange={handleUserFileChange}
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'hospitalRegistrationCertificate')}
                                                     />
                                                 </Button>
-                                                {featureImage && (
+                                                {manufacturingImage.hospitalRegistrationCertificate && (
                                                     <div style={{ marginTop: '5%' }}>
                                                         <img
-                                                            src={featureImage}
-                                                            alt={featureImage}
+                                                            src={manufacturingImage.hospitalRegistrationCertificate}
+                                                            alt="Hospital Registration Certificate"
                                                             style={{
                                                                 width: '200px',
                                                                 height: 'auto',
@@ -375,20 +611,19 @@ const Details = () => {
                                                     variant="contained"
                                                     tabIndex={-1}
                                                     startIcon={<CloudUploadIcon />}
-
                                                 >
                                                     Upload
                                                     <VisuallyHiddenInput
                                                         type="file"
-                                                        accept="image/png, image/jpeg" // Restrict file types to PNG and JPEG
-                                                        onChange={handleFileChange}
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'hospitalAddressProof')}
                                                     />
                                                 </Button>
-                                                {featureImage && (
+                                                {manufacturingImage.hospitalAddressProof && (
                                                     <div style={{ marginTop: '5%' }}>
                                                         <img
-                                                            src={featureImage}
-                                                            alt={featureImage}
+                                                            src={manufacturingImage.hospitalAddressProof}
+                                                            alt="Hospital Address Proof"
                                                             style={{
                                                                 width: '200px',
                                                                 height: 'auto',
@@ -403,30 +638,35 @@ const Details = () => {
                                         <>
                                             <Grid item size={6}>
                                                 <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Pathology Name</Typography>
-                                                <TextField fullWidth id="name" size="small" />
+                                                <TextField 
+                                                    fullWidth 
+                                                    id="pathologyName" 
+                                                    size="small"
+                                                    value={allData.additionalInformation.find(item => item.name === 'pathologyName')?.value || ''}
+                                                    onChange={(e) => handleAdditionalInfoChange('pathologyName', e.target.value)}
+                                                />
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Lab Registeration Certificate</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Lab Registration Certificate</Typography>
                                                 <Button
                                                     sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                                                     component="label"
                                                     variant="contained"
                                                     tabIndex={-1}
                                                     startIcon={<CloudUploadIcon />}
-
                                                 >
                                                     Upload
                                                     <VisuallyHiddenInput
                                                         type="file"
-                                                        accept="image/png, image/jpeg" // Restrict file types to PNG and JPEG
-                                                        onChange={handleUserFileChange}
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'labRegistrationCertificate')}
                                                     />
                                                 </Button>
-                                                {featureImage && (
+                                                {manufacturingImage.labRegistrationCertificate && (
                                                     <div style={{ marginTop: '5%' }}>
                                                         <img
-                                                            src={featureImage}
-                                                            alt={featureImage}
+                                                            src={manufacturingImage.labRegistrationCertificate}
+                                                            alt="Lab Registration Certificate"
                                                             style={{
                                                                 width: '200px',
                                                                 height: 'auto',
@@ -437,7 +677,13 @@ const Details = () => {
                                             </Grid>
                                             <Grid item size={6}>
                                                 <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Identity Proof</Typography>
-                                                <TextField fullWidth id="license" size="small" />
+                                                <TextField 
+                                                    fullWidth 
+                                                    id="pathologyIdentityProof" 
+                                                    size="small"
+                                                    value={allData.additionalInformation.find(item => item.name === 'pathologyIdentityProof')?.value || ''}
+                                                    onChange={(e) => handleAdditionalInfoChange('pathologyIdentityProof', e.target.value)}
+                                                />
                                             </Grid>
                                             <Grid item size={6}>
                                                 <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof</Typography>
@@ -447,20 +693,19 @@ const Details = () => {
                                                     variant="contained"
                                                     tabIndex={-1}
                                                     startIcon={<CloudUploadIcon />}
-
                                                 >
                                                     Upload
                                                     <VisuallyHiddenInput
                                                         type="file"
-                                                        accept="image/png, image/jpeg" // Restrict file types to PNG and JPEG
-                                                        onChange={handleFileChange}
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'pathologyAddressProof')}
                                                     />
                                                 </Button>
-                                                {featureImage && (
+                                                {manufacturingImage.pathologyAddressProof && (
                                                     <div style={{ marginTop: '5%' }}>
                                                         <img
-                                                            src={featureImage}
-                                                            alt={featureImage}
+                                                            src={manufacturingImage.pathologyAddressProof}
+                                                            alt="Pathology Address Proof"
                                                             style={{
                                                                 width: '200px',
                                                                 height: 'auto',
@@ -474,27 +719,26 @@ const Details = () => {
                                     {labelChanges === "D" && (
                                         <>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Diagnostic Center Registeration Certificate</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Diagnostic Center Registration Certificate</Typography>
                                                 <Button
                                                     sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                                                     component="label"
                                                     variant="contained"
                                                     tabIndex={-1}
                                                     startIcon={<CloudUploadIcon />}
-
                                                 >
                                                     Upload
                                                     <VisuallyHiddenInput
                                                         type="file"
-                                                        accept="image/png, image/jpeg" // Restrict file types to PNG and JPEG
-                                                        onChange={handleFileChange}
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'diagnosticRegistrationCertificate')}
                                                     />
                                                 </Button>
-                                                {featureImage && (
+                                                {manufacturingImage.diagnosticRegistrationCertificate && (
                                                     <div style={{ marginTop: '5%' }}>
                                                         <img
-                                                            src={featureImage}
-                                                            alt={featureImage}
+                                                            src={manufacturingImage.diagnosticRegistrationCertificate}
+                                                            alt="Diagnostic Registration Certificate"
                                                             style={{
                                                                 width: '200px',
                                                                 height: 'auto',
@@ -505,7 +749,13 @@ const Details = () => {
                                             </Grid>
                                             <Grid item size={6}>
                                                 <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Identity Proof</Typography>
-                                                <TextField fullWidth id="license" size="small" />
+                                                <TextField 
+                                                    fullWidth 
+                                                    id="diagnosticIdentityProof" 
+                                                    size="small"
+                                                    value={allData.additionalInformation.find(item => item.name === 'diagnosticIdentityProof')?.value || ''}
+                                                    onChange={(e) => handleAdditionalInfoChange('diagnosticIdentityProof', e.target.value)}
+                                                />
                                             </Grid>
                                             <Grid item size={6}>
                                                 <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof</Typography>
@@ -515,20 +765,19 @@ const Details = () => {
                                                     variant="contained"
                                                     tabIndex={-1}
                                                     startIcon={<CloudUploadIcon />}
-
                                                 >
                                                     Upload
                                                     <VisuallyHiddenInput
                                                         type="file"
-                                                        accept="image/png, image/jpeg" // Restrict file types to PNG and JPEG
-                                                        onChange={handleFileChange}
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'diagnosticAddressProof')}
                                                     />
                                                 </Button>
-                                                {featureImage && (
+                                                {manufacturingImage.diagnosticAddressProof && (
                                                     <div style={{ marginTop: '5%' }}>
                                                         <img
-                                                            src={featureImage}
-                                                            alt={featureImage}
+                                                            src={manufacturingImage.diagnosticAddressProof}
+                                                            alt="Diagnostic Address Proof"
                                                             style={{
                                                                 width: '200px',
                                                                 height: 'auto',
@@ -542,27 +791,26 @@ const Details = () => {
                                     {labelChanges === "Physio" && (
                                         <>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Establishment Registeration Certificate</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Establishment Registration Certificate</Typography>
                                                 <Button
                                                     sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                                                     component="label"
                                                     variant="contained"
                                                     tabIndex={-1}
                                                     startIcon={<CloudUploadIcon />}
-
                                                 >
                                                     Upload
                                                     <VisuallyHiddenInput
                                                         type="file"
-                                                        accept="image/png, image/jpeg" // Restrict file types to PNG and JPEG
-                                                        onChange={handleFileChange}
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'physioEstablishmentCertificate')}
                                                     />
                                                 </Button>
-                                                {featureImage && (
+                                                {manufacturingImage.physioEstablishmentCertificate && (
                                                     <div style={{ marginTop: '5%' }}>
                                                         <img
-                                                            src={featureImage}
-                                                            alt={featureImage}
+                                                            src={manufacturingImage.physioEstablishmentCertificate}
+                                                            alt="Physio Establishment Certificate"
                                                             style={{
                                                                 width: '200px',
                                                                 height: 'auto',
@@ -579,20 +827,19 @@ const Details = () => {
                                                     variant="contained"
                                                     tabIndex={-1}
                                                     startIcon={<CloudUploadIcon />}
-
                                                 >
                                                     Upload
                                                     <VisuallyHiddenInput
                                                         type="file"
-                                                        accept="image/png, image/jpeg" // Restrict file types to PNG and JPEG
-                                                        onChange={handleFileChange}
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'physioTradeLicense')}
                                                     />
                                                 </Button>
-                                                {featureImage && (
+                                                {manufacturingImage.physioTradeLicense && (
                                                     <div style={{ marginTop: '5%' }}>
                                                         <img
-                                                            src={featureImage}
-                                                            alt={featureImage}
+                                                            src={manufacturingImage.physioTradeLicense}
+                                                            alt="Physio Trade License"
                                                             style={{
                                                                 width: '200px',
                                                                 height: 'auto',
@@ -609,20 +856,19 @@ const Details = () => {
                                                     variant="contained"
                                                     tabIndex={-1}
                                                     startIcon={<CloudUploadIcon />}
-
                                                 >
                                                     Upload
                                                     <VisuallyHiddenInput
                                                         type="file"
-                                                        accept="image/png, image/jpeg" // Restrict file types to PNG and JPEG
-                                                        onChange={handleFileChange}
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'physioAddressProof')}
                                                     />
                                                 </Button>
-                                                {featureImage && (
+                                                {manufacturingImage.physioAddressProof && (
                                                     <div style={{ marginTop: '5%' }}>
                                                         <img
-                                                            src={featureImage}
-                                                            alt={featureImage}
+                                                            src={manufacturingImage.physioAddressProof}
+                                                            alt="Physio Address Proof"
                                                             style={{
                                                                 width: '200px',
                                                                 height: 'auto',
@@ -636,27 +882,26 @@ const Details = () => {
                                     {labelChanges === "Re" && (
                                         <>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Establishment Registeration Certificate</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Establishment Registration Certificate</Typography>
                                                 <Button
                                                     sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                                                     component="label"
                                                     variant="contained"
                                                     tabIndex={-1}
                                                     startIcon={<CloudUploadIcon />}
-
                                                 >
                                                     Upload
                                                     <VisuallyHiddenInput
                                                         type="file"
-                                                        accept="image/png, image/jpeg" // Restrict file types to PNG and JPEG
-                                                        onChange={handleFileChange}
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'rehabEstablishmentCertificate')}
                                                     />
                                                 </Button>
-                                                {featureImage && (
+                                                {manufacturingImage.rehabEstablishmentCertificate && (
                                                     <div style={{ marginTop: '5%' }}>
                                                         <img
-                                                            src={featureImage}
-                                                            alt={featureImage}
+                                                            src={manufacturingImage.rehabEstablishmentCertificate}
+                                                            alt="Rehabilitation Establishment Certificate"
                                                             style={{
                                                                 width: '200px',
                                                                 height: 'auto',
@@ -667,7 +912,13 @@ const Details = () => {
                                             </Grid>
                                             <Grid item size={6}>
                                                 <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Identity Proof</Typography>
-                                                <TextField fullWidth id="license" size="small" />
+                                                <TextField 
+                                                    fullWidth 
+                                                    id="rehabIdentityProof" 
+                                                    size="small"
+                                                    value={allData.additionalInformation.find(item => item.name === 'rehabIdentityProof')?.value || ''}
+                                                    onChange={(e) => handleAdditionalInfoChange('rehabIdentityProof', e.target.value)}
+                                                />
                                             </Grid>
                                             <Grid item size={6}>
                                                 <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof</Typography>
@@ -677,20 +928,19 @@ const Details = () => {
                                                     variant="contained"
                                                     tabIndex={-1}
                                                     startIcon={<CloudUploadIcon />}
-
                                                 >
                                                     Upload
                                                     <VisuallyHiddenInput
                                                         type="file"
-                                                        accept="image/png, image/jpeg" // Restrict file types to PNG and JPEG
-                                                        onChange={handleFileChange}
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'rehabAddressProof')}
                                                     />
                                                 </Button>
-                                                {featureImage && (
+                                                {manufacturingImage.rehabAddressProof && (
                                                     <div style={{ marginTop: '5%' }}>
                                                         <img
-                                                            src={featureImage}
-                                                            alt={featureImage}
+                                                            src={manufacturingImage.rehabAddressProof}
+                                                            alt="Rehabilitation Address Proof"
                                                             style={{
                                                                 width: '200px',
                                                                 height: 'auto',
@@ -711,20 +961,19 @@ const Details = () => {
                                                     variant="contained"
                                                     tabIndex={-1}
                                                     startIcon={<CloudUploadIcon />}
-
                                                 >
                                                     Upload
                                                     <VisuallyHiddenInput
                                                         type="file"
-                                                        accept="image/png, image/jpeg" // Restrict file types to PNG and JPEG
-                                                        onChange={handleFileChange}
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'polyclinicTradeLicense')}
                                                     />
                                                 </Button>
-                                                {featureImage && (
+                                                {manufacturingImage.polyclinicTradeLicense && (
                                                     <div style={{ marginTop: '5%' }}>
                                                         <img
-                                                            src={featureImage}
-                                                            alt={featureImage}
+                                                            src={manufacturingImage.polyclinicTradeLicense}
+                                                            alt="Polyclinic Trade License"
                                                             style={{
                                                                 width: '200px',
                                                                 height: 'auto',
@@ -734,27 +983,26 @@ const Details = () => {
                                                 )}
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Clinical Registeration Certificate</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Clinical Registration Certificate</Typography>
                                                 <Button
                                                     sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                                                     component="label"
                                                     variant="contained"
                                                     tabIndex={-1}
                                                     startIcon={<CloudUploadIcon />}
-
                                                 >
                                                     Upload
                                                     <VisuallyHiddenInput
                                                         type="file"
-                                                        accept="image/png, image/jpeg" // Restrict file types to PNG and JPEG
-                                                        onChange={handleFileChange}
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'polyclinicClinicalCertificate')}
                                                     />
                                                 </Button>
-                                                {featureImage && (
+                                                {manufacturingImage.polyclinicClinicalCertificate && (
                                                     <div style={{ marginTop: '5%' }}>
                                                         <img
-                                                            src={featureImage}
-                                                            alt={featureImage}
+                                                            src={manufacturingImage.polyclinicClinicalCertificate}
+                                                            alt="Polyclinic Clinical Certificate"
                                                             style={{
                                                                 width: '200px',
                                                                 height: 'auto',
@@ -771,20 +1019,19 @@ const Details = () => {
                                                     variant="contained"
                                                     tabIndex={-1}
                                                     startIcon={<CloudUploadIcon />}
-
                                                 >
                                                     Upload
                                                     <VisuallyHiddenInput
                                                         type="file"
-                                                        accept="image/png, image/jpeg" // Restrict file types to PNG and JPEG
-                                                        onChange={handleFileChange}
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'polyclinicAddressProof')}
                                                     />
                                                 </Button>
-                                                {featureImage && (
+                                                {manufacturingImage.polyclinicAddressProof && (
                                                     <div style={{ marginTop: '5%' }}>
                                                         <img
-                                                            src={featureImage}
-                                                            alt={featureImage}
+                                                            src={manufacturingImage.polyclinicAddressProof}
+                                                            alt="Polyclinic Address Proof"
                                                             style={{
                                                                 width: '200px',
                                                                 height: 'auto',

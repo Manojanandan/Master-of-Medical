@@ -1,8 +1,12 @@
-import { Box } from '@mui/material'
+import { Box, useTheme, useMediaQuery } from '@mui/material'
 import React from 'react'
 import TitleSection from '../../../components/e_commerceComponents/TitleSection'
 
 const FeatureBrands = () => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+    
     const brandList = [
         {
             image: "https://www.cetaphil.com/on/demandware.static/Sites-Galderma-US-Site/-/default/dw0e792d48/images/Cetaphil_Logo_285.png",
@@ -41,20 +45,24 @@ const FeatureBrands = () => {
 
     return (
         <React.Fragment>
-            <Box sx={{ height: 'auto', width: '100%', margin: '2% 0 1%', }}>
+            <Box sx={{ 
+                height: 'auto', 
+                width: '100%', 
+                margin: isMobile ? '4% 0 1%' : '2% 0 1%', 
+            }}>
                 <TitleSection title={"Feature Brands"} subTitle={"Check Out Our Latest Brands"} />
                 <Box sx={{
                     overflowX: 'auto',
                     overflowY: 'hidden',
-                    padding: '25px 0 10px',
+                    padding: isMobile ? '15px 0 10px' : '25px 0 10px',
                     width: '100%',
                 }}>
                     <Box sx={{
                         display: 'flex',
                         flexWrap: 'nowrap',
-                        gap: '2%',
-                        paddingLeft: '3%',
-                        paddingRight: '3%',
+                        gap: isMobile ? '4%' : '2%',
+                        paddingLeft: isMobile ? '2%' : '3%',
+                        paddingRight: isMobile ? '2%' : '3%',
                         width: 'max-content',
                     }}>
                         {brandList?.map((e, i) => (
@@ -62,20 +70,25 @@ const FeatureBrands = () => {
                                 key={i}
                                 sx={{
                                     flex: '0 0 auto',
-                                    width: '100px',
-                                    height: '100px',
+                                    width: isMobile ? '80px' : '100px',
+                                    height: isMobile ? '80px' : '100px',
                                     borderRadius: '50%',
                                     boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     backgroundColor: '#fff',
+                                    minWidth: isMobile ? '80px' : '100px',
                                 }}
                             >
                                 <img
                                     src={e?.image}
                                     alt={`Brand ${i}`}
-                                    style={{ height: '50px', width: '80px', objectFit: 'contain' }}
+                                    style={{ 
+                                        height: isMobile ? '40px' : '50px', 
+                                        width: isMobile ? '60px' : '80px', 
+                                        objectFit: 'contain' 
+                                    }}
                                 />
                             </Box>
                         ))}
