@@ -116,16 +116,6 @@ const App = () => {
               <FAQ />
             </AnimatedPage>
           } />
-          <Route path="/ecommerceDashboard/termsofuse" element={
-            <AnimatedPage animationType="slide" direction="left" timeout={600}>
-              <Termsofuse />
-            </AnimatedPage>
-          } />
-          <Route path="/ecommerceDashboard/privacyPolicy" element={
-            <AnimatedPage animationType="slide" direction="left" timeout={600}>
-              <PrivacyPolicy />
-            </AnimatedPage>
-          } />
           <Route path="/ecommerceDashboard/cookiesPolicy" element={
             <AnimatedPage animationType="slide" direction="left" timeout={600}>
               <CookiesPolicy />
@@ -153,6 +143,18 @@ const App = () => {
           } />
           {/* </Route> */}
         </Route>
+        
+        {/* Global Routes - Accessible from anywhere */}
+        <Route path="/termsofuse" element={
+          <AnimatedPage animationType="slide" direction="left" timeout={600}>
+            <Termsofuse />
+          </AnimatedPage>
+        } />
+        <Route path="/privacyPolicy" element={
+          <AnimatedPage animationType="slide" direction="left" timeout={600}>
+            <PrivacyPolicy />
+          </AnimatedPage>
+        } />
         {/* Vendor Dashboard */}
         <Route path="/vendorDashboard" element={<VendorLayout />}>
           <Route element={<ProtectedRoute />}>

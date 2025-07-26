@@ -139,7 +139,7 @@ const LoginForm = () => {
                     alignItems: 'center',
                     gap: '0.5rem',
                     cursor: 'pointer',
-                    alignSelf: 'flex-start',
+                    alignSelf: 'flex-end',
                     mb: 2,
                     '&:hover': {
                         color: 'primary.main'

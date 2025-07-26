@@ -35,6 +35,11 @@ const Details = () => {
     const [labelChanges, setLabelChanges] = useState("")
     const type = sessionStorage.getItem("userType")
 
+    // Debug: Log the userType to see what's being retrieved
+    console.log("Details page - userType from sessionStorage:", type);
+    console.log("Details page - condition check:", type !== "vendor");
+    console.log("Details page - should show user types:", type !== "vendor");
+
     const reducer = useSelector((state) => state.signUpReducer)
     const loader = reducer.loader;
     const message = reducer.message;
@@ -54,7 +59,8 @@ const Details = () => {
         additionalInformation: [], // Add additional information array
         files: {}, // Add files object
         email: "", // Add email field
-        userName: "" // Add userName field
+        userName: "", // Add userName field
+        fullName: "" // Add fullName field
     });
     const [errorMsg, setErrorMsg] = useState({ 
         addressLine1Error: '', 
@@ -63,7 +69,8 @@ const Details = () => {
         stateError: "", 
         pincodeError: "", 
         vendorTypeError: "", 
-        countryError: "" 
+        countryError: "",
+        fullNameError: ""
     });
     
     // Country, State, City dropdown states
@@ -175,7 +182,8 @@ const Details = () => {
             "D": "Diagnostic Centres",
             "Physio": "Physiotherapist",
             "Re": "Rehabilitation",
-            "Pc": "Poly Clinic"
+            "Pc": "Poly Clinic",
+            "Student": "Student"
         };
         
         const selectedLabel = typeLabels[userType] || userType;
@@ -245,13 +253,12 @@ const Details = () => {
     const handleAdditionalFileChange = (event, fieldName) => {
         const file = event.target.files[0];
         if (file) {
-            const previewUrl = URL.createObjectURL(file);
-            
-            // Update manufacturing image for preview
-            setManufacturingImage(prev => ({
-                ...prev,
-                [fieldName]: previewUrl
-            }));
+            // Validate file size (max 10MB)
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            if (file.size > maxSize) {
+                alert('File size must be less than 10MB');
+                return;
+            }
             
             // Update manufacturing image file
             setManufacturingImageFile(prev => ({
@@ -259,17 +266,76 @@ const Details = () => {
                 [fieldName]: file
             }));
             
-            // Update allData files
+            // Update allData files with file metadata
             setAlldata(prev => ({
                 ...prev,
                 files: {
                     ...prev.files,
-                    [fieldName]: file
+                    [fieldName]: {
+                        file: file,
+                        type: fieldName,
+                        name: getFileTypeName(fieldName),
+                        fileName: file.name,
+                        size: file.size,
+                        lastModified: file.lastModified
+                    }
                 }
             }));
             
             checkingImageType(fieldName, file);
         }
+    };
+
+    // Function to get human-readable file type names
+    const getFileTypeName = (fieldName) => {
+        const fileTypeNames = {
+            'hospitalRegistrationCertificate': 'Hospital Registration Certificate',
+            'hospitalAddressProof': 'Hospital Address Proof',
+            'labRegistrationCertificate': 'Lab Registration Certificate',
+            'pathologyAddressProof': 'Pathology Address Proof',
+            'diagnosticRegistrationCertificate': 'Diagnostic Registration Certificate',
+            'diagnosticAddressProof': 'Diagnostic Address Proof',
+            'physioEstablishmentCertificate': 'Physio Establishment Certificate',
+            'physioTradeLicense': 'Physio Trade License',
+            'physioAddressProof': 'Physio Address Proof',
+            'rehabEstablishmentCertificate': 'Rehabilitation Establishment Certificate',
+            'rehabAddressProof': 'Rehabilitation Address Proof',
+            'polyclinicTradeLicense': 'Polyclinic Trade License',
+            'polyclinicClinicalCertificate': 'Polyclinic Clinical Certificate',
+            'polyclinicAddressProof': 'Polyclinic Address Proof',
+            'studentIdCard': 'Student ID Card'
+        };
+        return fileTypeNames[fieldName] || fieldName;
+    };
+
+    // Function to remove uploaded file
+    const removeFile = (fieldName) => {
+        setManufacturingImage(prev => ({
+            ...prev,
+            [fieldName]: null
+        }));
+        
+        setManufacturingImageFile(prev => ({
+            ...prev,
+            [fieldName]: null
+        }));
+        
+        setAlldata(prev => ({
+            ...prev,
+            files: {
+                ...prev.files,
+                [fieldName]: null
+            }
+        }));
+    };
+
+    // Function to format file size
+    const formatFileSize = (bytes) => {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     };
 
     const handleChange = (e) => {
@@ -364,10 +430,14 @@ const Details = () => {
     }
 
     const handleSubmit = () => {
-        if (allData.addressLine1 === "") {
+        if (allData.fullName === "") {
+            setErrorMsg({ ...errorMsg, fullNameError: "Full Name is required" });
+        } else if (allData.addressLine1 === "") {
             setErrorMsg({ ...errorMsg, addressLine1Error: "Address Line 1 is required" });
         } else if (allData.number === "") {
             setErrorMsg({ ...errorMsg, numberError: "Contact Number is required" });
+        } else if (allData.number.length !== 10 || !/^\d{10}$/.test(allData.number)) {
+            setErrorMsg({ ...errorMsg, numberError: "Contact Number must be 10 digits" });
         } else if (!country || allData.country === "") {
             setErrorMsg({ ...errorMsg, countryError: "Country is required" });
         } else if (!currentState || allData.state === "") {
@@ -376,30 +446,47 @@ const Details = () => {
             setErrorMsg({ ...errorMsg, cityError: "City is required" });
         } else if (allData.pincode === "") {
             setErrorMsg({ ...errorMsg, pincodeError: "Pincode is required" });
+        } else if (allData.pincode.length !== 6 || !/^\d{6}$/.test(allData.pincode)) {
+            setErrorMsg({ ...errorMsg, pincodeError: "Pincode must be 6 digits" });
         } else if (type === "vendor" && allData.vendorType === "") {
             setErrorMsg({ ...errorMsg, vendorTypeError: "Vendor type is required" });
         } else {
             setErrorMsg({
-                addressLine1Error: '', numberError: "", cityError: "", stateError: "", pincodeError: "", vendorTypeError: "",countryError:""
+                addressLine1Error: '', numberError: "", cityError: "", stateError: "", pincodeError: "", vendorTypeError: "",countryError:"", fullNameError: ""
             });
             
             if (type === "user" || type === "customer") {
-                // Handle customer creation
-                const customerData = {
-                    name: allData.userName,
-                    email: allData.email,
-                    phone: allData.number,
-                    password: tempData[0]?.password || "", // Keep password from tempData for now
-                    address: `${allData.addressLine1}, ${allData.addressLine2}`,
-                    city: allData.city,
-                    state: allData.state,
-                    country: allData.country,
-                    postalCode: allData.pincode,
-                    type: allData.type,
-                    additionalInformation: allData.additionalInformation,
-                    files: allData.files
-                };
-                dispatch(registerCustomer(customerData));
+                // Handle customer creation with FormData for file uploads
+                const formData = new FormData();
+                const address = `${allData.addressLine1}, ${allData.addressLine2}`;
+                
+                // Append basic user data
+                formData.append('name', allData.fullName);
+                formData.append('email', allData.email);
+                formData.append('phone', allData.number);
+                formData.append('password', tempData[0]?.password || "");
+                formData.append('address', address);
+                formData.append('city', allData.city);
+                formData.append('state', allData.state);
+                formData.append('country', allData.country);
+                formData.append('postalCode', allData.pincode);
+                formData.append('type', allData.type);
+                
+                // Append additional information
+                allData.additionalInformation.forEach(item => {
+                    formData.append('additionalInformation', JSON.stringify(item));
+                });
+                
+                // Append files with proper naming and metadata
+                Object.entries(allData.files).forEach(([key, fileData]) => {
+                    if (fileData && fileData.file) {
+                        formData.append('files', fileData.file);
+                        formData.append('fileTypes', fileData.type);
+                        formData.append('fileNames', fileData.name);
+                    }
+                });
+                
+                dispatch(registerCustomer(formData));
                 setOpenModal(true);
             } else {
                 // Handle vendor creation
@@ -410,7 +497,7 @@ const Details = () => {
                 formData.append('city', allData.city);
                 formData.append('state', allData.state);
                 formData.append('postalCode', allData.pincode);
-                formData.append('name', allData.userName);
+                formData.append('name', allData.fullName);
                 formData.append('email', allData.email);
                 formData.append('password', tempData[0]?.password || ""); // Keep password from tempData for now
                 formData.append('country', allData.country);
@@ -465,24 +552,65 @@ const Details = () => {
                     
                     <Box sx={{ width: '95%', margin: '1% auto', }}>
                         <Grid container columnSpacing={2}>
-                            <Grid item size={12} >
+                            <Grid item size={6} >
                                 <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '1% 0 1%' }}>Username</Typography>
                                 <TextField disabled fullWidth id="userName" size="small" value={allData.userName || ''} />
                             </Grid>
                             <Grid item size={6} >
-                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 1%' }}>Email</Typography>
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '1% 0 1%' }}>Email</Typography>
                                 <TextField disabled fullWidth id="email" size="small" value={allData.email || ''} />
+                            </Grid>
+                            <Grid item size={6} >
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 1%' }}>Full Name<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                {errorMsg.fullNameError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.fullNameError}</Typography>}
+                                <TextField 
+                                    fullWidth 
+                                    id="fullName" 
+                                    size="small" 
+                                    onChange={handleChange}
+                                    placeholder="Enter your full name"
+                                    value={allData.fullName || ''}
+                                />
                             </Grid>
                              <Grid item size={6} >
                                 <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 1%' }}>Contact Number<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                 {errorMsg.numberError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.numberError}</Typography>}
-                                <TextField value={allData.number} autoComplete='off' fullWidth id="number" size="small" onChange={handleChange} />
+                                <TextField 
+                                    value={allData.number} 
+                                    autoComplete='off' 
+                                    fullWidth 
+                                    id="number" 
+                                    size="small" 
+                                    onChange={handleChange}
+                                    placeholder="Enter 10-digit contact number"
+                                    inputProps={{
+                                        maxLength: 10,
+                                        pattern: "[0-9]{10}"
+                                    }}
+                                />
                             </Grid>
                             <Grid item size={12} >
                                 <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '2% 0 1%', }}>Address<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                 {errorMsg.addressLine1Error && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.addressLine1Error}</Typography>}
-                                <TextField value={allData.addressLine1} autoComplete='off' fullWidth id="addressLine1" size="small" sx={{ marginBottom: '1%' }} onChange={handleChange} />
-                                <TextField value={allData.addressLine2} autoComplete='off' fullWidth id="addressLine2" size="small" onChange={handleChange} />
+                                <TextField 
+                                    value={allData.addressLine1} 
+                                    autoComplete='off' 
+                                    fullWidth 
+                                    id="addressLine1" 
+                                    size="small" 
+                                    sx={{ marginBottom: '1%' }} 
+                                    onChange={handleChange}
+                                    placeholder="Enter address line 1"
+                                />
+                                <TextField 
+                                    value={allData.addressLine2} 
+                                    autoComplete='off' 
+                                    fullWidth 
+                                    id="addressLine2" 
+                                    size="small" 
+                                    onChange={handleChange}
+                                    placeholder="Enter address line 2 (optional)"
+                                />
                             </Grid>
                            
 
@@ -530,9 +658,21 @@ const Details = () => {
                             <Grid item size={6} >
                                 <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '5% 0 1%' }}>Pincode<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                 {errorMsg.pincodeError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.pincodeError}</Typography>}
-                                <TextField value={allData.pincode} autoComplete='off' fullWidth id="pincode" size="small" onChange={handleChange} />
+                                <TextField 
+                                    value={allData.pincode} 
+                                    autoComplete='off' 
+                                    fullWidth 
+                                    id="pincode" 
+                                    size="small" 
+                                    onChange={handleChange}
+                                    placeholder="Enter 6-digit pincode"
+                                    inputProps={{
+                                        maxLength: 6,
+                                        pattern: "[0-9]{6}"
+                                    }}
+                                />
                             </Grid>
-                            {type === "user" ? (
+                            {type !== "vendor" ? (
                                 <React.Fragment>
                                     <Grid item size={12} >
                                         <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: '3% 0 0' }}>Type of users</Typography>
@@ -540,7 +680,7 @@ const Details = () => {
                                             <RadioGroup
                                                 row
                                                 name="radio"
-                                                value={allData.type}
+                                                value={labelChanges}
                                                 onChange={(e) => handleUserTypeChange(e.target.value)}
                                             >
                                                 <FormControlLabel value="H" control={<Radio />} label="Hospital" />
@@ -549,6 +689,7 @@ const Details = () => {
                                                 <FormControlLabel value="Physio" control={<Radio />} label="Physiotherapist" />
                                                 <FormControlLabel value="Re" control={<Radio />} label="Rehabilitation" />
                                                 <FormControlLabel value="Pc" control={<Radio />} label="Poly Clinic" />
+                                                <FormControlLabel value="Student" control={<Radio />} label="Student" />
                                             </RadioGroup>
                                         </FormControl>
                                     </Grid>
@@ -562,6 +703,7 @@ const Details = () => {
                                                     size="small"
                                                     value={allData.additionalInformation.find(item => item.name === 'hospitalName')?.value || ''}
                                                     onChange={(e) => handleAdditionalInfoChange('hospitalName', e.target.value)}
+                                                    placeholder="Enter hospital name"
                                                 />
                                             </Grid>
                                             <Grid item size={6}>
@@ -572,6 +714,7 @@ const Details = () => {
                                                     size="small"
                                                     value={allData.additionalInformation.find(item => item.name === 'medicalCouncilLicense')?.value || ''}
                                                     onChange={(e) => handleAdditionalInfoChange('medicalCouncilLicense', e.target.value)}
+                                                    placeholder="Enter medical council license number"
                                                 />
                                             </Grid>
                                             <Grid item size={6}>
@@ -586,22 +729,37 @@ const Details = () => {
                                                     Upload
                                                     <VisuallyHiddenInput
                                                         type="file"
-                                                        accept="image/png, image/jpeg"
                                                         onChange={(e) => handleAdditionalFileChange(e, 'hospitalRegistrationCertificate')}
                                                     />
                                                 </Button>
-                                                {manufacturingImage.hospitalRegistrationCertificate && (
-                                                    <div style={{ marginTop: '5%' }}>
-                                                        <img
-                                                            src={manufacturingImage.hospitalRegistrationCertificate}
-                                                            alt="Hospital Registration Certificate"
-                                                            style={{
-                                                                width: '200px',
-                                                                height: 'auto',
-                                                            }}
-                                                        />
+                                                {manufacturingImageFile.hospitalRegistrationCertificate && (
+                                                    <div style={{ marginTop: '5%', border: '1px solid #ddd', padding: '10px', borderRadius: '5px' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                            <div>
+                                                                <Typography variant="body2" sx={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                                                                    {allData.files.hospitalRegistrationCertificate?.fileName || 'Hospital Registration Certificate'}
+                                                                </Typography>
+                                                                {allData.files.hospitalRegistrationCertificate?.size && (
+                                                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                                                        Size: {formatFileSize(allData.files.hospitalRegistrationCertificate.size)}
+                                                                    </Typography>
+                                                                )}
+                                                            </div>
+                                                            <Button
+                                                                size="small"
+                                                                variant="outlined"
+                                                                color="error"
+                                                                onClick={() => removeFile('hospitalRegistrationCertificate')}
+                                                                sx={{ minWidth: 'auto', padding: '4px 8px' }}
+                                                            >
+                                                                Remove
+                                                            </Button>
+                                                        </div>
                                                     </div>
                                                 )}
+                                                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', marginTop: '5px' }}>
+                                                    Note: Maximum file size allowed is 10MB
+                                                </Typography>
                                             </Grid>
                                             <Grid item size={6}>
                                                 <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof</Typography>
@@ -615,22 +773,37 @@ const Details = () => {
                                                     Upload
                                                     <VisuallyHiddenInput
                                                         type="file"
-                                                        accept="image/png, image/jpeg"
                                                         onChange={(e) => handleAdditionalFileChange(e, 'hospitalAddressProof')}
                                                     />
                                                 </Button>
-                                                {manufacturingImage.hospitalAddressProof && (
-                                                    <div style={{ marginTop: '5%' }}>
-                                                        <img
-                                                            src={manufacturingImage.hospitalAddressProof}
-                                                            alt="Hospital Address Proof"
-                                                            style={{
-                                                                width: '200px',
-                                                                height: 'auto',
-                                                            }}
-                                                        />
+                                                {manufacturingImageFile.hospitalAddressProof && (
+                                                    <div style={{ marginTop: '5%', border: '1px solid #ddd', padding: '10px', borderRadius: '5px' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                            <div>
+                                                                <Typography variant="body2" sx={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                                                                    {allData.files.hospitalAddressProof?.fileName || 'Hospital Address Proof'}
+                                                                </Typography>
+                                                                {allData.files.hospitalAddressProof?.size && (
+                                                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                                                        Size: {formatFileSize(allData.files.hospitalAddressProof.size)}
+                                                                    </Typography>
+                                                                )}
+                                                            </div>
+                                                            <Button
+                                                                size="small"
+                                                                variant="outlined"
+                                                                color="error"
+                                                                onClick={() => removeFile('hospitalAddressProof')}
+                                                                sx={{ minWidth: 'auto', padding: '4px 8px' }}
+                                                            >
+                                                                Remove
+                                                            </Button>
+                                                        </div>
                                                     </div>
                                                 )}
+                                                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', marginTop: '5px' }}>
+                                                    Note: Maximum file size allowed is 10MB
+                                                </Typography>
                                             </Grid>
                                         </>
                                     )}
@@ -644,6 +817,7 @@ const Details = () => {
                                                     size="small"
                                                     value={allData.additionalInformation.find(item => item.name === 'pathologyName')?.value || ''}
                                                     onChange={(e) => handleAdditionalInfoChange('pathologyName', e.target.value)}
+                                                    placeholder="Enter pathology lab name"
                                                 />
                                             </Grid>
                                             <Grid item size={6}>
@@ -658,22 +832,37 @@ const Details = () => {
                                                     Upload
                                                     <VisuallyHiddenInput
                                                         type="file"
-                                                        accept="image/png, image/jpeg"
                                                         onChange={(e) => handleAdditionalFileChange(e, 'labRegistrationCertificate')}
                                                     />
                                                 </Button>
-                                                {manufacturingImage.labRegistrationCertificate && (
-                                                    <div style={{ marginTop: '5%' }}>
-                                                        <img
-                                                            src={manufacturingImage.labRegistrationCertificate}
-                                                            alt="Lab Registration Certificate"
-                                                            style={{
-                                                                width: '200px',
-                                                                height: 'auto',
-                                                            }}
-                                                        />
+                                                {manufacturingImageFile.labRegistrationCertificate && (
+                                                    <div style={{ marginTop: '5%', border: '1px solid #ddd', padding: '10px', borderRadius: '5px' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                            <div>
+                                                                <Typography variant="body2" sx={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                                                                    {allData.files.labRegistrationCertificate?.fileName || 'Lab Registration Certificate'}
+                                                                </Typography>
+                                                                {allData.files.labRegistrationCertificate?.size && (
+                                                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                                                        Size: {formatFileSize(allData.files.labRegistrationCertificate.size)}
+                                                                    </Typography>
+                                                                )}
+                                                            </div>
+                                                            <Button
+                                                                size="small"
+                                                                variant="outlined"
+                                                                color="error"
+                                                                onClick={() => removeFile('labRegistrationCertificate')}
+                                                                sx={{ minWidth: 'auto', padding: '4px 8px' }}
+                                                            >
+                                                                Remove
+                                                            </Button>
+                                                        </div>
                                                     </div>
                                                 )}
+                                                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', marginTop: '5px' }}>
+                                                    Note: Maximum file size allowed is 10MB
+                                                </Typography>
                                             </Grid>
                                             <Grid item size={6}>
                                                 <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Identity Proof</Typography>
@@ -683,6 +872,7 @@ const Details = () => {
                                                     size="small"
                                                     value={allData.additionalInformation.find(item => item.name === 'pathologyIdentityProof')?.value || ''}
                                                     onChange={(e) => handleAdditionalInfoChange('pathologyIdentityProof', e.target.value)}
+                                                    placeholder="Enter identity proof number"
                                                 />
                                             </Grid>
                                             <Grid item size={6}>
@@ -701,18 +891,34 @@ const Details = () => {
                                                         onChange={(e) => handleAdditionalFileChange(e, 'pathologyAddressProof')}
                                                     />
                                                 </Button>
-                                                {manufacturingImage.pathologyAddressProof && (
-                                                    <div style={{ marginTop: '5%' }}>
-                                                        <img
-                                                            src={manufacturingImage.pathologyAddressProof}
-                                                            alt="Pathology Address Proof"
-                                                            style={{
-                                                                width: '200px',
-                                                                height: 'auto',
-                                                            }}
-                                                        />
+                                                {manufacturingImageFile.pathologyAddressProof && (
+                                                    <div style={{ marginTop: '5%', border: '1px solid #ddd', padding: '10px', borderRadius: '5px' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                            <div>
+                                                                <Typography variant="body2" sx={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                                                                    {allData.files.pathologyAddressProof?.fileName || 'Pathology Address Proof'}
+                                                                </Typography>
+                                                                {allData.files.pathologyAddressProof?.size && (
+                                                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                                                        Size: {formatFileSize(allData.files.pathologyAddressProof.size)}
+                                                                    </Typography>
+                                                                )}
+                                                            </div>
+                                                            <Button
+                                                                size="small"
+                                                                variant="outlined"
+                                                                color="error"
+                                                                onClick={() => removeFile('pathologyAddressProof')}
+                                                                sx={{ minWidth: 'auto', padding: '4px 8px' }}
+                                                            >
+                                                                Remove
+                                                            </Button>
+                                                        </div>
                                                     </div>
                                                 )}
+                                                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', marginTop: '5px' }}>
+                                                    Note: Maximum file size allowed is 10MB
+                                                </Typography>
                                             </Grid>
                                         </>
                                     )}
@@ -755,6 +961,7 @@ const Details = () => {
                                                     size="small"
                                                     value={allData.additionalInformation.find(item => item.name === 'diagnosticIdentityProof')?.value || ''}
                                                     onChange={(e) => handleAdditionalInfoChange('diagnosticIdentityProof', e.target.value)}
+                                                    placeholder="Enter identity proof number"
                                                 />
                                             </Grid>
                                             <Grid item size={6}>
@@ -918,6 +1125,7 @@ const Details = () => {
                                                     size="small"
                                                     value={allData.additionalInformation.find(item => item.name === 'rehabIdentityProof')?.value || ''}
                                                     onChange={(e) => handleAdditionalInfoChange('rehabIdentityProof', e.target.value)}
+                                                    placeholder="Enter identity proof number"
                                                 />
                                             </Grid>
                                             <Grid item size={6}>
@@ -1039,6 +1247,65 @@ const Details = () => {
                                                         />
                                                     </div>
                                                 )}
+                                            </Grid>
+                                        </>
+                                    )}
+                                    {labelChanges === "Student" && (
+                                        <>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Student ID</Typography>
+                                                <TextField 
+                                                    fullWidth 
+                                                    id="studentId" 
+                                                    size="small"
+                                                    value={allData.additionalInformation.find(item => item.name === 'studentId')?.value || ''}
+                                                    onChange={(e) => handleAdditionalInfoChange('studentId', e.target.value)}
+                                                    placeholder="Enter your student ID"
+                                                />
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Student ID Card</Typography>
+                                                <Button
+                                                    sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                    component="label"
+                                                    variant="contained"
+                                                    tabIndex={-1}
+                                                    startIcon={<CloudUploadIcon />}
+                                                >
+                                                    Upload
+                                                    <VisuallyHiddenInput
+                                                        type="file"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'studentIdCard')}
+                                                    />
+                                                </Button>
+                                                {manufacturingImageFile.studentIdCard && (
+                                                    <div style={{ marginTop: '5%', border: '1px solid #ddd', padding: '10px', borderRadius: '5px' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                            <div>
+                                                                <Typography variant="body2" sx={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                                                                    {allData.files.studentIdCard?.fileName || 'Student ID Card'}
+                                                                </Typography>
+                                                                {allData.files.studentIdCard?.size && (
+                                                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                                                        Size: {formatFileSize(allData.files.studentIdCard.size)}
+                                                                    </Typography>
+                                                                )}
+                                                            </div>
+                                                            <Button
+                                                                size="small"
+                                                                variant="outlined"
+                                                                color="error"
+                                                                onClick={() => removeFile('studentIdCard')}
+                                                                sx={{ minWidth: 'auto', padding: '4px 8px' }}
+                                                            >
+                                                                Remove
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', marginTop: '5px' }}>
+                                                    Note: Maximum file size allowed is 10MB
+                                                </Typography>
                                             </Grid>
                                         </>
                                     )}
