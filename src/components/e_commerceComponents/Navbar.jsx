@@ -69,7 +69,7 @@ const Navbar = () => {
     if (isLoggedIn) {
       setAnchorEl(event.currentTarget);
     } else {
-      navigate("/login");
+      navigate("/");
     }
   };
 
@@ -89,7 +89,7 @@ const Navbar = () => {
     sessionStorage.removeItem("userType");
     setUserInfo(null);
     setIsLoggedIn(false);
-    navigate("/login");
+    navigate("/");
   };
 
   return (

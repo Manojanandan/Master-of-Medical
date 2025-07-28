@@ -26,6 +26,7 @@ import AboutUs from "./pages/eCommerce/AboutUs.jsx";
 import Blog from "./pages/eCommerce/Blog.jsx";
 import VendorLayout from './pages/vendor/dashboard/index.jsx'
 import ProtectedRoute from "./pages/routes/ProtectedRoute.jsx";
+import PendingStatusRoute from "./pages/routes/PendingStatusRoute.jsx";
 import Overview from "./pages/vendor/pages/Overview.jsx";
 import Orders from "./pages/vendor/pages/Orders.jsx";
 import Profile from "./pages/vendor/pages/Customers.jsx";
@@ -33,6 +34,9 @@ import AddProduct from "./pages/vendor/pages/AddProduct.jsx";
 import VendorProductDetail from "./pages/vendor/pages/ProductDetail.jsx";
 import ForgotPassword from "./pages/login/forgotPassword/ForgotPassword.jsx";
 import ThankYou from "./pages/eCommerce/ThankYou.jsx";
+import UserEditProfile from "./pages/user/EditProfile.jsx";
+import VendorEditProfile from "./pages/vendor/EditProfile.jsx";
+import AuthRedirect from "./components/AuthRedirect.jsx";
 
 const App = () => {
   // Use the scroll to top hook
@@ -44,9 +48,12 @@ const App = () => {
       {/* <Navbar /> */}
       <Routes>
         <Route path="/" element={
-          <AnimatedPage animationType="fade" timeout={1000}>
-            <LandingHomepage />
-          </AnimatedPage>
+          <>
+            <AuthRedirect />
+            <AnimatedPage animationType="fade" timeout={1000}>
+              <LandingHomepage />
+            </AnimatedPage>
+          </>
         } />
         <Route path="/signup" element={
           <AnimatedPage animationType="slide" direction="up" timeout={600}>
@@ -74,74 +81,74 @@ const App = () => {
           </AnimatedPage>
         } />
         {/* E-Commerce Route */}
-        <Route exact path="/ecommerceDashboard" element={<EcommerceLayout />}>
-          {/* <Route element={<ProtectedRoute />}> */}
-          <Route path="/ecommerceDashboard" element={
-            <AnimatedPage animationType="fade" timeout={800}>
-              <EcommerceHomePage />
-            </AnimatedPage>
-          } />
-          <Route path="/ecommerceDashboard/products" element={
-            <AnimatedPage animationType="slide" direction="up" timeout={600}>
-              <Products />
-            </AnimatedPage>
-          } />
-          <Route path="/ecommerceDashboard/product/:id" element={
-            <AnimatedPage animationType="zoom" timeout={700}>
-              <ProductDetail />
-            </AnimatedPage>
-          } />
-          <Route path="/ecommerceDashboard/contact" element={
-            <AnimatedPage animationType="slide" direction="left" timeout={600}>
-              <Contact />
-            </AnimatedPage>
-          } />
-          <Route path="/ecommerceDashboard/cart" element={
-            <AnimatedPage animationType="slide" direction="right" timeout={600}>
-              <Cart />
-            </AnimatedPage>
-          } />
-          <Route path="/ecommerceDashboard/checkout" element={
-            <AnimatedPage animationType="grow" timeout={800}>
-              <Checkout />
-            </AnimatedPage>
-          } />
-          <Route path="/ecommerceDashboard/profile" element={
-            <AnimatedPage animationType="fade" timeout={1000}>
-              <CustomerProfile />
-            </AnimatedPage>
-          } />
-          <Route path="/ecommerceDashboard/faq" element={
-            <AnimatedPage animationType="slide" direction="up" timeout={600}>
-              <FAQ />
-            </AnimatedPage>
-          } />
-          <Route path="/ecommerceDashboard/cookiesPolicy" element={
-            <AnimatedPage animationType="slide" direction="left" timeout={600}>
-              <CookiesPolicy />
-            </AnimatedPage>
-          } />
-          <Route path="/ecommerceDashboard/orderTracking" element={
-            <AnimatedPage animationType="slide" direction="up" timeout={600}>
-              <OrderTracking />
-            </AnimatedPage>
-          } />
-          <Route path="/ecommerceDashboard/about-us" element={
-            <AnimatedPage animationType="slide" direction="up" timeout={600}>
-              <AboutUs />
-            </AnimatedPage>
-          } />
-          <Route path="/ecommerceDashboard/blog" element={
-            <AnimatedPage animationType="slide" direction="up" timeout={600}>
-              <Blog />
-            </AnimatedPage>
-          } />
-          <Route path="/ecommerceDashboard/thankyou" element={
-            <AnimatedPage animationType="zoom" timeout={800}>
-              <ThankYou />
-            </AnimatedPage>
-          } />
-          {/* </Route> */}
+        <Route path="/ecommerceDashboard" element={<EcommerceLayout />}>
+          <Route element={<PendingStatusRoute />}>
+            <Route index element={
+              <AnimatedPage animationType="fade" timeout={800}>
+                <EcommerceHomePage />
+              </AnimatedPage>
+            } />
+            <Route path="products" element={
+              <AnimatedPage animationType="slide" direction="up" timeout={600}>
+                <Products />
+              </AnimatedPage>
+            } />
+            <Route path="product/:id" element={
+              <AnimatedPage animationType="zoom" timeout={700}>
+                <ProductDetail />
+              </AnimatedPage>
+            } />
+            <Route path="contact" element={
+              <AnimatedPage animationType="slide" direction="left" timeout={600}>
+                <Contact />
+              </AnimatedPage>
+            } />
+            <Route path="cart" element={
+              <AnimatedPage animationType="slide" direction="right" timeout={600}>
+                <Cart />
+              </AnimatedPage>
+            } />
+            <Route path="checkout" element={
+              <AnimatedPage animationType="grow" timeout={800}>
+                <Checkout />
+              </AnimatedPage>
+            } />
+            <Route path="profile" element={
+              <AnimatedPage animationType="fade" timeout={1000}>
+                <CustomerProfile />
+              </AnimatedPage>
+            } />
+            <Route path="faq" element={
+              <AnimatedPage animationType="slide" direction="up" timeout={600}>
+                <FAQ />
+              </AnimatedPage>
+            } />
+            <Route path="cookiesPolicy" element={
+              <AnimatedPage animationType="slide" direction="left" timeout={600}>
+                <CookiesPolicy />
+              </AnimatedPage>
+            } />
+            <Route path="orderTracking" element={
+              <AnimatedPage animationType="slide" direction="up" timeout={600}>
+                <OrderTracking />
+              </AnimatedPage>
+            } />
+            <Route path="about-us" element={
+              <AnimatedPage animationType="slide" direction="up" timeout={600}>
+                <AboutUs />
+              </AnimatedPage>
+            } />
+            <Route path="blog" element={
+              <AnimatedPage animationType="slide" direction="up" timeout={600}>
+                <Blog />
+              </AnimatedPage>
+            } />
+            <Route path="thankyou" element={
+              <AnimatedPage animationType="zoom" timeout={800}>
+                <ThankYou />
+              </AnimatedPage>
+            } />
+          </Route>
         </Route>
         
         {/* Global Routes - Accessible from anywhere */}
@@ -155,14 +162,28 @@ const App = () => {
             <PrivacyPolicy />
           </AnimatedPage>
         } />
+        
+        {/* Edit Profile Routes - Accessible during pending status */}
+        <Route path="/user/edit-profile" element={
+          <AnimatedPage animationType="fade" timeout={800}>
+            <UserEditProfile />
+          </AnimatedPage>
+        } />
+        <Route path="/vendor/edit-profile" element={
+          <AnimatedPage animationType="fade" timeout={800}>
+            <VendorEditProfile />
+          </AnimatedPage>
+        } />
+        
         {/* Vendor Dashboard */}
         <Route path="/vendorDashboard" element={<VendorLayout />}>
           <Route element={<ProtectedRoute />}>
-            <Route index element={
-              <AnimatedPage animationType="fade" timeout={800}>
-                <Overview />
-              </AnimatedPage>
-            } />
+            <Route element={<PendingStatusRoute />}>
+              <Route index element={
+                <AnimatedPage animationType="fade" timeout={800}>
+                  <Overview />
+                </AnimatedPage>
+              } />
             <Route path="products" element={
               <AnimatedPage animationType="slide" direction="up" timeout={600}>
                 <VendorProducts />
@@ -188,6 +209,7 @@ const App = () => {
                 <Profile />
               </AnimatedPage>
             } />
+            </Route>
           </Route>
         </Route>
     </Routes >

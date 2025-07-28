@@ -221,20 +221,20 @@ const StatusCheck = () => {
     sessionStorage.clear();
     localStorage.removeItem('token');
     
-    // Redirect to login
-    window.location.href = '/login';
+    // Redirect to main home page
+    window.location.href = '/';
   };
 
   const handleEditProfile = () => {
     // Close the popup
     setShowPopup(false);
     
-    // Navigate to profile page based on user type
+    // Navigate to edit profile page based on user type
     const userType = sessionStorage.getItem('userType');
     if (userType === 'vendor') {
-      navigate('/vendorDashboard/profile');
+      navigate('/vendor/edit-profile');
     } else {
-      navigate('/ecommerceDashboard/profile');
+      navigate('/user/edit-profile');
     }
   };
 
@@ -299,15 +299,21 @@ const StatusCheck = () => {
                 <li>Our admin team will review your account and verify</li>
                 <li>You'll receive an approval status within 24-48 hours</li>
                 <li>Once approved, you can access all features of the platform</li>
+                <li>For immediate approval, please contact our support team at +91 00000 00000</li>
               </ul>
             </div>
 
-            {/* Review Status Note */}
-            <div className="review-status-note">
-              <Typography variant="body2" className="review-note-text">
-                Your account is currently pending approval our admin will review you submitted details. This process usually takes 4 - 48 hours
-              </Typography>
-            </div>
+            {/* Review Status Note - Only show if there are remarks */}
+            {userData?.remarks && userData.remarks.trim() !== '' && (
+              <div className="review-status-note">
+                <Typography variant="h6" className="review-status-note-title" sx={{ marginBottom: '10px', fontWeight: 'bold' }}>
+                  Review Status Note
+                </Typography>
+                <Typography variant="body2" className="review-note-text">
+                  {userData.remarks}
+                </Typography>
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="action-buttons">
