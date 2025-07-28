@@ -20,7 +20,7 @@ import Termsofuse from "./pages/eCommerce/termsCondition/Termsofuse.jsx";
 import PrivacyPolicy from "./pages/eCommerce/privacyPolicy/PrivacyPolicy.jsx";
 import CookiesPolicy from "./pages/eCommerce/cookiesPolicy/CookiesPolicy.jsx";
 import OrderTracking from "./pages/eCommerce/orderTracking/OrderTracking.jsx";
-import ProductDetail from "./pages/eCommerce/ProductDetail.jsx";
+import ProductDetail from './pages/eCommerce/ProductDetail.jsx';
 import CustomerProfile from "./pages/eCommerce/Profile.jsx";
 import AboutUs from "./pages/eCommerce/AboutUs.jsx";
 import Blog from "./pages/eCommerce/Blog.jsx";

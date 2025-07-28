@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+
 import { FaUserMd, FaStethoscope, FaAmbulance, FaPhone, FaMapMarkerAlt, FaClock, FaHeart, FaBrain, FaChild, FaBone, FaSyringe, FaHandHoldingMedical } from 'react-icons/fa';
 
 const API_KEY = 'Tk21ap3mVHhetx3KKpWGfO9jLeiEomY7vOhYH9WlwU86JxyCptwJjnHv'; // Replace with your actual Pexels API key
