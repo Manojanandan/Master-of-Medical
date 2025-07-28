@@ -238,7 +238,7 @@ const Checkout = () => {
 
       if (response.data.success) {
         // Navigate to thank you page
-        navigate("/ecommerceDashboard/thankyou", {
+        navigate("/customer/order-success", {
           state: { orderId: response.data.orderId },
         });
       } else {
@@ -283,7 +283,7 @@ const Checkout = () => {
           <Button
             variant="outlined"
             sx={{ mt: 2 }}
-            onClick={() => navigate("/loginform")}
+            onClick={() => navigate("/auth/login")}
           >
             Go to Login
           </Button>
@@ -317,7 +317,7 @@ const Checkout = () => {
         <Button
           variant="contained"
           size="large"
-          onClick={() => navigate("/ecommerceDashboard")}
+                      onClick={() => navigate("/customer")}
           sx={{
             borderRadius: 2,
             px: 4,
@@ -741,7 +741,7 @@ const Checkout = () => {
                   variant="outlined"
                   fullWidth
                   size="large"
-                  onClick={() => navigate("/ecommerceDashboard")}
+                  onClick={() => navigate("/customer")}
                   sx={{
                     mt: 2,
                     borderRadius: 2,

@@ -69,11 +69,11 @@ const LandingNavbar = () => {
                             Reach Us</Typography></Link>
                     </Stack>
                     <Stack direction='row' spacing={3}>
-                        <Box sx={{ height: '50px', width: '150px', borderBottom: 'solid 1.8px #c5225f', display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', cursor: 'pointer' }} onClick={() => { navigate('/signup'), sessionStorage.setItem("userType", "user") }}>
+                        <Box sx={{ height: '50px', width: '150px', borderBottom: 'solid 1.8px #c5225f', display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', cursor: 'pointer' }} onClick={() => { navigate('/auth/register'), sessionStorage.setItem("userType", "user") }}>
                             <LocalMallIcon sx={{ color: 'black', fontSize: '1.6rem' }} />
                             <Typography variant='span' component='div' sx={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'black', marginTop: '5px' }}>SHOP NOW</Typography>
                         </Box>
-                        <Box sx={{ height: '50px', width: '160px', borderBottom: 'solid 1.8px #009e92', display: 'flex', justifyContent: 'space-around', alignItems: 'center', cursor: 'pointer' }} onClick={() => { navigate('/signup'), sessionStorage.setItem("userType", "vendor") }}>
+                        <Box sx={{ height: '50px', width: '160px', borderBottom: 'solid 1.8px #009e92', display: 'flex', justifyContent: 'space-around', alignItems: 'center', cursor: 'pointer' }} onClick={() => { navigate('/auth/register'), sessionStorage.setItem("userType", "vendor") }}>
                             <EnhancedEncryptionIcon sx={{ color: 'black', fontSize: '1.8rem' }} />
                             <Typography variant='span' component='div' sx={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'black', marginTop: '5px' }}>BE A SELLER</Typography>
                         </Box>

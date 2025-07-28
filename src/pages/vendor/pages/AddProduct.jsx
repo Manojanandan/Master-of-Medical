@@ -295,7 +295,7 @@ const AddProduct = () => {
         <Button 
           startIcon={<ArrowBackIosNewIcon />} 
           sx={{ color: '#222', fontWeight: 600, textTransform: 'uppercase', fontSize: 13, pl: 0 }}
-          onClick={() => navigate('/vendorDashboard/products')}
+          onClick={() => navigate('/vendor/products')}
         >
           Back
         </Button>

@@ -70,9 +70,9 @@ const LoginForm = () => {
             setOpenModal(true);
             setTimeout(() => {
                 if (type === 'vendor') {
-                    navigate("/vendorDashboard");
+                    navigate("/vendor");
                 } else {
-                    navigate("/ecommerceDashboard");
+                    navigate("/customer");
                 }
             }, 1000);
         } else if (message && !success) {
@@ -133,7 +133,7 @@ const LoginForm = () => {
         }}>
             {/* Back Button */}
             <Box 
-                onClick={() => navigate('/signup')} 
+                onClick={() => navigate('/auth/register')} 
                 sx={{
                     display: 'flex',
                     alignItems: 'center',
@@ -200,7 +200,7 @@ const LoginForm = () => {
                         <Typography variant="body1" sx={{ color: 'text.secondary' }}>
                             Don't have an account?{' '}
                             <Link 
-                                to="/signup" 
+                                to="/auth/register" 
                                 style={{ 
                                     color: '#009e92',
                                     fontWeight: '600',
@@ -280,7 +280,7 @@ const LoginForm = () => {
                             {/* Forgot Password Link */}
                             <Box sx={{ textAlign: 'right' }}>
                                 <Link 
-                                    to="/forgotpassword"
+                                    to="/auth/forgot-password"
                                     style={{ 
                                         color: '#009e92',
                                         textDecoration: 'none',

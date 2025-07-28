@@ -12,9 +12,9 @@ const AuthRedirect = () => {
       if (jwt && userType) {
         // User is logged in, redirect to appropriate dashboard
         if (userType === 'user' || userType === 'customer') {
-          navigate('/ecommerceDashboard');
+          navigate('/customer');
         } else if (userType === 'vendor') {
-          navigate('/vendorDashboard');
+          navigate('/vendor');
         }
       }
       // If not logged in, stay on the landing page

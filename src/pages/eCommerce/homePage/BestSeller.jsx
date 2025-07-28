@@ -19,7 +19,7 @@ const BestSeller = () => {
   
   // Handle product click navigation
   const handleProductClick = (productId) => {
-    navigate(`/ecommerceDashboard/product/${productId}`);
+    navigate(`/customer/products/${productId}`);
   };
   
   // Fetch cart data when component mounts

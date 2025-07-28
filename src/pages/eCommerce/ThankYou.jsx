@@ -48,12 +48,12 @@ const ThankYou = () => {
 
   const handleContinueShopping = () => {
     setLoading(true);
-    navigate('/ecommerceDashboard');
+            navigate('/customer');
   };
 
   const handleViewOrders = () => {
     setLoading(true);
-    navigate('/ecommerceDashboard/profile');
+            navigate('/customer/profile');
   };
 
   const handleGoHome = () => {

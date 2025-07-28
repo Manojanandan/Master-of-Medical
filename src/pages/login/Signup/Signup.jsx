@@ -131,7 +131,7 @@ const Signup = () => {
             sessionStorage.setItem("tempUserData", JSON.stringify(userData));
             
             // Redirect to details page
-            navigate('/details');
+            navigate('/auth/complete-profile');
             
         } catch (error) {
             console.error("Signup error:", error);
@@ -190,7 +190,7 @@ const Signup = () => {
                         <Typography variant="body1" sx={{ color: 'text.secondary' }}>
                             Already have an account?{' '}
                             <Link 
-                                to="/login" 
+                                to="/auth/login" 
                                 style={{ 
                                     color: '#009e92',
                                     fontWeight: '600',
@@ -336,7 +336,7 @@ const Signup = () => {
                                         >
                                             I agree to the{' '}
                                             <Link 
-                                                to="/termsofuse" 
+                                                to="/legal/terms-of-use" 
                                                 target="_blank"
                                                 style={{ 
                                                     color: '#009e92',
@@ -348,7 +348,7 @@ const Signup = () => {
                                             </Link>{' '}
                                             and{' '}
                                             <Link 
-                                                to="/privacyPolicy" 
+                                                to="/legal/privacy-policy" 
                                                 target="_blank"
                                                 style={{ 
                                                     color: '#009e92',

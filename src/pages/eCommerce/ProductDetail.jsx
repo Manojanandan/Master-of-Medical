@@ -282,7 +282,7 @@ const ProductDetail = () => {
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Button
           startIcon={<ArrowBack />}
-          onClick={() => navigate('/ecommerceDashboard')}
+          onClick={() => navigate('/customer')}
           sx={{ mb: 3, color: 'text.secondary' }}
         >
           Back to Products
@@ -300,7 +300,7 @@ const ProductDetail = () => {
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Button
           startIcon={<ArrowBack />}
-          onClick={() => navigate('/ecommerceDashboard')}
+          onClick={() => navigate('/customer')}
           sx={{ mb: 3, color: 'text.secondary' }}
         >
           Back to Products
@@ -319,7 +319,7 @@ const ProductDetail = () => {
       {/* Back to Products Button */}
       {/* <Button
         startIcon={<ArrowBack />}
-        onClick={() => navigate('/ecommerceDashboard')}
+        onClick={() => navigate('/customer')}
         sx={{ mb: 3, color: 'text.secondary' }}
       >
         Back to Products
@@ -582,7 +582,7 @@ const ProductDetail = () => {
               variant="outlined"
               size="large"
               fullWidth
-              onClick={() => navigate('/ecommerceDashboard/cart')}
+              onClick={() => navigate('/customer/cart')}
               sx={{ mb: 2 }}
             >
               View Cart ({cart.totalItems} items)

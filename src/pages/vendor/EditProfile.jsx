@@ -19,6 +19,8 @@ import { useNavigate } from 'react-router-dom';
 import { CloudUpload } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import instance from '../../utils/Instance';
+import { getVendorProfile, updateVendorProfile } from '../../utils/Service';
+import { getUserInfoFromToken } from '../../utils/jwtUtils';
 import { CountrySelect, StateSelect, CitySelect } from "react-country-state-city";
 import "react-country-state-city/dist/react-country-state-city.css";
 import "../../styles/countryStateCity.css";
@@ -127,6 +129,8 @@ const EditProfile = () => {
     cfAuthorization: "",
   });
   const [featureImage, setFeatureImage] = useState(null);
+  const [labelChanges, setLabelChanges] = useState("");
+  const type = sessionStorage.getItem("userType");
 
   useEffect(() => {
     fetchVendorData();
@@ -141,7 +145,34 @@ const EditProfile = () => {
         return;
       }
 
-      const response = await instance.get('/api/vendor/profile');
+      // Debug: Check what's stored in session storage
+      const vendorDataFromSession = sessionStorage.getItem('userData');
+      console.log('Vendor data from session storage:', vendorDataFromSession);
+      if (vendorDataFromSession) {
+        try {
+          const parsedVendorData = JSON.parse(vendorDataFromSession);
+          console.log('Parsed vendor data from session:', parsedVendorData);
+        } catch (e) {
+          console.error('Error parsing vendor data from session:', e);
+        }
+      }
+
+      const userInfo = getUserInfoFromToken();
+      console.log('Vendor info from JWT:', userInfo);
+      console.log('JWT token:', jwt);
+      
+      if (!userInfo || !userInfo.id) {
+        console.error('Vendor information not found in JWT:', userInfo);
+        setMessage('Vendor information not found');
+        setSeverity('error');
+        setShowMessage(true);
+        return;
+      }
+      
+      console.log('Fetching vendor data for ID:', userInfo.id);
+      const response = await getVendorProfile(userInfo.id);
+      console.log('Vendor API response:', response);
+      
       if (response.data.success) {
         const data = response.data.data;
         setVendorData(data);
@@ -168,6 +199,11 @@ const EditProfile = () => {
           userName: data.userName || ''
         });
 
+        // Set the vendor type selection based on existing type
+        if (data.vendorType) {
+          setLabelChanges(data.vendorType);
+        }
+
         // Set country, state, city for dropdowns
         if (data.country) {
           setCountry({ name: data.country });
@@ -190,15 +226,103 @@ const EditProfile = () => {
           });
           setManufacturingImageFile(existingFiles);
         }
+      } else {
+        console.error('API returned error:', response.data);
+        setMessage(response.data.message || 'Failed to load vendor data');
+        setSeverity('error');
+        setShowMessage(true);
       }
     } catch (error) {
       console.error('Error fetching vendor data:', error);
+      console.error('Error response:', error.response);
       setMessage('Failed to load vendor data');
       setSeverity('error');
       setShowMessage(true);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Handle vendor type selection
+  const handleUserTypeChange = (userType) => {
+    setLabelChanges(userType);
+    setAllData({ ...allData, vendorType: userType });
+  };
+
+  // Handle additional information changes
+  const handleAdditionalInfoChange = (fieldName, value) => {
+    setAllData(prev => ({
+      ...prev,
+      additionalInformation: prev.additionalInformation.map(item => 
+        item.field === fieldName ? { ...item, value } : item
+      )
+    }));
+  };
+
+  // Handle additional file changes
+  const handleAdditionalFileChange = (event, fieldName) => {
+    const file = event.target.files[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
+        setMessage('File size must be less than 10MB');
+        setSeverity('error');
+        setShowMessage(true);
+        return;
+      }
+      
+      setAllData(prev => ({
+        ...prev,
+        files: {
+          ...prev.files,
+          [fieldName]: {
+            file: file,
+            name: file.name,
+            type: file.type,
+            size: file.size
+          }
+        }
+      }));
+    }
+  };
+
+  // Get file type name for display
+  const getFileTypeName = (fieldName) => {
+    const fileTypeNames = {
+      mdmLicense: "MDM License",
+      gst: "GST Certificate",
+      bis: "BIS Certificate",
+      iso: "ISO Certificate",
+      loanLicense: "Loan License",
+      establishmentProof: "Establishment Proof",
+      dl: "Drug License",
+      fda: "FDA Certificate",
+      cfDL: "CF Drug License",
+      cfGumasta: "CF Gumasta",
+      cfGst: "CF GST Certificate",
+      cfEstablishmentProof: "CF Establishment Proof",
+      cfAuthorization: "CF Authorization"
+    };
+    return fileTypeNames[fieldName] || fieldName;
+  };
+
+  // Remove file
+  const removeFile = (fieldName) => {
+    setAllData(prev => ({
+      ...prev,
+      files: {
+        ...prev.files,
+        [fieldName]: null
+      }
+    }));
+  };
+
+  // Format file size
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   const handleChange = (e) => {
@@ -319,9 +443,23 @@ const EditProfile = () => {
       try {
         setLoading(true);
         
+        // Get user info from token
+        const userInfo = getUserInfoFromToken();
+        if (!userInfo || !userInfo.id) {
+          setMessage('Vendor information not found');
+          setSeverity('error');
+          setShowMessage(true);
+          return;
+        }
+        
         // Prepare form data
         const formData = new FormData();
         const address = `${allData.addressLine1}, ${allData.addressLine2}`;
+        
+        // Append vendor ID
+        formData.append('id', userInfo.id);
+        console.log('Sending vendor ID to API:', userInfo.id);
+        
         formData.append('address', address);
         formData.append('phone', allData.number);
         formData.append('city', allData.city);
@@ -341,7 +479,7 @@ const EditProfile = () => {
           formData.append('files', file);
         });
 
-        const response = await instance.put('/api/vendor/profile', formData);
+        const response = await updateVendorProfile(formData);
         
         if (response.data.success) {
           setMessage('Profile updated successfully!');
@@ -350,11 +488,11 @@ const EditProfile = () => {
           
           // Update session storage with new data
           const updatedVendorData = response.data.data;
-          sessionStorage.setItem('vendorData', JSON.stringify(updatedVendorData));
+          sessionStorage.setItem('userData', JSON.stringify(updatedVendorData));
           
-          // Navigate back to status check
+          // Navigate to vendor dashboard after successful update
           setTimeout(() => {
-            navigate('/status-check');
+            navigate('/vendor');
           }, 2000);
         } else {
           setMessage(response.data.message || 'Failed to update profile');

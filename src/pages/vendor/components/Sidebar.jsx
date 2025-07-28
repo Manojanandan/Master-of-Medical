@@ -4,10 +4,10 @@ import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, IconBu
 import { Home, ShoppingCart, ListAlt, People, ExitToApp, Menu as MenuIcon, ChevronLeft } from '@mui/icons-material';
 
 const menuItems = [
-  { text: 'Dashboard', icon: <Home />, path: '/vendorDashboard' },
-  { text: 'Products', icon: <ShoppingCart />, path: '/vendorDashboard/products' },
-  { text: 'Orders', icon: <ListAlt />, path: '/vendorDashboard/orders' },
-  { text: 'Profile', icon: <People />, path: '/vendorDashboard/profile' },
+  { text: 'Dashboard', icon: <Home />, path: '/vendor' },
+  { text: 'Products', icon: <ShoppingCart />, path: '/vendor/products' },
+  { text: 'Orders', icon: <ListAlt />, path: '/vendor/orders' },
+  { text: 'Profile', icon: <People />, path: '/vendor/profile' },
 ];
 
 const Sidebar = ({ collapsed, onToggle, isMobile, mobileOpen }) => {
@@ -44,7 +44,7 @@ const Sidebar = ({ collapsed, onToggle, isMobile, mobileOpen }) => {
               <ListItemButton
                 component={NavLink}
                 to={item.path}
-                end={item.path === '/vendorDashboard'}
+                end={item.path === '/vendor'}
                 sx={{
                   minHeight: 56,
                   justifyContent: (collapsed && !isMobile) ? 'center' : 'initial',

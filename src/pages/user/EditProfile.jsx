@@ -19,6 +19,8 @@ import { useNavigate } from 'react-router-dom';
 import { CloudUpload } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import instance from '../../utils/Instance';
+import { getCustomerById, updateCustomer } from '../../utils/Service';
+import { getUserInfoFromToken } from '../../utils/jwtUtils';
 import { CountrySelect, StateSelect, CitySelect } from "react-country-state-city";
 import "react-country-state-city/dist/react-country-state-city.css";
 import "../../styles/countryStateCity.css";
@@ -112,6 +114,22 @@ const EditProfile = () => {
     cfGst: null,
     cfEstablishmentProof: null,
     cfAuthorization: null,
+    // User-specific file fields
+    hospitalRegistrationCertificate: null,
+    hospitalAddressProof: null,
+    labRegistrationCertificate: null,
+    pathologyAddressProof: null,
+    diagnosticRegistrationCertificate: null,
+    diagnosticAddressProof: null,
+    physioEstablishmentCertificate: null,
+    physioTradeLicense: null,
+    physioAddressProof: null,
+    rehabEstablishmentCertificate: null,
+    rehabAddressProof: null,
+    polyclinicTradeLicense: null,
+    polyclinicClinicalCertificate: null,
+    polyclinicAddressProof: null,
+    studentIdCard: null,
   });
   const [imageType, setImageType] = useState({
     mdmLicense: "",
@@ -143,7 +161,34 @@ const EditProfile = () => {
         return;
       }
 
-      const response = await instance.get('/api/user/profile');
+      // Debug: Check what's stored in session storage
+      const userDataFromSession = sessionStorage.getItem('userData');
+      console.log('User data from session storage:', userDataFromSession);
+      if (userDataFromSession) {
+        try {
+          const parsedUserData = JSON.parse(userDataFromSession);
+          console.log('Parsed user data from session:', parsedUserData);
+        } catch (e) {
+          console.error('Error parsing user data from session:', e);
+        }
+      }
+
+      const userInfo = getUserInfoFromToken();
+      console.log('User info from JWT:', userInfo);
+      console.log('JWT token:', jwt);
+      
+      if (!userInfo || !userInfo.id) {
+        console.error('User information not found in JWT:', userInfo);
+        setMessage('User information not found');
+        setSeverity('error');
+        setShowMessage(true);
+        return;
+      }
+      
+      console.log('Fetching customer data for ID:', userInfo.id);
+      const response = await getCustomerById(userInfo.id);
+      console.log('Customer API response:', response);
+      
       if (response.data.success) {
         const data = response.data.data;
         setUserData(data);
@@ -209,9 +254,15 @@ const EditProfile = () => {
           });
           setManufacturingImageFile(existingFiles);
         }
+      } else {
+        console.error('API returned error:', response.data);
+        setMessage(response.data.message || 'Failed to load user data');
+        setSeverity('error');
+        setShowMessage(true);
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
+      console.error('Error response:', error.response);
       setMessage('Failed to load user data');
       setSeverity('error');
       setShowMessage(true);
@@ -275,6 +326,22 @@ const EditProfile = () => {
       cfGst: null,
       cfEstablishmentProof: null,
       cfAuthorization: null,
+      // User-specific file fields
+      hospitalRegistrationCertificate: null,
+      hospitalAddressProof: null,
+      labRegistrationCertificate: null,
+      pathologyAddressProof: null,
+      diagnosticRegistrationCertificate: null,
+      diagnosticAddressProof: null,
+      physioEstablishmentCertificate: null,
+      physioTradeLicense: null,
+      physioAddressProof: null,
+      rehabEstablishmentCertificate: null,
+      rehabAddressProof: null,
+      polyclinicTradeLicense: null,
+      polyclinicClinicalCertificate: null,
+      polyclinicAddressProof: null,
+      studentIdCard: null,
     });
     setFeatureImage(null);
   };
@@ -503,9 +570,22 @@ const EditProfile = () => {
       try {
         setLoading(true);
         
+        // Get user info from token
+        const userInfo = getUserInfoFromToken();
+        if (!userInfo || !userInfo.id) {
+          setMessage('User information not found');
+          setSeverity('error');
+          setShowMessage(true);
+          return;
+        }
+        
         // Prepare form data
         const formData = new FormData();
         const address = `${allData.addressLine1}, ${allData.addressLine2}`;
+        
+        // Append user ID
+        formData.append('id', userInfo.id);
+        console.log('Sending user ID to API:', userInfo.id);
         
         // Append basic user data
         formData.append('name', allData.fullName);
@@ -532,7 +612,7 @@ const EditProfile = () => {
           }
         });
 
-        const response = await instance.put('/api/user/profile', formData);
+        const response = await updateCustomer(formData);
         
         if (response.data.success) {
           setMessage('Profile updated successfully!');
@@ -543,9 +623,9 @@ const EditProfile = () => {
           const updatedUserData = response.data.data;
           sessionStorage.setItem('userData', JSON.stringify(updatedUserData));
           
-          // Navigate back to status check
+          // Navigate to customer dashboard after successful update
           setTimeout(() => {
-            navigate('/status-check');
+            navigate('/customer');
           }, 2000);
         } else {
           setMessage(response.data.message || 'Failed to update profile');

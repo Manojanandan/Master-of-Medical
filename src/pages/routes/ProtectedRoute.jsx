@@ -7,7 +7,7 @@ const ProtectedRoute = () => {
 
   const AuthToken = sessionStorage.getItem('jwt');
 
-  return AuthToken !== null && AuthToken !== 'undefind' ? <Outlet/> : <Navigate to="/loginform" />;
+  return AuthToken !== null && AuthToken !== 'undefind' ? <Outlet/> : <Navigate to="/auth/login" />;
 };
 
 export default ProtectedRoute;

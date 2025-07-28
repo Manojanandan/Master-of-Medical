@@ -137,7 +137,7 @@ const ForgotPassword = () => {
         try {
             // Simulate API call
             await new Promise(resolve => setTimeout(resolve, 1000));
-            navigate('/login');
+            navigate('/auth/login');
         } finally {
             setLoading(false);
         }
@@ -153,7 +153,7 @@ const ForgotPassword = () => {
         }}>
             {/* Back Button */}
             <Box 
-                onClick={() => navigate('/login')} 
+                onClick={() => navigate('/auth/login')} 
                 sx={{
                     display: 'flex',
                     alignItems: 'center',
@@ -250,7 +250,7 @@ const ForgotPassword = () => {
                     <Typography variant="body2" sx={{ textAlign: 'center', mt: 2 }}>
                         Remember your password?{' '}
                         <Link 
-                            to="/login" 
+                                    to="/auth/login"
                             style={{ 
                                 color: '#009e92',
                                 fontWeight: '600',

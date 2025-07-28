@@ -7,7 +7,7 @@ const TitleSection = ({ title, subTitle }) => {
   const navigate = useNavigate();
 
   const handleViewAll = () => {
-    navigate('/ecommerceDashboard/products');
+    navigate('/customer/products');
   };
 
   return (

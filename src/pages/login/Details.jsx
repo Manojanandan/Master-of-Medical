@@ -163,9 +163,9 @@ const Details = () => {
                 // Trigger login success event to check status immediately
                 triggerLoginSuccess();
                 if (type === "user" || type === "customer") {
-                    navigate("/ecommerceDashboard");
+                    navigate("/customer");
                 } else if (type === "vendor") {
-                    navigate("/vendorDashboard");
+                    navigate("/vendor");
                 }
             }
         }

@@ -17,7 +17,7 @@ const Sidebar = () => {
   };
 
   const handleSubcategoryClick = (subcategoryId) => {
-    navigate(`/ecommerceDashboard/products?subCategory=${subcategoryId}`);
+    navigate(`/customer/products?subCategory=${subcategoryId}`);
   };
 
   // Fetch categories and subcategories

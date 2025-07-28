@@ -83,8 +83,8 @@ const StatusCheck = () => {
   const isProfilePage = () => {
     const currentPath = location.pathname;
     const isProfile = currentPath.includes('/profile') || 
-                     currentPath.includes('/vendorDashboard/profile') || 
-                     currentPath.includes('/ecommerceDashboard/profile');
+                     currentPath.includes('/vendor/profile') || 
+                     currentPath.includes('/customer/profile');
     
     console.log('Profile page check:', { currentPath, isProfile });
     return isProfile;
@@ -232,9 +232,9 @@ const StatusCheck = () => {
     // Navigate to edit profile page based on user type
     const userType = sessionStorage.getItem('userType');
     if (userType === 'vendor') {
-      navigate('/vendor/edit-profile');
+              navigate('/profile/vendor/edit');
     } else {
-      navigate('/user/edit-profile');
+              navigate('/profile/customer/edit');
     }
   };
 
@@ -305,14 +305,14 @@ const StatusCheck = () => {
 
             {/* Review Status Note - Only show if there are remarks */}
             {userData?.remarks && userData.remarks.trim() !== '' && (
-              <div className="review-status-note">
+            <div className="review-status-note">
                 <Typography variant="h6" className="review-status-note-title" sx={{ marginBottom: '10px', fontWeight: 'bold' }}>
                   Review Status Note
                 </Typography>
-                <Typography variant="body2" className="review-note-text">
+              <Typography variant="body2" className="review-note-text">
                   {userData.remarks}
-                </Typography>
-              </div>
+              </Typography>
+            </div>
             )}
 
             {/* Action Buttons */}
