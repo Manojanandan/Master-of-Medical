@@ -38,6 +38,11 @@ body::-webkit-scrollbar {
   border: none !important;
 }
 
+.stsearch-box input:focus-visible{
+  border: none !important;
+  outline: none !important;
+}
+
 .primary-button {
   background-color: var(--primary-button-Color) !important;
 }

@@ -191,7 +191,7 @@ const Products = () => {
   }, []);
 
   const handleProductClick = (productId) => {
-    navigate(`/ecommerceDashboard/product/${productId}`);
+    navigate(`/customer/products/${productId}`);
   };
 
   const handleSearch = (event) => {

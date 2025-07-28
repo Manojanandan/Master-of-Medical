@@ -189,7 +189,7 @@ const CartList = () => {
           variant="contained"
           size="large"
           startIcon={<ArrowBackIcon />}
-          onClick={() => navigate("/ecommerceDashboard")}
+          onClick={() => navigate("/customer")}
           sx={{
             borderRadius: 2,
             px: 4,
@@ -334,7 +334,7 @@ const CartList = () => {
               variant="contained"
               fullWidth
               size="large"
-              onClick={() => navigate("/ecommerceDashboard/checkout")}
+              onClick={() => navigate("/customer/checkout")}
               disabled={displayTotals.totalItems === 0}
               sx={{
                 borderRadius: 2,
@@ -352,7 +352,7 @@ const CartList = () => {
               variant="outlined"
               fullWidth
               size="large"
-              onClick={() => navigate("/ecommerceDashboard")}
+              onClick={() => navigate("/customer")}
               sx={{
                 mt: 2,
                 borderRadius: 2,

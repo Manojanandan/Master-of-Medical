@@ -25,13 +25,11 @@ export default Termsofuse */
 
 import React from 'react';
 import { Box, Typography, Container, Paper } from '@mui/material';
-import BreadCrumbs from '../../../components/e_commerceComponents/BreadCrumbs';
 
 const Termsofuse = () => {
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#f5f5f5', py: 4 }}>
       <Container maxWidth="lg">
-        <BreadCrumbs title="Terms of Use" />
         <Paper elevation={3} sx={{ p: { xs: 3, md: 5 }, mt: 3, borderRadius: 2 }}>
           <Typography
             variant="h4"

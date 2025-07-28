@@ -154,7 +154,7 @@ const Products = () => {
             },
             transition: 'all 0.3s ease-in-out'
           }}
-          onClick={() => navigate('/vendorDashboard/products/add')}
+          onClick={() => navigate('/vendor/products/add')}
         >
           Add Product
         </Button>
@@ -262,7 +262,7 @@ const Products = () => {
               },
               transition: 'all 0.3s ease-in-out'
             }}
-            onClick={() => navigate('/vendorDashboard/products/add')}
+            onClick={() => navigate('/vendor/products/add')}
           >
             Add Your First Product
           </Button>
@@ -465,7 +465,7 @@ const Products = () => {
                       },
                       transition: 'all 0.3s ease-in-out'
                     }}
-                    onClick={() => navigate(`/vendorDashboard/products/${product.id}`)}
+                    onClick={() => navigate(`/vendor/products/${product.id}`)}
                   >
                     View Details
                   </Button>
