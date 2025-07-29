@@ -1,0 +1,95 @@
+/* Global styles for MainLayout */
+.main-layout {
+  font-family: 'Arial', sans-serif;
+  line-height: 1.6;
+  color: #333;
+  overflow-x: hidden;
+}
+
+/* Reset and base styles */
+.main-layout * {
+  box-sizing: border-box;
+}
+
+.main-layout body {
+  margin: 0;
+  padding: 0;
+}
+
+/* Smooth scrolling */
+.main-layout html {
+  scroll-behavior: smooth;
+}
+
+/* Section spacing */
+.main-layout section {
+  position: relative;
+}
+
+/* Button styles */
+.main-layout button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  font-family: inherit;
+}
+
+/* Link styles */
+.main-layout a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Image styles */
+.main-layout img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Container max-width */
+.main-layout .container {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .main-layout .container {
+    padding: 0 1rem;
+  }
+}
+
+/* Animation utilities */
+.main-layout .fade-in {
+  animation: fadeIn 0.6s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Gradient text utility */
+.main-layout .gradient-text {
+  background: linear-gradient(135deg, #ff6b35, #c5225f);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Card hover effects */
+.main-layout .hover-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.main-layout .hover-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+} 

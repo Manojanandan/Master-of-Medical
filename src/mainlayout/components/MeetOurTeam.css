@@ -1,0 +1,221 @@
+.meet-our-team {
+  padding: 4rem 0;
+  background: white;
+}
+
+.team-container {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 3rem;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.title-meet {
+  color: #c5225f;
+  display: inline;
+}
+
+.title-out-team {
+  color: #333;
+  display: inline;
+}
+
+.team-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.team-card {
+  background: linear-gradient(135deg, #c5225f 0%, #ff6b35 50%, #667eea 100%);
+  border-radius: 20px;
+  padding: 0;
+  color: white;
+  transition: transform 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  height: 200px;
+}
+
+.team-card:hover {
+  transform: translateY(-10px);
+}
+
+.card-content {
+  display: flex;
+  height: 100%;
+  position: relative;
+}
+
+.member-info {
+  flex: 1;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+}
+
+.member-name {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+.member-description {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin-bottom: 1rem;
+}
+
+.plus-icon {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  display: flex;
+  opacity: 0.5;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 4rem;
+  color: white;
+  backdrop-filter: blur(5px);
+}
+
+.member-silhouette {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.silhouette {
+  width: 80px;
+  height: 120px;
+  background: #333;
+  border-radius: 40px 40px 0 0;
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.silhouette-1 {
+  /* Male silhouette */
+  width: 70px;
+  height: 110px;
+}
+
+.silhouette-2 {
+  /* Female silhouette with long hair */
+  width: 75px;
+  height: 115px;
+  border-radius: 50px 50px 0 0;
+}
+
+.silhouette-2::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 20px;
+  background: #333;
+  border-radius: 10px;
+}
+
+.silhouette-3 {
+  /* Another male silhouette */
+  width: 72px;
+  height: 112px;
+}
+
+/* Mobile responsive */
+@media (max-width: 1024px) {
+  .team-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .meet-our-team {
+    padding: 3rem 0;
+  }
+  
+  .team-container {
+    padding: 0 1rem;
+  }
+  
+  .section-title {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .team-cards {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  .team-card {
+    padding: 1.5rem;
+  }
+  
+  .avatar-placeholder {
+    width: 100px;
+    height: 100px;
+    font-size: 2.5rem;
+  }
+  
+  .member-name {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-title {
+    font-size: 1.5rem;
+  }
+  
+  .team-cards {
+    max-width: 300px;
+  }
+  
+  .team-card {
+    padding: 1rem;
+  }
+  
+  .avatar-placeholder {
+    width: 80px;
+    height: 80px;
+    font-size: 2rem;
+  }
+  
+  .member-name {
+    font-size: 1.1rem;
+  }
+  
+  .member-title {
+    font-size: 0.9rem;
+  }
+  
+  .member-description {
+    font-size: 0.8rem;
+  }
+} 
