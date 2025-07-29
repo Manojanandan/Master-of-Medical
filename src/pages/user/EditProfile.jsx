@@ -53,7 +53,13 @@ const EditProfile = () => {
   const [userData, setUserData] = useState(null);
   const [labelChanges, setLabelChanges] = useState("");
   const type = sessionStorage.getItem("userType");
-
+  
+  // Add state variables for prefilling
+  const [prefillData, setPrefillData] = useState({
+    country: null,
+    state: null,
+    city: null
+  });
   const [allData, setAllData] = useState({
     addressLine1: "", 
     addressLine2: "", 
@@ -152,6 +158,25 @@ const EditProfile = () => {
     fetchUserData();
   }, []);
 
+  // Handle sequential prefilling of country, state, city
+  useEffect(() => {
+    if (prefillData.country && !country) {
+      setCountry(prefillData.country);
+    }
+  }, [prefillData.country, country]);
+
+  useEffect(() => {
+    if (prefillData.state && country && !currentState) {
+      setCurrentState(prefillData.state);
+    }
+  }, [prefillData.state, country, currentState]);
+
+  useEffect(() => {
+    if (prefillData.city && currentState && !currentCity) {
+      setCurrentCity(prefillData.city);
+    }
+  }, [prefillData.city, currentState, currentCity]);
+
   const fetchUserData = async () => {
     try {
       setLoading(true);
@@ -232,15 +257,13 @@ const EditProfile = () => {
           setLabelChanges(userTypeValue);
         }
 
-        // Set country, state, city for dropdowns
-        if (data.country) {
-          setCountry({ name: data.country });
-        }
-        if (data.state) {
-          setCurrentState({ name: data.state });
-        }
-        if (data.city) {
-          setCurrentCity({ name: data.city });
+        // Store country, state, city data for sequential prefilling
+        if (data.country || data.state || data.city) {
+          setPrefillData({
+            country: data.country ? { name: data.country } : null,
+            state: data.state ? { name: data.state } : null,
+            city: data.city ? { name: data.city } : null
+          });
         }
 
         // Handle existing files if any
@@ -274,6 +297,9 @@ const EditProfile = () => {
   // Handle user type selection
   const handleUserTypeChange = (userType) => {
     setLabelChanges(userType);
+    
+    // Clear error message when user type is selected
+    setErrorMsg({ ...errorMsg, vendorTypeError: "" });
     
     // Map user type values to labels
     const typeLabels = {
@@ -562,7 +588,101 @@ const EditProfile = () => {
       setErrorMsg({ ...errorMsg, pincodeError: "Pincode is required" });
     } else if (allData.pincode.length !== 6 || !/^\d{6}$/.test(allData.pincode)) {
       setErrorMsg({ ...errorMsg, pincodeError: "Pincode must be 6 digits" });
+    } else if ((type === "user" || type === "customer") && allData.type === "") {
+      setErrorMsg({ ...errorMsg, vendorTypeError: "User type is required" });
     } else {
+      // Validate mandatory file uploads for users
+      if (type === "user" || type === "customer") {
+        let userFileError = "";
+        let userInputError = "";
+        
+        // Validate mandatory input fields based on user type
+        if (allData.type === "Pathology Labs") {
+          const pathologyName = allData.additionalInformation.find(item => item.name === 'pathologyName')?.value;
+          if (!pathologyName || pathologyName.trim() === "") {
+            userInputError = "Pathology Name is mandatory for Pathology Labs type";
+          }
+          const pathologyIdentityProof = allData.additionalInformation.find(item => item.name === 'pathologyIdentityProof')?.value;
+          if (!pathologyIdentityProof || pathologyIdentityProof.trim() === "") {
+            userInputError = "Identity Proof is mandatory for Pathology Labs type";
+          }
+        } else if (allData.type === "Diagnostic Centres") {
+          const diagnosticIdentityProof = allData.additionalInformation.find(item => item.name === 'diagnosticIdentityProof')?.value;
+          if (!diagnosticIdentityProof || diagnosticIdentityProof.trim() === "") {
+            userInputError = "Identity Proof is mandatory for Diagnostic Centres type";
+          }
+        } else if (allData.type === "Student") {
+          const studentId = allData.additionalInformation.find(item => item.name === 'studentId')?.value;
+          if (!studentId || studentId.trim() === "") {
+            userInputError = "Student ID is mandatory for Student type";
+          }
+        }
+        
+        if (userInputError) {
+          setErrorMsg({ ...errorMsg, vendorTypeError: userInputError });
+          return;
+        }
+        
+        if (allData.type === "Hospital") {
+          if (!manufacturingImageFile.hospitalRegistrationCertificate) {
+            userFileError = "Hospital Registration Certificate is mandatory for Hospital type";
+          }
+          if (!manufacturingImageFile.hospitalAddressProof) {
+            userFileError = "Hospital Address Proof is mandatory for Hospital type";
+          }
+        } else if (allData.type === "Pathology Labs") {
+          if (!manufacturingImageFile.labRegistrationCertificate) {
+            userFileError = "Lab Registration Certificate is mandatory for Pathology Labs type";
+          }
+          if (!manufacturingImageFile.pathologyAddressProof) {
+            userFileError = "Pathology Address Proof is mandatory for Pathology Labs type";
+          }
+        } else if (allData.type === "Diagnostic Centres") {
+          if (!manufacturingImageFile.diagnosticRegistrationCertificate) {
+            userFileError = "Diagnostic Registration Certificate is mandatory for Diagnostic Centres type";
+          }
+          if (!manufacturingImageFile.diagnosticAddressProof) {
+            userFileError = "Diagnostic Address Proof is mandatory for Diagnostic Centres type";
+          }
+        } else if (allData.type === "Physiotherapist") {
+          if (!manufacturingImageFile.physioEstablishmentCertificate) {
+            userFileError = "Physio Establishment Certificate is mandatory for Physiotherapist type";
+          }
+          if (!manufacturingImageFile.physioTradeLicense) {
+            userFileError = "Physio Trade License is mandatory for Physiotherapist type";
+          }
+          if (!manufacturingImageFile.physioAddressProof) {
+            userFileError = "Physio Address Proof is mandatory for Physiotherapist type";
+          }
+        } else if (allData.type === "Rehabilitation") {
+          if (!manufacturingImageFile.rehabEstablishmentCertificate) {
+            userFileError = "Rehabilitation Establishment Certificate is mandatory for Rehabilitation type";
+          }
+          if (!manufacturingImageFile.rehabAddressProof) {
+            userFileError = "Rehabilitation Address Proof is mandatory for Rehabilitation type";
+          }
+        } else if (allData.type === "Poly Clinic") {
+          if (!manufacturingImageFile.polyclinicTradeLicense) {
+            userFileError = "Polyclinic Trade License is mandatory for Poly Clinic type";
+          }
+          if (!manufacturingImageFile.polyclinicClinicalCertificate) {
+            userFileError = "Polyclinic Clinical Certificate is mandatory for Poly Clinic type";
+          }
+          if (!manufacturingImageFile.polyclinicAddressProof) {
+            userFileError = "Polyclinic Address Proof is mandatory for Poly Clinic type";
+          }
+        } else if (allData.type === "Student") {
+          if (!manufacturingImageFile.studentIdCard) {
+            userFileError = "Student ID Card is mandatory for Student type";
+          }
+        }
+        
+        if (userFileError) {
+          setErrorMsg({ ...errorMsg, vendorTypeError: userFileError });
+          return;
+        }
+      }
+      
       setErrorMsg({
         addressLine1Error: '', numberError: "", cityError: "", stateError: "", pincodeError: "", vendorTypeError: "",countryError:"", fullNameError: ""
       });
@@ -804,7 +924,9 @@ const EditProfile = () => {
               {type !== "vendor" ? (
                 <React.Fragment>
                   <Grid item size={12} >
-                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: '3% 0 0' }}>Type of users</Typography>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: '3% 0 0' }}>Type of users<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                    {errorMsg.vendorTypeError &&
+                        <Typography sx={{ color: 'red', fontSize: '14px', marginTop: '5px' }}>{errorMsg.vendorTypeError}</Typography>}
                     <FormControl>
                       <RadioGroup
                         row
@@ -847,7 +969,7 @@ const EditProfile = () => {
                         />
                       </Grid>
                       <Grid item size={6}>
-                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Hospital Registration Certificate</Typography>
+                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Hospital Registration Certificate<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                         <Button
                           sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                           component="label"
@@ -891,7 +1013,7 @@ const EditProfile = () => {
                         </Typography>
                       </Grid>
                       <Grid item size={6}>
-                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof</Typography>
+                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                         <Button
                           sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                           component="label"
@@ -939,7 +1061,7 @@ const EditProfile = () => {
                   {labelChanges === "P" && (
                     <>
                       <Grid item size={6}>
-                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Pathology Name</Typography>
+                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Pathology Name<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                         <TextField 
                           fullWidth 
                           id="pathologyName" 
@@ -950,7 +1072,7 @@ const EditProfile = () => {
                         />
                       </Grid>
                       <Grid item size={6}>
-                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Lab Registration Certificate</Typography>
+                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Lab Registration Certificate<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                         <Button
                           sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                           component="label"
@@ -994,7 +1116,7 @@ const EditProfile = () => {
                         </Typography>
                       </Grid>
                       <Grid item size={6}>
-                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Identity Proof</Typography>
+                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Identity Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                         <TextField 
                           fullWidth 
                           id="pathologyIdentityProof" 
@@ -1005,7 +1127,7 @@ const EditProfile = () => {
                         />
                       </Grid>
                       <Grid item size={6}>
-                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof</Typography>
+                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                         <Button
                           sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                           component="label"
@@ -1053,7 +1175,7 @@ const EditProfile = () => {
                   {labelChanges === "D" && (
                     <>
                       <Grid item size={6}>
-                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Diagnostic Center Registration Certificate</Typography>
+                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Diagnostic Center Registration Certificate<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                         <Button
                           sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                           component="label"
@@ -1097,7 +1219,7 @@ const EditProfile = () => {
                         </Typography>
                       </Grid>
                       <Grid item size={6}>
-                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Identity Proof</Typography>
+                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Identity Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                         <TextField 
                           fullWidth 
                           id="diagnosticIdentityProof" 
@@ -1108,7 +1230,7 @@ const EditProfile = () => {
                         />
                       </Grid>
                       <Grid item size={6}>
-                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof</Typography>
+                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                         <Button
                           sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                           component="label"
@@ -1156,7 +1278,7 @@ const EditProfile = () => {
                   {labelChanges === "Physio" && (
                     <>
                       <Grid item size={6}>
-                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Establishment Registration Certificate</Typography>
+                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Establishment Registration Certificate<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                         <Button
                           sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                           component="label"
@@ -1200,7 +1322,7 @@ const EditProfile = () => {
                         </Typography>
                       </Grid>
                       <Grid item size={6}>
-                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Trade License</Typography>
+                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Trade License<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                         <Button
                           sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                           component="label"
@@ -1244,7 +1366,7 @@ const EditProfile = () => {
                         </Typography>
                       </Grid>
                       <Grid item size={6}>
-                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof</Typography>
+                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                         <Button
                           sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                           component="label"
@@ -1292,7 +1414,7 @@ const EditProfile = () => {
                   {labelChanges === "Re" && (
                     <>
                       <Grid item size={6}>
-                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Establishment Registration Certificate</Typography>
+                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Establishment Registration Certificate<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                         <Button
                           sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                           component="label"
@@ -1347,7 +1469,7 @@ const EditProfile = () => {
                         />
                       </Grid>
                       <Grid item size={6}>
-                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof</Typography>
+                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                         <Button
                           sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                           component="label"
@@ -1395,7 +1517,7 @@ const EditProfile = () => {
                   {labelChanges === "Pc" && (
                     <>
                       <Grid item size={6}>
-                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Trade License</Typography>
+                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Trade License<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                         <Button
                           sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                           component="label"
@@ -1439,7 +1561,7 @@ const EditProfile = () => {
                         </Typography>
                       </Grid>
                       <Grid item size={6}>
-                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Clinical Registration Certificate</Typography>
+                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Clinical Registration Certificate<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                         <Button
                           sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                           component="label"
@@ -1483,7 +1605,7 @@ const EditProfile = () => {
                         </Typography>
                       </Grid>
                       <Grid item size={6}>
-                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof</Typography>
+                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                         <Button
                           sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                           component="label"
@@ -1531,7 +1653,7 @@ const EditProfile = () => {
                   {labelChanges === "Student" && (
                     <>
                       <Grid item size={6}>
-                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Student ID</Typography>
+                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Student ID<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                         <TextField 
                           fullWidth 
                           id="studentId" 
@@ -1542,7 +1664,7 @@ const EditProfile = () => {
                         />
                       </Grid>
                       <Grid item size={6}>
-                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Student ID Card</Typography>
+                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Student ID Card<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                         <Button
                           sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                           component="label"

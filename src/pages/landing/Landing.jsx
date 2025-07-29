@@ -9,6 +9,7 @@ import LandingFeature from '../../components/landingComponents/LandingFeature'
 import LandingConnect from '../../components/landingComponents/LandingConnect'
 import LandingFooter from '../../components/landingComponents/LandingFooter'
 import LandingCallAction from '../../components/landingComponents/LandingCallAction'
+import AuthRedirect from '../../components/AuthRedirect'
 import c1 from '../../assets/c1.jpg'
 import c2 from '../../assets/c2.jpg'
 import c3 from '../../assets/c3.jpg'
@@ -60,6 +61,7 @@ const brandLogos = [
 const Landing = () => {
   return (
     <React.Fragment>
+      <AuthRedirect />
       <Box style={{ height: 'auto', width: "100%", backgroundColor: "#e2edf3"}} >
         <LandingNavbar />
         <LandingHero />

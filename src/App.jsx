@@ -9,6 +9,7 @@ import Products from "./pages/Products";
 import VendorProducts from "./pages/vendor/pages/Products.jsx";
 import Contact from "./pages/Contact";
 import LandingHomepage from './pages/landing/index.jsx'
+import MainLayout from './mainlayout/index.jsx'
 import LoginForm from "./pages/login/LoginForm.jsx";
 import Signup from "./pages/login/Signup/Signup.jsx";
 import Details from "./pages/login/Details.jsx";
@@ -36,7 +37,6 @@ import ForgotPassword from "./pages/login/forgotPassword/ForgotPassword.jsx";
 import ThankYou from "./pages/eCommerce/ThankYou.jsx";
 import UserEditProfile from "./pages/user/EditProfile.jsx";
 import VendorEditProfile from "./pages/vendor/EditProfile.jsx";
-import AuthRedirect from "./components/AuthRedirect.jsx";
 
 const App = () => {
   // Use the scroll to top hook
@@ -50,9 +50,17 @@ const App = () => {
         {/* Landing Page */}
         <Route path="/" element={
           <>
-            <AuthRedirect />
           <AnimatedPage animationType="fade" timeout={1000}>
             <LandingHomepage />
+          </AnimatedPage>
+          </>
+        } />
+        
+        {/* Latest Main Layout */}
+        <Route path="/latest-main" element={
+          <>
+          <AnimatedPage animationType="fade" timeout={1000}>
+            <MainLayout />
           </AnimatedPage>
           </>
         } />

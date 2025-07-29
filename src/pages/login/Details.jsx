@@ -106,6 +106,22 @@ const Details = () => {
         cfGst: null,
         cfEstablishmentProof: null,
         cfAuthorization: null,
+        // User-specific file fields
+        hospitalRegistrationCertificate: null,
+        hospitalAddressProof: null,
+        labRegistrationCertificate: null,
+        pathologyAddressProof: null,
+        diagnosticRegistrationCertificate: null,
+        diagnosticAddressProof: null,
+        physioEstablishmentCertificate: null,
+        physioTradeLicense: null,
+        physioAddressProof: null,
+        rehabEstablishmentCertificate: null,
+        rehabAddressProof: null,
+        polyclinicTradeLicense: null,
+        polyclinicClinicalCertificate: null,
+        polyclinicAddressProof: null,
+        studentIdCard: null,
     });
     const [imageType, setImageType] = useState({
         mdmLicense: "",
@@ -175,6 +191,9 @@ const Details = () => {
     const handleUserTypeChange = (userType) => {
         setLabelChanges(userType);
         
+        // Clear error message when user type is selected
+        setErrorMsg({ ...errorMsg, vendorTypeError: "" });
+        
         // Map user type values to labels
         const typeLabels = {
             "H": "Hospital",
@@ -226,6 +245,22 @@ const Details = () => {
             cfGst: null,
             cfEstablishmentProof: null,
             cfAuthorization: null,
+            // User-specific file fields
+            hospitalRegistrationCertificate: null,
+            hospitalAddressProof: null,
+            labRegistrationCertificate: null,
+            pathologyAddressProof: null,
+            diagnosticRegistrationCertificate: null,
+            diagnosticAddressProof: null,
+            physioEstablishmentCertificate: null,
+            physioTradeLicense: null,
+            physioAddressProof: null,
+            rehabEstablishmentCertificate: null,
+            rehabAddressProof: null,
+            polyclinicTradeLicense: null,
+            polyclinicClinicalCertificate: null,
+            polyclinicAddressProof: null,
+            studentIdCard: null,
         });
         setFeatureImage(null);
     };
@@ -450,7 +485,137 @@ const Details = () => {
             setErrorMsg({ ...errorMsg, pincodeError: "Pincode must be 6 digits" });
         } else if (type === "vendor" && allData.vendorType === "") {
             setErrorMsg({ ...errorMsg, vendorTypeError: "Vendor type is required" });
+        } else if ((type === "user" || type === "customer") && allData.type === "") {
+            setErrorMsg({ ...errorMsg, vendorTypeError: "User type is required" });
         } else {
+            // Validate mandatory file uploads for vendors
+            if (type === "vendor") {
+                let vendorFileError = "";
+                
+                if (allData.vendorType === "manufacturing") {
+                    if (!manufacturingImageFile.mdmLicense) {
+                        vendorFileError = "MDM License is mandatory for Manufacturing vendors";
+                    }
+                } else if (allData.vendorType === "oem") {
+                    if (!manufacturingImageFile.loanLicense) {
+                        vendorFileError = "Loan License is mandatory for OEM vendors";
+                    }
+                    if (!manufacturingImageFile.establishmentProof) {
+                        vendorFileError = "Establishment Proof is mandatory for OEM vendors";
+                    }
+                } else if (allData.vendorType === "dealer") {
+                    if (!manufacturingImageFile.cfDL) {
+                        vendorFileError = "D/L is mandatory for C&F / Super Stockist / Dealer's vendors";
+                    }
+                    if (!manufacturingImageFile.cfGumasta) {
+                        vendorFileError = "Gumasta is mandatory for C&F / Super Stockist / Dealer's vendors";
+                    }
+                    if (!manufacturingImageFile.cfEstablishmentProof) {
+                        vendorFileError = "Establishment Proof is mandatory for C&F / Super Stockist / Dealer's vendors";
+                    }
+                    if (!manufacturingImageFile.cfAuthorization) {
+                        vendorFileError = "Authorization of Company is mandatory for C&F / Super Stockist / Dealer's vendors";
+                    }
+                }
+                
+                if (vendorFileError) {
+                    setErrorMsg({ ...errorMsg, vendorTypeError: vendorFileError });
+                    return;
+                }
+            }
+            
+            // Validate mandatory file uploads for users
+            if (type === "user" || type === "customer") {
+                let userFileError = "";
+                let userInputError = "";
+                
+                // Validate mandatory input fields based on user type
+                if (allData.type === "Pathology Labs") {
+                    const pathologyName = allData.additionalInformation.find(item => item.name === 'pathologyName')?.value;
+                    if (!pathologyName || pathologyName.trim() === "") {
+                        userInputError = "Pathology Name is mandatory for Pathology Labs type";
+                    }
+                    const pathologyIdentityProof = allData.additionalInformation.find(item => item.name === 'pathologyIdentityProof')?.value;
+                    if (!pathologyIdentityProof || pathologyIdentityProof.trim() === "") {
+                        userInputError = "Identity Proof is mandatory for Pathology Labs type";
+                    }
+                } else if (allData.type === "Diagnostic Centres") {
+                    const diagnosticIdentityProof = allData.additionalInformation.find(item => item.name === 'diagnosticIdentityProof')?.value;
+                    if (!diagnosticIdentityProof || diagnosticIdentityProof.trim() === "") {
+                        userInputError = "Identity Proof is mandatory for Diagnostic Centres type";
+                    }
+                } else if (allData.type === "Student") {
+                    const studentId = allData.additionalInformation.find(item => item.name === 'studentId')?.value;
+                    if (!studentId || studentId.trim() === "") {
+                        userInputError = "Student ID is mandatory for Student type";
+                    }
+                }
+                
+                if (userInputError) {
+                    setErrorMsg({ ...errorMsg, vendorTypeError: userInputError });
+                    return;
+                }
+                
+                if (allData.type === "Hospital") {
+                    if (!manufacturingImageFile.hospitalRegistrationCertificate) {
+                        userFileError = "Hospital Registration Certificate is mandatory for Hospital type";
+                    }
+                    if (!manufacturingImageFile.hospitalAddressProof) {
+                        userFileError = "Hospital Address Proof is mandatory for Hospital type";
+                    }
+                } else if (allData.type === "Pathology Labs") {
+                    if (!manufacturingImageFile.labRegistrationCertificate) {
+                        userFileError = "Lab Registration Certificate is mandatory for Pathology Labs type";
+                    }
+                    if (!manufacturingImageFile.pathologyAddressProof) {
+                        userFileError = "Pathology Address Proof is mandatory for Pathology Labs type";
+                    }
+                } else if (allData.type === "Diagnostic Centres") {
+                    if (!manufacturingImageFile.diagnosticRegistrationCertificate) {
+                        userFileError = "Diagnostic Registration Certificate is mandatory for Diagnostic Centres type";
+                    }
+                    if (!manufacturingImageFile.diagnosticAddressProof) {
+                        userFileError = "Diagnostic Address Proof is mandatory for Diagnostic Centres type";
+                    }
+                } else if (allData.type === "Physiotherapist") {
+                    if (!manufacturingImageFile.physioEstablishmentCertificate) {
+                        userFileError = "Physio Establishment Certificate is mandatory for Physiotherapist type";
+                    }
+                    if (!manufacturingImageFile.physioTradeLicense) {
+                        userFileError = "Physio Trade License is mandatory for Physiotherapist type";
+                    }
+                    if (!manufacturingImageFile.physioAddressProof) {
+                        userFileError = "Physio Address Proof is mandatory for Physiotherapist type";
+                    }
+                } else if (allData.type === "Rehabilitation") {
+                    if (!manufacturingImageFile.rehabEstablishmentCertificate) {
+                        userFileError = "Rehabilitation Establishment Certificate is mandatory for Rehabilitation type";
+                    }
+                    if (!manufacturingImageFile.rehabAddressProof) {
+                        userFileError = "Rehabilitation Address Proof is mandatory for Rehabilitation type";
+                    }
+                } else if (allData.type === "Poly Clinic") {
+                    if (!manufacturingImageFile.polyclinicTradeLicense) {
+                        userFileError = "Polyclinic Trade License is mandatory for Poly Clinic type";
+                    }
+                    if (!manufacturingImageFile.polyclinicClinicalCertificate) {
+                        userFileError = "Polyclinic Clinical Certificate is mandatory for Poly Clinic type";
+                    }
+                    if (!manufacturingImageFile.polyclinicAddressProof) {
+                        userFileError = "Polyclinic Address Proof is mandatory for Poly Clinic type";
+                    }
+                } else if (allData.type === "Student") {
+                    if (!manufacturingImageFile.studentIdCard) {
+                        userFileError = "Student ID Card is mandatory for Student type";
+                    }
+                }
+                
+                if (userFileError) {
+                    setErrorMsg({ ...errorMsg, vendorTypeError: userFileError });
+                    return;
+                }
+            }
+            
             setErrorMsg({
                 addressLine1Error: '', numberError: "", cityError: "", stateError: "", pincodeError: "", vendorTypeError: "",countryError:"", fullNameError: ""
             });
@@ -675,7 +840,9 @@ const Details = () => {
                             {type !== "vendor" ? (
                                 <React.Fragment>
                                     <Grid item size={12} >
-                                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: '3% 0 0' }}>Type of users</Typography>
+                                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: '3% 0 0' }}>Type of users<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                        {errorMsg.vendorTypeError &&
+                                            <Typography sx={{ color: 'red', fontSize: '14px', marginTop: '5px' }}>{errorMsg.vendorTypeError}</Typography>}
                                         <FormControl>
                                             <RadioGroup
                                                 row
@@ -718,7 +885,7 @@ const Details = () => {
                                                 />
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Hospital Registration Certificate</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Hospital Registration Certificate<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <Button
                                                     sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                                                     component="label"
@@ -762,7 +929,7 @@ const Details = () => {
                                                 </Typography>
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <Button
                                                     sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                                                     component="label"
@@ -810,7 +977,7 @@ const Details = () => {
                                     {labelChanges === "P" && (
                                         <>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Pathology Name</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Pathology Name<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <TextField 
                                                     fullWidth 
                                                     id="pathologyName" 
@@ -821,7 +988,7 @@ const Details = () => {
                                                 />
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Lab Registration Certificate</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Lab Registration Certificate<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <Button
                                                     sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                                                     component="label"
@@ -865,7 +1032,7 @@ const Details = () => {
                                                 </Typography>
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Identity Proof</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Identity Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <TextField 
                                                     fullWidth 
                                                     id="pathologyIdentityProof" 
@@ -876,7 +1043,7 @@ const Details = () => {
                                                 />
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <Button
                                                     sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                                                     component="label"
@@ -925,7 +1092,7 @@ const Details = () => {
                                     {labelChanges === "D" && (
                                         <>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Diagnostic Center Registration Certificate</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Diagnostic Center Registration Certificate<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <Button
                                                     sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                                                     component="label"
@@ -954,7 +1121,7 @@ const Details = () => {
                                                 )}
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Identity Proof</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Identity Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <TextField 
                                                     fullWidth 
                                                     id="diagnosticIdentityProof" 
@@ -965,7 +1132,7 @@ const Details = () => {
                                                 />
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <Button
                                                     sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                                                     component="label"
@@ -998,7 +1165,7 @@ const Details = () => {
                                     {labelChanges === "Physio" && (
                                         <>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Establishment Registration Certificate</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Establishment Registration Certificate<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <Button
                                                     sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                                                     component="label"
@@ -1027,7 +1194,7 @@ const Details = () => {
                                                 )}
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Trade License</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Trade License<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <Button
                                                     sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                                                     component="label"
@@ -1056,7 +1223,7 @@ const Details = () => {
                                                 )}
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <Button
                                                     sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                                                     component="label"
@@ -1129,7 +1296,7 @@ const Details = () => {
                                                 />
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <Button
                                                     sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                                                     component="label"
@@ -1220,7 +1387,7 @@ const Details = () => {
                                                 )}
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <Button
                                                     sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                                                     component="label"
@@ -1253,7 +1420,7 @@ const Details = () => {
                                     {labelChanges === "Student" && (
                                         <>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Student ID</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Student ID<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <TextField 
                                                     fullWidth 
                                                     id="studentId" 
@@ -1264,7 +1431,7 @@ const Details = () => {
                                                 />
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Student ID Card</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Student ID Card<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <Button
                                                     sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
                                                     component="label"
@@ -1337,7 +1504,7 @@ const Details = () => {
                                     {allData.vendorType === "manufacturing" && (
                                         <>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>MDM License</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>MDM License<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <div style={{ display: 'flex', alignItems: 'center', }}>
                                                     <div >
                                                         <Button
@@ -1383,7 +1550,7 @@ const Details = () => {
                                                 </div>
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>GST</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>GST (Optional)</Typography>
                                                 <div style={{ display: 'flex', alignItems: 'center', }}>
                                                     <div >
                                                         <Button
@@ -1429,7 +1596,7 @@ const Details = () => {
                                                 </div>
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>BIS</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>BIS (Optional)</Typography>
                                                 <div style={{ display: 'flex', alignItems: 'center', }}>
                                                     <div >
                                                         <Button
@@ -1475,7 +1642,7 @@ const Details = () => {
                                                 </div>
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>ISO/FDA/CE </Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>ISO/FDA/CE (Optional)</Typography>
                                                 <div style={{ display: 'flex', alignItems: 'center', }}>
                                                     <div >
                                                         <Button
@@ -1525,7 +1692,7 @@ const Details = () => {
                                     {allData.vendorType === "oem" && (
                                         <>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Loan License</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Loan License<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <div style={{ display: 'flex', alignItems: 'center', }}>
                                                     <div >
                                                         <Button
@@ -1571,7 +1738,7 @@ const Details = () => {
                                                 </div>
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Establishment Proof</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Establishment Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <div style={{ display: 'flex', alignItems: 'center', }}>
                                                     <div >
                                                         <Button
@@ -1617,7 +1784,7 @@ const Details = () => {
                                                 </div>
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>D/L</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>D/L (Optional)</Typography>
                                                 <div style={{ display: 'flex', alignItems: 'center', }}>
                                                     <div >
                                                         <Button
@@ -1663,7 +1830,7 @@ const Details = () => {
                                                 </div>
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>ISO/FDA/CE </Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>ISO/FDA/CE (Optional)</Typography>
                                                 <div style={{ display: 'flex', alignItems: 'center', }}>
                                                     <div >
                                                         <Button
@@ -1713,7 +1880,7 @@ const Details = () => {
                                     {allData.vendorType === "dealer" && (
                                         <>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>D/L</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>D/L<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <div style={{ display: 'flex', alignItems: 'center', }}>
                                                     <div >
                                                         <Button
@@ -1759,7 +1926,7 @@ const Details = () => {
                                                 </div>
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Gumasta</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Gumasta<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <div style={{ display: 'flex', alignItems: 'center', }}>
                                                     <div >
                                                         <Button
@@ -1805,7 +1972,7 @@ const Details = () => {
                                                 </div>
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>GST</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>GST (Optional)</Typography>
                                                 <div style={{ display: 'flex', alignItems: 'center', }}>
                                                     <div >
                                                         <Button
@@ -1851,7 +2018,7 @@ const Details = () => {
                                                 </div>
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Establishment Proof</Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Establishment Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <div style={{ display: 'flex', alignItems: 'center', }}>
                                                     <div >
                                                         <Button
@@ -1897,7 +2064,7 @@ const Details = () => {
                                                 </div>
                                             </Grid>
                                             <Grid item size={6}>
-                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Authorization of Company </Typography>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Authorization of Company<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                                                 <div style={{ display: 'flex', alignItems: 'center', }}>
                                                     <div >
                                                         <Button
