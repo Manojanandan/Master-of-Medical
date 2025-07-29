@@ -188,33 +188,38 @@ const Footer = () => {
                       component="h6"
                       sx={{ fontSize: 14, fontWeight: 'bold' }}
                     >
-                      Make Money with Us
+                      Legal & Policies
                     </Typography>
                   </ListItem>
 
                   {[
-                    'Sell on Grogin',
-                    'Sell your services on Grogin',
-                    'sell your Business on Grogin',
-                    'Sell your Apps on Grogin',
-                    'Become an Affiliate',
-                    'Advertise your Products',
-                    'Sell Publish with us',
-                    'Become a Browser Vendor',
-                  ].map((text, index) => (
+                    { text: 'Terms & Conditions', path: '/ecommerceDashboard/terms-conditions' },
+                    { text: 'Privacy Policy', path: '/ecommerceDashboard/privacy-policy' },
+                    { text: 'Cookies Policy', path: '/ecommerceDashboard/cookies-policy' },
+                    { text: 'Disclaimer', path: '/ecommerceDashboard/disclaimer' },
+                    { text: 'Returns & Refunds', path: '/ecommerceDashboard/returns-refunds' },
+                    { text: 'Shipping Policy', path: '#' },
+                    { text: 'Payment Terms', path: '#' },
+                    { text: 'Data Protection', path: '#' },
+                  ].map((item, index) => (
                     <ListItem
                       key={index}
                       disableGutters
                       sx={{ padding: '0px 0' }}
                     >
-                      <ListItemText
-                        sx={{ marginBottom: '2px', marginTop: '2px' }}
-                        primary={
-                          <Typography variant="body1" sx={{ fontSize: 13, color:'#6b7280', }}>
-                            {text}
-                          </Typography>
-                        }
-                      />
+                      <ListItemButton
+                        onClick={() => navigate(item.path)}
+                        sx={{ padding: '0px 0' }}
+                      >
+                        <ListItemText
+                          sx={{ marginBottom: '2px', marginTop: '2px' }}
+                          primary={
+                            <Typography variant="body1" sx={{ fontSize: 13, color:'#6b7280', '&:hover': { color: '#de3b6f' } }}>
+                              {item.text}
+                            </Typography>
+                          }
+                        />
+                      </ListItemButton>
                     </ListItem>
                   ))}
                 </List>
@@ -227,33 +232,38 @@ const Footer = () => {
                       component="h6"
                       sx={{ fontSize: 14, fontWeight: 'bold' }}
                     >
-                      Let Us Help You
+                      Customer Support
                     </Typography>
                   </ListItem>
 
                   {[
-                    'Sell on Grogin',
-                    'Sell your services on Grogin',
-                    'sell your Business on Grogin',
-                    'Sell your Apps on Grogin',
-                    'Become an Affiliate',
-                    'Advertise your Products',
-                    'Sell Publish with us',
-                    'Become a Browser Vendor',
-                  ].map((text, index) => (
+                    { text: 'Help & Support', path: '/ecommerceDashboard/help-support' },
+                    { text: 'Order Tracking', path: '/ecommerceDashboard/order-tracking' },
+                    { text: 'Returns & Refunds', path: '/ecommerceDashboard/returns-refunds' },
+                    { text: 'FAQ', path: '/ecommerceDashboard/faq' },
+                    { text: 'Contact Us', path: '/ecommerceDashboard/contact' },
+                    { text: 'Shipping Info', path: '#' },
+                    { text: 'Payment Methods', path: '#' },
+                    { text: 'Size Guide', path: '#' },
+                  ].map((item, index) => (
                     <ListItem
                       key={index}
                       disableGutters
                       sx={{ padding: '0px 0' }}
                     >
-                      <ListItemText
-                        sx={{ marginBottom: '2px', marginTop: '2px' }}
-                        primary={
-                          <Typography variant="body1" sx={{ fontSize: 13, color:'#6b7280', }}>
-                            {text}
-                          </Typography>
-                        }
-                      />
+                      <ListItemButton
+                        onClick={() => navigate(item.path)}
+                        sx={{ padding: '0px 0' }}
+                      >
+                        <ListItemText
+                          sx={{ marginBottom: '2px', marginTop: '2px' }}
+                          primary={
+                            <Typography variant="body1" sx={{ fontSize: 13, color:'#6b7280', '&:hover': { color: '#de3b6f' } }}>
+                              {item.text}
+                            </Typography>
+                          }
+                        />
+                      </ListItemButton>
                     </ListItem>
                   ))}
                 </List>
@@ -266,33 +276,38 @@ const Footer = () => {
                       component="h6"
                       sx={{ fontSize: 14, fontWeight: 'bold' }}
                     >
-                      Get to Know Us
+                      Company
                     </Typography>
                   </ListItem>
 
                   {[
-                    'Sell on Grogin',
-                    'Sell your services on Grogin',
-                    'sell your Business on Grogin',
-                    'Sell your Apps on Grogin',
-                    'Become an Affiliate',
-                    'Advertise your Products',
-                    'Sell Publish with us',
-                    'Become a Browser Vendor',
-                  ].map((text, index) => (
+                    { text: 'About Us', path: '/ecommerceDashboard/about-us' },
+                    { text: 'Contact Us', path: '/ecommerceDashboard/contact' },
+                    { text: 'Blog', path: '/ecommerceDashboard/blog' },
+                    { text: 'Careers', path: '#' },
+                    { text: 'Press & Media', path: '#' },
+                    { text: 'Partnerships', path: '#' },
+                    { text: 'Investor Relations', path: '#' },
+                    { text: 'Sustainability', path: '#' },
+                  ].map((item, index) => (
                     <ListItem
                       key={index}
                       disableGutters
                       sx={{ padding: '0px 0' }}
                     >
-                      <ListItemText
-                        sx={{ marginBottom: '2px', marginTop: '2px' }}
-                        primary={
-                          <Typography variant="body1" sx={{ fontSize: 13,color:'#6b7280', }}>
-                            {text}
-                          </Typography>
-                        }
-                      />
+                      <ListItemButton
+                        onClick={() => navigate(item.path)}
+                        sx={{ padding: '0px 0' }}
+                      >
+                        <ListItemText
+                          sx={{ marginBottom: '2px', marginTop: '2px' }}
+                          primary={
+                            <Typography variant="body1" sx={{ fontSize: 13, color:'#6b7280', '&:hover': { color: '#de3b6f' } }}>
+                              {item.text}
+                            </Typography>
+                          }
+                        />
+                      </ListItemButton>
                     </ListItem>
                   ))}
                 </List>
@@ -410,22 +425,22 @@ const Footer = () => {
             <Box sx={{ width: '30%', textAlign: 'center',color:'blue' }}>
               <Typography variant="p" component="p" sx={{ fontSize: 13,color:'blue',cursor:'pointer'  }}>
                 <span
-                  style={{ textDecoration: 'underline', marginRight: '6px' }} onClick={()=>navigate('/ecommerceDashboard/termsofuse')}
+                  style={{ textDecoration: 'underline', marginRight: '6px' }} onClick={()=>navigate('/ecommerceDashboard/terms-conditions')}
                 >
-                  Terms and Conditions
+                  Terms & Conditions
                 </span>{' '}
                 <span
-                  style={{ textDecoration: 'underline', marginRight: '6px' }} onClick={()=>navigate('/ecommerceDashboard/privacyPolicy')}
+                  style={{ textDecoration: 'underline', marginRight: '6px' }} onClick={()=>navigate('/ecommerceDashboard/privacy-policy')}
                 >
                   Privacy Policy
                 </span>{' '}
                 <span
-                  style={{ textDecoration: 'underline', marginRight: '6px' }} onClick={()=>navigate('/ecommerceDashboard/cookiesPolicy')}
+                  style={{ textDecoration: 'underline', marginRight: '6px' }} onClick={()=>navigate('/ecommerceDashboard/cookies-policy')}
                 >
                   Cookies Policy
                 </span>{' '}
                 <span
-                  style={{ textDecoration: 'underline', marginRight: '6px' }} onClick={()=>navigate('/ecommerceDashboard/orderTracking')}
+                  style={{ textDecoration: 'underline', marginRight: '6px' }} onClick={()=>navigate('/ecommerceDashboard/order-tracking')}
                 >
                   Order Tracking
                 </span>

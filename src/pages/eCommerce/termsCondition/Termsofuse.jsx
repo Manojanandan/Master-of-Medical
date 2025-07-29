@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Box, Typography, Container, Paper } from '@mui/material';
+import { Box, Typography, Container, Paper, Divider } from '@mui/material';
 
 const TermsOfUse = () => {
   useEffect(() => {
@@ -7,27 +7,38 @@ const TermsOfUse = () => {
   }, []);
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#ffffff' }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: '#ffffff', py: 0 }}>
       <Container maxWidth="lg">
-        <Paper elevation={0} sx={{ p: { xs: 3, md: 5 },  borderRadius: 2 }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: { xs: 3, md: 5 },
+            mt: 0,
+            borderRadius: 2,
+            bgcolor: '#ffffff',
+          }}
+        >
           <Typography
             variant="h4"
             sx={{
-              fontWeight: 'bold',
+              fontWeight: 700,
               mb: 3,
-              color: '#1a237e',
+              color: '#de3b6f', // Title color from ReturnsRefundsPolicy
               textAlign: 'center',
               fontSize: { xs: '1.8rem', md: '2.5rem' },
             }}
           >
             Terms of Use
           </Typography>
+
+          <Divider sx={{ mb: 4 }} /> {/* Divider from ReturnsRefundsPolicy */}
+
           <Typography
             variant="h6"
             sx={{
-              fontWeight: 'medium',
+              fontWeight: 600,
               mb: 2,
-              color: '#1a237e',
+              color: '#f49507', // Subheading color from ReturnsRefundsPolicy
               fontSize: { xs: '1.2rem', md: '1.5rem' },
             }}
           >
@@ -37,87 +48,90 @@ const TermsOfUse = () => {
             variant="body1"
             sx={{
               fontSize: { xs: '0.9rem', md: '1rem' },
-              color: '#616161',
+              color: '#666', // Body text color from ReturnsRefundsPolicy
               mb: 4,
-              lineHeight: 1.8,
+              lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
             }}
           >
-            At Master of Medical, your compliance with these terms is our priority.
+            By accessing and using the M.O.M platform, you agree to the following:
           </Typography>
           <Box sx={{ pl: { xs: 2, md: 4 }, mb: 4 }}>
             <Typography
               variant="body1"
               sx={{
                 fontSize: { xs: '0.9rem', md: '1rem' },
-                color: '#212121',
+                color: '#666', // Body text color from ReturnsRefundsPolicy
                 mb: 2,
-                lineHeight: 2,
+                lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
                 display: 'flex',
                 alignItems: 'flex-start',
               }}
             >
-              <Box component="span" sx={{ mr: 2, color: '#1a237e' }}>1.</Box>
-              We collect only necessary information to deliver services—such as name, contact, business info, and payment data.
+              <Box component="span" sx={{ mr: 2, color: '#873589' }}>1.</Box> {/* Bullet color updated to #873589 */}
+              All users must register with accurate and updated information.
             </Typography>
             <Typography
               variant="body1"
               sx={{
                 fontSize: { xs: '0.9rem', md: '1rem' },
-                color: '#212121',
+                color: '#666', // Body text color from ReturnsRefundsPolicy
                 mb: 2,
-                lineHeight: 2,
+                lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
                 display: 'flex',
                 alignItems: 'flex-start',
               }}
             >
-              <Box component="span" sx={{ mr: 2, color: '#1a237e' }}>2.</Box>
-              All user data is encrypted and stored securely.
+              <Box component="span" sx={{ mr: 2, color: '#873589' }}>2.</Box> {/* Bullet color updated to #873589 */}
+              Buyers must use the platform for institutional or business use only.
             </Typography>
             <Typography
               variant="body1"
               sx={{
                 fontSize: { xs: '0.9rem', md: '1rem' },
-                color: '#212121',
+                color: '#666', // Body text color from ReturnsRefundsPolicy
                 mb: 2,
-                lineHeight: 2,
+                lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
                 display: 'flex',
                 alignItems: 'flex-start',
               }}
             >
-              <Box component="span" sx={{ mr: 2, color: '#1a237e' }}>3.</Box>
-              We do not sell or share your information with third parties for advertising.
+              <Box component="span" sx={{ mr: 2, color: '#873589' }}>3.</Box> {/* Bullet color updated to #873589 */}
+              Sellers are responsible for ensuring their product listings, inventory, and pricing are accurate and compliant with applicable laws.
             </Typography>
             <Typography
               variant="body1"
               sx={{
                 fontSize: { xs: '0.9rem', md: '1rem' },
-                color: '#212121',
+                color: '#666', // Body text color from ReturnsRefundsPolicy
                 mb: 2,
-                lineHeight: 2,
+                lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
                 display: 'flex',
                 alignItems: 'flex-start',
               }}
             >
-              <Box component="span" sx={{ mr: 2, color: '#1a237e' }}>4.</Box>
-              Data is used solely to process orders, support logistics, and improve user experience.
+              <Box component="span" sx={{ mr: 2, color: '#873589' }}>4.</Box> {/* Bullet color updated to #873589 */}
+              Any misuse of the platform, false information, or breach of these terms may lead to suspension or legal action.
             </Typography>
             <Typography
               variant="body1"
               sx={{
                 fontSize: { xs: '0.9rem', md: '1rem' },
-                color: '#212121',
-                mt: 2,
-                lineHeight: 2,
+                color: '#666', // Body text color from ReturnsRefundsPolicy
+                mb: 2,
+                lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
+                display: 'flex',
+                alignItems: 'flex-start',
               }}
             >
-              You can request to review or delete your data anytime by contacting our support team.
+              <Box component="span" sx={{ mr: 2, color: '#873589' }}>5.</Box> {/* Bullet color updated to #873589 */}
+              We reserve the right to update these terms as necessary.
             </Typography>
           </Box>
           <Typography
             variant="body2"
             sx={{
               fontSize: { xs: '0.8rem', md: '0.9rem' },
-              color: '#757575',
+              color: '#873589', // Note color from ReturnsRefundsPolicy
               textAlign: 'center',
               mt: 4,
             }}

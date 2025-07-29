@@ -1,36 +1,13 @@
-/* import React from 'react'
-import BreadCrumbs from '../../../components/e_commerceComponents/BreadCrumbs'
-import { Box, Typography } from '@mui/material'
-
-const OrderTracking = () => {
-  return (
-    <Box sx={{height:'auto',width:'100%',}}>
-        <BreadCrumbs title={"Order Tracking"} />
-        <Box sx={{height:'100%',width:'90%',margin:'2% auto'}}>
-            <Typography variant='h5' sx={{fontWeight:'bold',margin:'1% 0'}}>Note</Typography>
-            <Typography variant='p' sx={{fontSize:'16px',}}>Stay in control with real-time order tracking.</Typography><br />
-            <Typography variant='p' sx={{fontSize:'16px',lineHeight:'50px',marginLeft:'2%'}}>1. Log in to your M.O.M account</Typography><br/>
-            <Typography variant='p' sx={{fontSize:'16px',lineHeight:'50px',marginLeft:'2%'}}>2.	Navigate to “My Orders”</Typography><br />
-            <Typography variant='p' sx={{fontSize:'16px',lineHeight:'50px',marginLeft:'2%'}}>3.	Click “Track Order” for live updates on shipment, delivery, and status</Typography><br />
-            <Typography variant='p' sx={{fontSize:'16px',lineHeight:'50px'}}>You’ll also receive notifications via SMS and email at every key stage.</Typography><br />
-        </Box>
-    </Box>
-  )
-}
-
-export default OrderTracking */
-
-
 import React, { useEffect } from 'react';
-import { Box, Typography, Container, Paper } from '@mui/material';
+import { Box, Typography, Container, Paper, Divider } from '@mui/material';
 
 const OrderTracking = () => {
   useEffect(() => {
-    window.scrollTo(0, 0); 
+    window.scrollTo(0, 0);
   }, []);
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#ffffff' }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: '#ffffff', py: 0 }}>
       <Container maxWidth="lg">
         <Paper
           elevation={0}
@@ -44,21 +21,24 @@ const OrderTracking = () => {
           <Typography
             variant="h4"
             sx={{
-              fontWeight: 'bold',
+              fontWeight: 700,
               mb: 3,
-              color: '#003087',
+              color: '#de3b6f', // Title color from ReturnsRefundsPolicy (already correct)
               textAlign: 'center',
               fontSize: { xs: '1.8rem', md: '2.5rem' },
             }}
           >
             Order Tracking
           </Typography>
+
+          <Divider sx={{ mb: 4 }} /> {/* Divider from ReturnsRefundsPolicy */}
+
           <Typography
             variant="h6"
             sx={{
-              fontWeight: 'medium',
+              fontWeight: 600,
               mb: 2,
-              color: '#1e40af',
+              color: '#f49507', // Subheading color from ReturnsRefundsPolicy (already correct)
               fontSize: { xs: '1.2rem', md: '1.5rem' },
             }}
           >
@@ -68,9 +48,9 @@ const OrderTracking = () => {
             variant="body1"
             sx={{
               fontSize: { xs: '0.9rem', md: '1rem' },
-              color: '#374151',
+              color: '#666', // Body text color from ReturnsRefundsPolicy
               mb: 4,
-              lineHeight: 1.8,
+              lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
             }}
           >
             Stay in control with real-time order tracking at Master of Medical.
@@ -80,51 +60,51 @@ const OrderTracking = () => {
               variant="body1"
               sx={{
                 fontSize: { xs: '0.9rem', md: '1rem' },
-                color: '#212121',
+                color: '#666', // Body text color from ReturnsRefundsPolicy
                 mb: 2,
-                lineHeight: 2,
+                lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
                 display: 'flex',
                 alignItems: 'flex-start',
               }}
             >
-              <Box component="span" sx={{ mr: 2, color: '#1a237e' }}>1.</Box>
+              <Box component="span" sx={{ mr: 2, color: '#873589' }}>1.</Box> {/* Bullet color #873589 (already correct) */}
               Log in to your Master of Medical account.
             </Typography>
             <Typography
               variant="body1"
               sx={{
                 fontSize: { xs: '0.9rem', md: '1rem' },
-                color: '#212121',
+                color: '#666', // Body text color from ReturnsRefundsPolicy
                 mb: 2,
-                lineHeight: 2,
+                lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
                 display: 'flex',
                 alignItems: 'flex-start',
               }}
             >
-              <Box component="span" sx={{ mr: 2, color: '#1a237e' }}>2.</Box>
+              <Box component="span" sx={{ mr: 2, color: '#873589' }}>2.</Box> {/* Bullet color #873589 (already correct) */}
               Navigate to “My Orders” in your account dashboard.
             </Typography>
             <Typography
               variant="body1"
               sx={{
                 fontSize: { xs: '0.9rem', md: '1rem' },
-                color: '#212121',
+                color: '#666', // Body text color from ReturnsRefundsPolicy
                 mb: 2,
-                lineHeight: 2,
+                lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
                 display: 'flex',
                 alignItems: 'flex-start',
               }}
             >
-              <Box component="span" sx={{ mr: 2, color: '#1a237e' }}>3.</Box>
+              <Box component="span" sx={{ mr: 2, color: '#873589' }}>3.</Box> {/* Bullet color #873589 (already correct) */}
               Click “Track Order” for live updates on shipment, delivery, and status.
             </Typography>
             <Typography
               variant="body1"
               sx={{
                 fontSize: { xs: '0.9rem', md: '1rem' },
-                color: '#212121',
+                color: '#666', // Body text color from ReturnsRefundsPolicy
                 mt: 2,
-                lineHeight: 2,
+                lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
               }}
             >
               You’ll also receive notifications via SMS and email at every key stage of your order.
@@ -134,12 +114,12 @@ const OrderTracking = () => {
             variant="body2"
             sx={{
               fontSize: { xs: '0.8rem', md: '0.9rem' },
-              color: '#6b7280',
+              color: '#873589', // Note color from ReturnsRefundsPolicy
               textAlign: 'center',
               mt: 4,
             }}
           >
-            Last updated: July 24, 2025
+            Last updated: July 22, 2025
           </Typography>
         </Paper>
       </Container>
