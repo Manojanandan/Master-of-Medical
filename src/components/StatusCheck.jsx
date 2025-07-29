@@ -21,8 +21,6 @@ const StatusCheck = () => {
   const [userData, setUserData] = useState(null);
 
 
-  console.log(userData , "userDataaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-
   useEffect(() => {
     // Immediately check if we're on a profile page and hide popup if so
     if (shouldPreventPopup()) {
