@@ -43,8 +43,8 @@ const LandingSolution = () => {
                 <Box sx={{ width: '600px', minHeight: '400px' }}>
                     {smallAcor?.map((e, i) => {
                         return (
-                            <div style={{borderBottom:'solid 2px black',}}>
-                                <Accordion  expanded={expanded === i} onChange={() => setExpanded(expanded === i ? null : i)} key={i}  sx={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
+                            <div style={{borderBottom:'solid 2px black'}} key={e?.id || e?.title || i}>
+                                <Accordion  expanded={expanded === i} onChange={() => setExpanded(expanded === i ? null : i)} key={e?.id || e?.title || i}  sx={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
                                     <AccordionSummary
                                         expandIcon={expanded === i ? <RemoveIcon sx={{ color: '#000000' }} /> : <AddIcon sx={{ color: '#000000' }} />}
 
@@ -53,9 +53,9 @@ const LandingSolution = () => {
                                     </AccordionSummary>
                                     <AccordionDetails>
                                         <Typography component="p" sx={{ fontWeight: 'bold', color: '#242424',fontSize:'18px',textAlign:'left' }}>{e?.description}</Typography><br/>
-                                        {e?.list?.map((list)=>{
+                                        {e?.list?.map((list, idx) => {
                                             return (
-                                                <Typography variant='ul' sx={{textAlign:'left',}}><li>{list}</li></Typography>
+                                                <Typography variant='ul' sx={{textAlign:'left'}} key={list + '-' + idx}><li>{list}</li></Typography>
                                             )
                                         }) }
                                         {e?.subTitle &&  <Typography component="p" sx={{ fontWeight: 'bold',fontSize:'18px',textAlign:'left',paddingTop:'20px' }}>{e?.subTitle}</Typography>}

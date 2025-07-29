@@ -579,7 +579,7 @@ const Profile = () => {
                 className={`${styles.navButton} ${activeSection === 'profile' ? styles.active : ''}`}
                 onClick={() => handleSectionChange('profile')}
               >
-                <span className={styles.navText}>Dashboard</span>
+                <span className={styles.navText}>Account Details</span>
               </button>
             </li>
             

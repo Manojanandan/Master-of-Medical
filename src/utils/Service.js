@@ -149,7 +149,7 @@ export const createAddress = async(addressData) =>{
 }
 
 export const updateAddress = async(addressData) =>{
-    return await instance.put('address/update-address', addressData)
+    return await instance.put(`address/update-address/${addressData.id}`, addressData);
 }
 
 export const deleteAddress = async(addressId) =>{

@@ -62,30 +62,39 @@ const Contact = () => {
   };
 
   return (
-    <Box sx={{ px: { xs: 2, md: 6 }, py: 6 }}>
+    <Box sx={{ 
+      px: { xs: 3, sm: 4, md: 6, lg: 8 },
+      py: 4,
+      maxWidth: 1400,
+      mx: 'auto'
+    }}>
       {/* Heading */}
-      <Box textAlign="center" mb={6}>
+      <Box textAlign="center" mb={4}>
         <Typography variant="overline" color="primary" fontWeight="bold">
-          Contact With Us
+          CONTACT WITH US
         </Typography>
         <Typography
           variant="h4"
           fontWeight="bold"
-          sx={{ mt: 1, mb: 2, fontSize: { xs: '1.8rem', md: '2.5rem' } }}
+          sx={{ mt: 1, mb: 1.5, fontSize: { xs: '1.6rem', md: '2.2rem' } }}
         >
           You can ask us questions
         </Typography>
         <Typography
           variant="body1"
           color="text.secondary"
-          sx={{ maxWidth: 700, mx: 'auto' }}
+          sx={{ 
+            maxWidth: 650,
+            mx: 'auto',
+            px: { xs: 1, sm: 0 }
+          }}
         >
           Reach out for questions, feedback, or help. You can also connect with our regional offices for faster assistance.
         </Typography>
       </Box>
 
       {/* Grid Layout */}
-      <Grid container spacing={6}>
+      <Grid container spacing={4}>
         {/* Office Locations */}
         <Grid item xs={12} md={6}>
           <Typography variant="h6" fontWeight="bold" mb={2}>
@@ -105,7 +114,12 @@ const Contact = () => {
             email: 'contact@example.com',
             city: 'Munich'
           }].map((office, index) => (
-            <Box key={index} sx={{ display: 'flex', gap: 2, mb: 4 }}>
+            <Box key={index} sx={{ 
+              display: 'flex', 
+              gap: 2, 
+              mb: 3,
+              px: { xs: 1, sm: 0 }
+            }}>
               <LocationOnIcon color="primary" sx={{ mt: 0.5 }} />
               <Box>
                 <Typography variant="caption" fontWeight={500} color="text.secondary">
@@ -129,15 +143,20 @@ const Contact = () => {
         </Grid>
 
         {/* Contact Form */}
-        <Grid item xs={12} md={6} >
-          <Typography variant="h6" fontWeight="bold" mb={3}>
+        <Grid item xs={12} md={6}>
+          <Typography variant="h6" fontWeight="bold" mb={2}>
             Get In Touch
           </Typography>
 
           <Box
             component="form"
             onSubmit={handleSubmit}
-            sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}
+            sx={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: 2,
+              px: { xs: 1, sm: 0 }
+            }}
           >
             {success && <Alert severity="success">{success}</Alert>}
             {error && <Alert severity="error">{error}</Alert>}
@@ -187,9 +206,9 @@ const Contact = () => {
               color="primary"
               type="submit"
               disabled={loading}
-              sx={{ width: 'fit-content' }}
+              sx={{ alignSelf: 'flex-start', minWidth: 160 }}
             >
-              {loading ? 'Sending...' : 'Send Message'}
+              {loading ? 'Sending...' : 'SEND MESSAGE'}
             </Button>
           </Box>
         </Grid>
@@ -198,14 +217,15 @@ const Contact = () => {
       {/* Social Media Links */}
       <Box
         sx={{
-          mt: 8,
-          pt: 4,
-          borderTop: '1px solid #eee',
+          mt: 5,
+          pt: 3,
+          borderTop: '1px solid #ddd',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           flexDirection: { xs: 'column', sm: 'row' },
           gap: 2,
+          px: { xs: 1, sm: 0 }
         }}
       >
         <Typography variant="caption" color="text.secondary">

@@ -22,12 +22,29 @@ import {
   DialogActions,
   TextField,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  Stack,
+  Avatar,
+  Badge,
+  Tooltip,
+  Switch,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  Snackbar
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchCart } from '../../../redux/CartReducer';
-import { getAllAddresses, createOrder } from '../../../utils/Service';
+import { fetchCart, clearCart } from '../../../redux/CartReducer';
+import { 
+  getAllAddresses, 
+  createOrder, 
+  updateCustomer, 
+  updateAddress, 
+  createAddress, 
+  deleteAddress 
+} from '../../../utils/Service';
 import { getUserInfoFromToken } from '../../../utils/jwtUtils';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AddIcon from '@mui/icons-material/Add';
@@ -36,22 +53,273 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PaymentIcon from '@mui/icons-material/Payment';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
-import StarRating from '../../../components/e_commerceComponents/StarRating';
-import AddressDialog from '../profileTabs/AddressDialog';
+import PersonIcon from '@mui/icons-material/Person';
+import BusinessIcon from '@mui/icons-material/Business';
+import HomeIcon from '@mui/icons-material/Home';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CloseIcon from '@mui/icons-material/Close';
+import SaveIcon from '@mui/icons-material/Save';
+
+// Constants
+const SHIPPING_COST = 15.00;
+const GST_RATE = 0.18;
+const FREE_SHIPPING_THRESHOLD = 500;
+
+// Address Dialog Component
+function AddressDialog({ open, onClose, address, onSave, loading, error, success }) {
+  const [formData, setFormData] = useState({
+    building: '',
+    address: '',
+    country: 'India',
+    state: '',
+    city: '',
+    postalCode: '',
+    isDefault: false
+  });
+
+  useEffect(() => {
+    if (address) {
+      setFormData({
+        building: address.building || '',
+        address: address.address || '',
+        country: address.country || 'India',
+        state: address.state || '',
+        city: address.city || '',
+        postalCode: address.postalCode || '',
+        isDefault: address.isDefault || false
+      });
+    } else {
+      setFormData({
+        building: '',
+        address: '',
+        country: 'India',
+        state: '',
+        city: '',
+        postalCode: '',
+        isDefault: false
+      });
+    }
+  }, [address, open]);
+
+  const handleChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = () => {
+    if (!formData.address || !formData.city || !formData.state || !formData.postalCode) {
+      return;
+    }
+    onSave(formData);
+  };
+
+  const isFormValid = formData.address && formData.city && formData.state && formData.postalCode;
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+      <DialogTitle>
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Box display="flex" alignItems="center">
+            <Avatar sx={{ bgcolor: 'success.main', mr: 2 }}>
+              <LocationOnIcon />
+            </Avatar>
+            <Typography variant="h6" fontWeight={600}>
+              {address ? 'Edit Address' : 'Add New Address'}
+            </Typography>
+          </Box>
+          <IconButton onClick={onClose} size="small">
+            <CloseIcon />
+          </IconButton>
+        </Box>
+      </DialogTitle>
+      <DialogContent>
+        <Grid container spacing={3} sx={{ mt: 1 }}>
+          <Grid item xs={12}>
+            <TextField
+              label="Building/Apartment/Company"
+              fullWidth
+              value={formData.building}
+              onChange={e => handleChange('building', e.target.value)}
+              placeholder="Optional"
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Street Address *"
+              fullWidth
+              multiline
+              rows={3}
+              value={formData.address}
+              onChange={e => handleChange('address', e.target.value)}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Country *</InputLabel>
+              <Select
+                value={formData.country}
+                onChange={e => handleChange('country', e.target.value)}
+                label="Country *"
+                required
+              >
+                <MenuItem value="India">India</MenuItem>
+                <MenuItem value="United States">United States</MenuItem>
+                <MenuItem value="United Kingdom">United Kingdom</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="State *"
+              fullWidth
+              value={formData.state}
+              onChange={e => handleChange('state', e.target.value)}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="City *"
+              fullWidth
+              value={formData.city}
+              onChange={e => handleChange('city', e.target.value)}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Postal Code *"
+              fullWidth
+              value={formData.postalCode}
+              onChange={e => handleChange('postalCode', e.target.value)}
+              required
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={formData.isDefault}
+                  onChange={e => handleChange('isDefault', e.target.checked)}
+                  color="primary"
+                />
+              }
+              label="Set as default address"
+            />
+          </Grid>
+        </Grid>
+        
+        {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+        {success && <Alert severity="success" sx={{ mt: 2 }}>Address saved successfully!</Alert>}
+      </DialogContent>
+      <DialogActions sx={{ p: 3 }}>
+        <Button onClick={onClose} disabled={loading} variant="outlined">
+          Cancel
+        </Button>
+        <Button 
+          onClick={handleSubmit} 
+          variant="contained" 
+          disabled={loading || !isFormValid}
+          startIcon={loading ? null : <SaveIcon />}
+        >
+          {loading ? <CircularProgress size={20} /> : 'Save Address'}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+// Address Card Component
+function AddressCard({ address, isSelected, onSelect, onEdit, onDelete, index }) {
+  return (
+    <Paper
+      elevation={isSelected ? 2 : 0}
+      sx={{
+        p: 2,
+        border: isSelected ? '2px solid' : '1px solid',
+        borderColor: isSelected ? 'primary.main' : 'divider',
+        borderRadius: 2,
+        cursor: 'pointer',
+        position: 'relative',
+        '&:hover': {
+          borderColor: 'primary.main'
+        }
+      }}
+      onClick={onSelect}
+    >
+      {isSelected && (
+        <Chip
+          icon={<CheckCircleIcon />}
+          label="Selected"
+          color="primary"
+          size="small"
+          sx={{ position: 'absolute', top: 8, right: 8 }}
+        />
+      )}
+      <Box display="flex" alignItems="flex-start">
+        <Radio checked={isSelected} value={address._id} />
+        <Box ml={1}>
+          <Typography variant="subtitle1" fontWeight={600}>
+            {address.isDefault ? 'Default Address' : `Address ${index + 1}`}
+          </Typography>
+          {address.building && (
+            <Typography variant="body2" color="text.secondary">
+              {address.building}
+            </Typography>
+          )}
+          <Typography variant="body2" mt={1}>
+            {address.address}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" mt={1}>
+            {address.city}, {address.state}, {address.country} - {address.postalCode}
+          </Typography>
+        </Box>
+      </Box>
+      <Box display="flex" justifyContent="flex-end" mt={1}>
+        <Tooltip title="Edit">
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(address);
+            }}
+          >
+            <EditIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Delete">
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(address);
+            }}
+          >
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      </Box>
+    </Paper>
+  );
+}
 
 const Checkout = () => {
+  const user = getUserInfoFromToken();
+  const userId = user?.id;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   // Redux state
-  const { items, totalItems, totalAmount, loading: cartLoading } = useSelector((state) => state.cartReducer);
+  const { items, loading: cartLoading } = useSelector((state) => state.cartReducer);
 
   // Local state
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [defaultBillingAddress, setDefaultBillingAddress] = useState(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [sameAsShipping, setSameAsShipping] = useState(true);
   const [loading, setLoading] = useState(true);
   const [orderLoading, setOrderLoading] = useState(false);
   const [error, setError] = useState('');
@@ -59,37 +327,27 @@ const Checkout = () => {
   // Address dialog state
   const [addressDialogOpen, setAddressDialogOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
-  const [addressForm, setAddressForm] = useState({
-    address: '',
-    country: '',
-    state: '',
-    city: '',
-    postalCode: ''
+  const [addressLoading, setAddressLoading] = useState(false);
+  const [addressError, setAddressError] = useState('');
+
+  // Snackbar state
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
   });
 
-  // Constants for calculations
-  const SHIPPING_COST = 15.00;
-  const GST_RATE = 0.18; // 18% GST
-  const FREE_SHIPPING_THRESHOLD = 500; // Free shipping above ₹500
+  // Dialog state for order success
+  const [orderSuccessDialogOpen, setOrderSuccessDialogOpen] = useState(false);
 
-  // Get user info
-  const user = getUserInfoFromToken();
-  const userId = user?.id;
-
-  // Calculate totals
+  // Calculate order totals
   const calculateTotals = () => {
     const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const gst = subtotal * GST_RATE;
     const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
     const total = subtotal + gst + shipping;
 
-    return {
-      subtotal,
-      gst,
-      shipping,
-      total,
-      totalItems: items.reduce((sum, item) => sum + item.quantity, 0)
-    };
+    return { subtotal, gst, shipping, total };
   };
 
   const totals = calculateTotals();
@@ -104,93 +362,125 @@ const Checkout = () => {
       return;
     }
 
-    fetchData();
-  }, [userId]);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        await dispatch(fetchCart());
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-
-      // Fetch cart data
-      await dispatch(fetchCart());
-
-      // Fetch addresses
-      const addressesResponse = await getAllAddresses({ customerId: userId });
-      if (addressesResponse.data.success) {
-        setAddresses(addressesResponse.data.data);
+        // Fetch addresses and set default
+        const addressesResponse = await getAllAddresses({ customerId: userId });
+        if (addressesResponse.data?.success) {
+          const addressesData = addressesResponse.data.data;
+          setAddresses(addressesData);
+          
+          // Set default shipping address
+          const defaultAddress = addressesData.find(addr => addr.isDefault);
+          if (defaultAddress) {
+            setSelectedAddress(defaultAddress);
+            setDefaultBillingAddress(defaultAddress);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching checkout data:', error);
+        setError('Failed to load checkout data. Please try again.');
+      } finally {
+        setLoading(false);
       }
+    };
 
-    } catch (error) {
-      console.error('Error fetching checkout data:', error);
-      setError('Failed to load checkout data. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchData();
+  }, [userId, dispatch]);
 
-  const handleAddressSelect = (address) => {
-    setSelectedAddress(address);
-  };
-
-  const handleTermsChange = (event) => {
-    setTermsAccepted(event.target.checked);
-  };
-
-  // Address dialog handlers
-  const openAddressDialog = (address = null) => {
-    if (address) {
-      setEditingAddress(address);
-      setAddressForm({
-        address: address.address || '',
-        country: address.country || '',
-        state: address.state || '',
-        city: address.city || '',
-        postalCode: address.postalCode || ''
-      });
-    } else {
-      setEditingAddress(null);
-      setAddressForm({
-        address: '',
-        country: '',
-        state: '',
-        city: '',
-        postalCode: ''
-      });
-    }
-    setAddressDialogOpen(true);
-  };
-
-  const closeAddressDialog = () => {
-    setAddressDialogOpen(false);
-    setEditingAddress(null);
-    setAddressForm({
-      address: '',
-      country: '',
-      state: '',
-      city: '',
-      postalCode: ''
-    });
-  };
-
-  const handleAddressInputChange = (field, value) => {
-    setAddressForm(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleSaveAddress = async () => {
+  // Address CRUD operations
+  const handleSaveAddress = async (formData) => {
+    setAddressLoading(true);
+    setAddressError('');
+    
     try {
-      // This would typically call an API to save the address
-      // For now, we'll just close the dialog and refresh addresses
-      closeAddressDialog();
-      await fetchData(); // Refresh addresses
+      let response;
+      
+      if (editingAddress) {
+        response = await updateAddress({ ...formData, id: editingAddress._id });
+      } else {
+        response = await createAddress({ ...formData, customerId: userId });
+      }
+      
+      if (response.data?.success) {
+        setSnackbar({
+          open: true,
+          message: editingAddress ? 'Address updated!' : 'Address added!',
+          severity: 'success'
+        });
+        
+        // Refresh addresses
+        const addressesResponse = await getAllAddresses({ customerId: userId });
+        if (addressesResponse.data?.success) {
+          const updatedAddresses = addressesResponse.data.data;
+          setAddresses(updatedAddresses);
+          
+          // Update selected address if it was edited
+          if (editingAddress && selectedAddress?._id === editingAddress._id) {
+            setSelectedAddress(updatedAddresses.find(a => a._id === editingAddress._id));
+          }
+          
+          // Update default address if changed
+          const newDefault = updatedAddresses.find(a => a.isDefault);
+          if (newDefault) {
+            setDefaultBillingAddress(newDefault);
+          }
+        }
+        
+        setAddressDialogOpen(false);
+      } else {
+        setAddressError(response.data?.message || 'Failed to save address.');
+      }
     } catch (error) {
       console.error('Error saving address:', error);
-      setError('Failed to save address. Please try again.');
+      setAddressError('Failed to save address. Please try again.');
+    } finally {
+      setAddressLoading(false);
     }
   };
 
+  const handleDeleteAddress = async (address) => {
+    if (!window.confirm('Are you sure you want to delete this address?')) return;
+
+    try {
+      const response = await deleteAddress(address._id);
+      
+      if (response.data?.success) {
+        setSnackbar({
+          open: true,
+          message: 'Address deleted!',
+          severity: 'success'
+        });
+        
+        // Update addresses
+        const updatedAddresses = addresses.filter(a => a._id !== address._id);
+        setAddresses(updatedAddresses);
+        
+        // Handle if deleted address was selected
+        if (selectedAddress?._id === address._id) {
+          setSelectedAddress(null);
+        }
+        
+        // Find a new default address if needed
+        if (address.isDefault && updatedAddresses.length > 0) {
+          const newDefault = updatedAddresses[0];
+          setDefaultBillingAddress(newDefault);
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting address:', error);
+      setSnackbar({
+        open: true,
+        message: 'Failed to delete address.',
+        severity: 'error'
+      });
+    }
+  };
+
+  // Order placement
   const handleConfirmOrder = async () => {
     if (!canPlaceOrder) return;
 
@@ -198,29 +488,42 @@ const Checkout = () => {
       setOrderLoading(true);
       setError('');
 
+
+      // Build productInfo array as required by backend
+      const productInfo = items.map(item => ({
+        productId: item.productId,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        subTotal: item.price * item.quantity,
+        gst: (item.price * item.quantity) * GST_RATE,
+        total: (item.price * item.quantity) * (1 + GST_RATE)
+      }));
+
       const orderData = {
         customerId: userId,
-        items: items.map(item => ({
-          productId: item.productId,
-          quantity: item.quantity,
-          price: item.price
-        })),
-        shippingAddress: selectedAddress,
-        totalAmount: totals.total,
-        paymentMethod: 'cod' // Cash on Delivery
+        customerInfo: {
+          name: user?.name,
+          email: user?.email,
+          phone: user?.phone || '',
+          address: selectedAddress
+        },
+        productInfo,
+        subTotal: totals.subtotal,
+        gstAmount: totals.gst,
+        totalCost: totals.total,
+        status: 'pending'
       };
+      console.log('Order Payload:', orderData);
 
       const response = await createOrder(orderData);
-
-      if (response.data.success) {
-        // Navigate to thank you page
-        navigate('/ecommerceDashboard/thankyou', { 
-          state: { orderId: response.data.orderId }
-        });
+      if (response.data?.success) {
+        dispatch(clearCart()); // Clear the cart after successful order
+        setOrderSuccessDialogOpen(true); // Show the dialog
+        // navigate('/ecommerceDashboard/checkout'); // Remove this line
       } else {
-        setError('Failed to place order. Please try again.');
+        setError(response.data?.message || 'Failed to place order.');
       }
-
     } catch (error) {
       console.error('Error placing order:', error);
       setError('Failed to place order. Please try again.');
@@ -232,13 +535,8 @@ const Checkout = () => {
   // Loading state
   if (loading || cartLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-        <Box sx={{ textAlign: 'center' }}>
-          <CircularProgress size={60} sx={{ mb: 2 }} />
-          <Typography variant="h6" color="text.secondary">
-            Loading checkout details...
-          </Typography>
-        </Box>
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+        <CircularProgress size={60} sx={{ mb: 2, color: 'primary.main' }} />
       </Box>
     );
   }
@@ -246,7 +544,7 @@ const Checkout = () => {
   // Error state
   if (error && !userId) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+      <Box display="flex" justifyContent="center" p={3}>
         <Alert severity="error" sx={{ maxWidth: '600px' }}>
           <Typography variant="h6">Authentication Required</Typography>
           <Typography>{error}</Typography>
@@ -263,363 +561,294 @@ const Checkout = () => {
   }
 
   // Empty cart state
-  if (!items || items.length === 0) {
+  if (items.length === 0) {
     return (
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: 'column',
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: '400px',
-        textAlign: 'center'
-      }}>
+      <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" minHeight="400px">
         <ShoppingCartIcon sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
-        <Typography variant="h4" sx={{ mb: 1, fontWeight: 600 }}>
-          Your cart is empty
-        </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-          Add some items to your cart to proceed with checkout.
-        </Typography>
+        <Typography variant="h4" mb={1}>Your cart is empty</Typography>
         <Button 
           variant="contained" 
-          size="large"
           onClick={() => navigate('/ecommerceDashboard')}
-          sx={{ 
-            borderRadius: 2,
-            px: 4,
-            py: 1.5,
-            textTransform: 'none',
-            fontSize: '16px'
-          }}
+          sx={{ mt: 3 }}
         >
-            Continue Shopping
+          Continue Shopping
         </Button>
       </Box>
     );
   }
 
   return (
-    <Box>
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
+    <Box sx={{ bgcolor: 'grey.50', py: 3 }}>
+      <Box sx={{ maxWidth: 1200, mx: 'auto', px: 2 }}>
+        {/* Header */}
+        <Paper sx={{ p: 3, mb: 3, bgcolor: 'primary.main', color: 'white' }}>
+          <Typography variant="h4" fontWeight={700}>Checkout</Typography>
+          <Typography variant="body1">Review your order and complete your purchase</Typography>
+        </Paper>
 
-      <Grid container spacing={3}>
-        {/* Left Column - Address Selection & Order Details */}
-        <Grid item xs={12} lg={8}>
-          {/* Address Selection */}
-          <Card elevation={2} sx={{ borderRadius: 2, mb: 3 }}>
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                <LocationOnIcon sx={{ mr: 2, color: 'primary.main' }} />
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  Delivery Address
-                </Typography>
-              </Box>
+        {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
 
-              {addresses.length === 0 ? (
-                <Box sx={{ textAlign: 'center', py: 4 }}>
-                  <LocationOnIcon sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
-                  <Typography variant="h6" sx={{ mb: 1 }}>
-                    No addresses found
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                    Please add a delivery address to continue with checkout.
-                  </Typography>
+        <Grid container spacing={3}>
+          {/* Left Column - Address Selection */}
+          <Grid item xs={12} md={8}>
+            {/* Shipping Address */}
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Box display="flex" alignItems="center" mb={3}>
+                  <Avatar sx={{ bgcolor: 'success.main', mr: 2 }}>
+                    <LocalShippingIcon />
+                  </Avatar>
+                  <Box flex={1}>
+                    <Typography variant="h6" fontWeight={600}>Shipping Address</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Choose where to deliver your order
+                    </Typography>
+                  </Box>
                   <Button
-                    variant="contained"
+                    variant="outlined"
                     startIcon={<AddIcon />}
-                    onClick={() => openAddressDialog()}
-                    sx={{ borderRadius: 2, textTransform: 'none' }}
+                    onClick={() => setAddressDialogOpen(true)}
                   >
                     Add Address
                   </Button>
                 </Box>
-              ) : (
-                <Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      Select a delivery address
-                    </Typography>
+
+                {addresses.length === 0 ? (
+                  <Box textAlign="center" py={6}>
+                    <LocationOnIcon sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
+                    <Typography variant="h6" mb={1}>No addresses found</Typography>
                     <Button
-                      variant="outlined"
-                      size="small"
+                      variant="contained"
                       startIcon={<AddIcon />}
-                      onClick={() => openAddressDialog()}
-                      sx={{ borderRadius: 2, textTransform: 'none' }}
+                      onClick={() => setAddressDialogOpen(true)}
+                      sx={{ mt: 3 }}
                     >
-                      Add New Address
+                      Add Your First Address
                     </Button>
                   </Box>
-
-                  <RadioGroup
-                    value={selectedAddress?._id || selectedAddress?.id || ''}
-                    onChange={(e) => {
-                      const address = addresses.find(addr => 
-                        addr._id === e.target.value || addr.id === e.target.value
-                      );
-                      handleAddressSelect(address);
-                    }}
-                  >
-                    <Grid container spacing={2}>
-                      {addresses.map((address, index) => (
-                        <Grid item xs={12} sm={6} key={address._id || address.id}>
-                          <Paper
-                            elevation={selectedAddress?._id === address._id || selectedAddress?.id === address.id ? 3 : 1}
-                            sx={{
-                              p: 2,
-                              border: selectedAddress?._id === address._id || selectedAddress?.id === address.id 
-                                ? '2px solid' 
-                                : '1px solid',
-                              borderColor: selectedAddress?._id === address._id || selectedAddress?.id === address.id 
-                                ? 'primary.main' 
-                                : '#e0e0e0',
-                              borderRadius: 2,
-                              cursor: 'pointer',
-                              transition: 'all 0.2s ease',
-                              '&:hover': {
-                                borderColor: 'primary.main',
-                                boxShadow: 2
+                ) : (
+                  <Grid container spacing={2}>
+                    {addresses.map((address, index) => (
+                      <Grid item xs={12} key={address._id || index}>
+                        <AddressCard
+                          address={address}
+                          isSelected={String(selectedAddress?._id) === String(address._id)}
+                          onSelect={() => setSelectedAddress(address)}
+                          onEdit={(addr) => {
+                            setEditingAddress(addr);
+                            setAddressDialogOpen(true);
+                          }}
+                          onDelete={async (addr) => {
+                            if (!window.confirm('Are you sure you want to delete this address?')) return;
+                            try {
+                              const response = await deleteAddress(addr._id);
+                              if (response.data?.success) {
+                                setSnackbar({
+                                  open: true,
+                                  message: 'Address deleted!',
+                                  severity: 'success'
+                                });
+                                // Update addresses
+                                const updatedAddresses = addresses.filter(a => a._id !== addr._id);
+                                setAddresses(updatedAddresses);
+                                // Handle if deleted address was selected
+                                if (selectedAddress?._id === addr._id) {
+                                  setSelectedAddress(updatedAddresses[0] || null);
+                                }
+                              } else {
+                                setSnackbar({
+                                  open: true,
+                                  message: response.data?.message || 'Failed to delete address.',
+                                  severity: 'error'
+                                });
                               }
-                            }}
-                            onClick={() => handleAddressSelect(address)}
-                          >
-                            <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
-                              <Radio
-                          value={address._id || address.id}
-                                sx={{ mt: -0.5 }}
-                              />
-                              <Box sx={{ flex: 1 }}>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                                  <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                                    Address {index + 1}
-                                  </Typography>
-                          {selectedAddress?._id === address._id || selectedAddress?.id === address.id && (
-                                    <Chip label="Selected" size="small" color="primary" />
-                                  )}
-                                </Box>
-                                <Typography variant="body2" sx={{ mb: 0.5 }}>
-                                  {address.address}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                  {address.city}, {address.state}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                  {address.country} - {address.postalCode}
-                                </Typography>
-                              </Box>
-                            </Box>
-                          </Paper>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </RadioGroup>
-                </Box>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Order Items */}
-          <Card elevation={2} sx={{ borderRadius: 2 }}>
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                <ShoppingCartIcon sx={{ mr: 2, color: 'primary.main' }} />
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  Order Items ({totals.totalItems})
-                </Typography>
-              </Box>
-
-              <Box sx={{ maxHeight: '400px', overflowY: 'auto' }}>
-                {items.map((item, index) => (
-                  <Box key={item._id || index} sx={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    py: 2,
-                    borderBottom: index < items.length - 1 ? '1px solid #e0e0e0' : 'none'
-                  }}>
-                    <Box sx={{ 
-                      width: 80, 
-                      height: 80, 
-                      borderRadius: 2, 
-                      overflow: 'hidden',
-                      bgcolor: '#f5f5f5',
-                      mr: 2
-                    }}>
-                      <img
-                        src={item.product?.thumbnailImage || 'https://via.placeholder.com/80x80?text=Product'}
-                        alt={item.product?.name || 'Product'}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover'
-                        }}
-                      />
-                    </Box>
-                    
-                    <Box sx={{ flex: 1 }}>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>
-                        {item.product?.name || 'Product Name'}
-                      </Typography>
-                      <Box sx={{ mb: 1 }}>
-                        <StarRating
-                          rating={item.product?.averageRating || 0}
-                          reviewCount={item.product?.reviewCount || 0}
-                          size="small"
-                          showReviewCount={true}
+                            } catch (error) {
+                              console.error('Error deleting address:', error);
+                              setSnackbar({
+                                open: true,
+                                message: 'Failed to delete address.',
+                                severity: 'error'
+                              });
+                            }
+                          }}
+                          index={index}
                         />
-                      </Box>
-                      <Typography variant="body2" color="text.secondary">
-                        Qty: {item.quantity} × ₹{item.price?.toFixed(2)}
-        </Typography>
-                    </Box>
-                    
-                    <Typography variant="h6" sx={{ fontWeight: 600, ml: 2 }}>
-                      ₹{(item.price * item.quantity).toFixed(2)}
-          </Typography>
-        </Box>
-                ))}
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+                      </Grid>
+                    ))}
+                  </Grid>
+                )}
+              </CardContent>
+            </Card>
 
-        {/* Right Column - Order Summary */}
-        <Grid item xs={12} lg={4}>
-          <Card elevation={2} sx={{ borderRadius: 2, position: 'sticky', top: 20 }}>
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                <PaymentIcon sx={{ mr: 2, color: 'primary.main' }} />
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  Order Summary
-                </Typography>
-              </Box>
-
-              {/* Price Breakdown */}
-              <Box sx={{ mb: 3 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Subtotal ({totals.totalItems} items)
-                  </Typography>
-                  <Typography variant="body2" fontWeight={500}>
-                    ₹{totals.subtotal.toFixed(2)}
-          </Typography>
-        </Box>
-
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    GST (18%)
-                  </Typography>
-                  <Typography variant="body2" fontWeight={500}>
-                    ₹{totals.gst.toFixed(2)}
-          </Typography>
-                </Box>
-                
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Shipping
-          </Typography>
-                  <Typography variant="body2" fontWeight={500}>
-                    {totals.shipping === 0 ? (
-                      <Chip label="FREE" size="small" color="success" />
-                    ) : (
-                      `₹${totals.shipping.toFixed(2)}`
-                    )}
-          </Typography>
-        </Box>
-
-                {totals.subtotal < FREE_SHIPPING_THRESHOLD && (
-                  <Box sx={{ mt: 1 }}>
-                    <Typography variant="caption" color="success.main">
-                      Add ₹{(FREE_SHIPPING_THRESHOLD - totals.subtotal).toFixed(2)} more for FREE shipping
+            {/* Billing Address */}
+            <Card>
+              <CardContent>
+                <Box display="flex" alignItems="center" mb={3}>
+                  <Avatar sx={{ bgcolor: 'warning.main', mr: 2 }}>
+                    <BusinessIcon />
+                  </Avatar>
+                  <Box flex={1}>
+                    <Typography variant="h6" fontWeight={600}>Billing Address</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Address for billing and invoicing
                     </Typography>
                   </Box>
+                </Box>
+
+                <Box display="flex" alignItems="center" mb={2}>
+                  <Switch
+                    checked={sameAsShipping}
+                    onChange={(e) => setSameAsShipping(e.target.checked)}
+                    color="primary"
+                  />
+                  <Typography>Same as shipping address</Typography>
+                </Box>
+
+                {!sameAsShipping && defaultBillingAddress && (
+                  <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
+                    <Typography variant="subtitle2" fontWeight={600} mb={1}>
+                      Default Billing Address
+                    </Typography>
+                    {defaultBillingAddress.building && (
+                      <Typography variant="body2">{defaultBillingAddress.building}</Typography>
+                    )}
+                    <Typography variant="body2">{defaultBillingAddress.address}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {defaultBillingAddress.city}, {defaultBillingAddress.state}, {defaultBillingAddress.country} - {defaultBillingAddress.postalCode}
+                    </Typography>
+                  </Paper>
                 )}
-              </Box>
+              </CardContent>
+            </Card>
+          </Grid>
 
-              <Divider sx={{ my: 2 }} />
+          {/* Right Column - Order Summary */}
+          <Grid item xs={12} md={4}>
+            <Card sx={{ position: 'sticky', top: 20 }}>
+              <CardContent>
+                <Box display="flex" alignItems="center" mb={3}>
+                  <Avatar sx={{ bgcolor: 'info.main', mr: 2 }}>
+                    <PaymentIcon />
+                  </Avatar>
+                  <Typography variant="h6" fontWeight={600}>Order Summary</Typography>
+                </Box>
 
-              {/* Total */}
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-                <Typography variant="h6" fontWeight={600}>
-                  Total
-                </Typography>
-                <Typography variant="h6" fontWeight={600} color="primary">
-                  ₹{totals.total.toFixed(2)}
-                </Typography>
-        </Box>
+                <Stack spacing={2} mb={3}>
+                  <Box display="flex" justifyContent="space-between">
+                    <Typography>Subtotal</Typography>
+                    <Typography>₹{totals.subtotal.toFixed(2)}</Typography>
+                  </Box>
+                  <Box display="flex" justifyContent="space-between">
+                    <Typography>GST (18%)</Typography>
+                    <Typography>₹{totals.gst.toFixed(2)}</Typography>
+                  </Box>
+                  <Box display="flex" justifyContent="space-between">
+                    <Typography>Shipping</Typography>
+                    <Typography>
+                      {totals.shipping === 0 ? 'FREE' : `₹${totals.shipping.toFixed(2)}`}
+                    </Typography>
+                  </Box>
+                </Stack>
 
-              {/* Terms and Conditions */}
-              <Box sx={{ mb: 3 }}>
-          <FormControlLabel
-            control={
-              <Checkbox
+                <Divider sx={{ my: 2 }} />
+
+                <Box display="flex" justifyContent="space-between" mb={3}>
+                  <Typography variant="h6">Total</Typography>
+                  <Typography variant="h6" color="primary.main">
+                    ₹{totals.total.toFixed(2)}
+                  </Typography>
+                </Box>
+
+                <FormControlLabel
+                  control={
+                    <Checkbox
                       checked={termsAccepted}
-                      onChange={handleTermsChange}
+                      onChange={(e) => setTermsAccepted(e.target.checked)}
                       color="primary"
-              />
-            }
-            label={
-                    <Typography variant="body2">
-                      I agree to the{' '}
-                      <a href="#" style={{ color: theme.palette.primary.main, textDecoration: 'underline' }}>
-                  terms and conditions
-                </a>
-              </Typography>
-            }
-          />
-        </Box>
+                    />
+                  }
+                  label="I agree to the terms and conditions"
+                  sx={{ mb: 3 }}
+                />
 
-        {/* Place Order Button */}
-        <Button
-          variant="contained"
-          fullWidth
-                size="large"
-                onClick={handleConfirmOrder}
-                disabled={!canPlaceOrder}
-                startIcon={orderLoading ? <CircularProgress size={20} color="inherit" /> : <LocalShippingIcon />}
-                sx={{
-                  borderRadius: 2,
-                  py: 1.5,
-                  textTransform: 'none',
-                  fontSize: '16px',
-                  fontWeight: 600
-                }}
-              >
-                {orderLoading ? 'Placing Order...' : 'Place Order'}
-              </Button>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  size="large"
+                  onClick={handleConfirmOrder}
+                  disabled={!canPlaceOrder}
+                  sx={{ mb: 2 }}
+                >
+                  {orderLoading ? (
+                    <Box display="flex" alignItems="center">
+                      <CircularProgress size={20} color="inherit" sx={{ mr: 2 }} />
+                      Processing...
+                    </Box>
+                  ) : (
+                    'Place Order (COD)'
+                  )}
+                </Button>
 
-              {/* Continue Shopping */}
-              <Button
-                variant="outlined"
-                fullWidth
-                size="large"
-                onClick={() => navigate('/ecommerceDashboard')}
-                sx={{
-                  mt: 2,
-                  borderRadius: 2,
-                  py: 1.5,
-                  textTransform: 'none',
-                  fontSize: '16px'
-                }}
-              >
-                Continue Shopping
-        </Button>
-      </CardContent>
-    </Card>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  onClick={() => navigate('/ecommerceDashboard')}
+                >
+                  Continue Shopping
+                </Button>
+              </CardContent>
+            </Card>
+          </Grid>
         </Grid>
-      </Grid>
 
-      {/* Address Dialog */}
-      <AddressDialog
-        addressDialogOpen={addressDialogOpen}
-        closeAddressDialog={closeAddressDialog}
-        editingAddress={editingAddress}
-        addressForm={addressForm}
-        handleAddressInputChange={handleAddressInputChange}
-        handleSaveAddress={handleSaveAddress}
-      />
+        {/* Address Dialog */}
+        <AddressDialog
+          open={addressDialogOpen}
+          onClose={() => {
+            setAddressDialogOpen(false);
+            setEditingAddress(null);
+            setAddressError('');
+          }}
+          address={editingAddress}
+          onSave={handleSaveAddress}
+          loading={addressLoading}
+          error={addressError}
+        />
+
+        {/* Snackbar */}
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={4000}
+          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        >
+          <Alert severity={snackbar.severity}>
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+
+        {/* Order Success Dialog */}
+        <Dialog
+          open={orderSuccessDialogOpen}
+          onClose={() => setOrderSuccessDialogOpen(false)}
+        >
+          <DialogTitle>Order Placed Successfully!</DialogTitle>
+          <DialogContent>
+            <Typography>Your order has been placed. Would you like to continue shopping?</Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => {
+                setOrderSuccessDialogOpen(false);
+                navigate('/ecommerceDashboard'); // or your shop route
+              }}
+              variant="contained"
+              color="primary"
+            >
+              Continue Shopping
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
     </Box>
   );
 };

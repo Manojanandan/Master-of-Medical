@@ -1,69 +1,143 @@
 import React, { useState, useEffect } from "react";
-import SearchIcon from "@mui/icons-material/Search";
-import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
-import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import PersonIcon from "@mui/icons-material/Person";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-// import AddShoppingCartIcon from "@mui/icons-material";import { ShoppingCartOutlined } from "@mui/icons-material";
-import { ShoppingCartOutlined } from "@mui/icons-material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   AppBar,
   Badge,
   Box,
   IconButton,
   InputAdornment,
-  Stack,
   TextField,
   Toolbar,
   Typography,
   Menu,
   MenuItem,
-  Chip,  
   Avatar,
+  Container,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  useTheme,
+  useMediaQuery,
+  Paper,
+  CircularProgress,
+  Fade,
 } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+
+import SearchIcon from "@mui/icons-material/Search";
+import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import PersonIcon from "@mui/icons-material/Person";
+import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
+import CallOutlinedIcon from "@mui/icons-material/CallOutlined";
+import MailOutlineIcon from "@mui/icons-material/MailOutline";
+import MenuIcon from "@mui/icons-material/Menu";
+import CloseIcon from "@mui/icons-material/Close";
+import ClearIcon from "@mui/icons-material/Clear";
+
+import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { getUserInfoFromToken } from "../../utils/jwtUtils";
+import { getPublicProducts } from "../../utils/Service"; // Fixed import path
 import Logo from "../../assets/pharmaSiteLogo.png";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { totalItems } = useSelector((state) => state.cartReducer);
   const [userInfo, setUserInfo] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const [anchorHelp, setAnchorHelp] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  // Search functionality states
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchAnchor, setSearchAnchor] = useState(null);
+
+  // Color theme
+  const colors = {
+    primary: '#de3b6f',
+    secondary: '#f49507',
+    accent: '#873589',
+    text: '#2C3E50',
+    lightText: '#7F8C8D',
+    background: '#ffffff',
+    lightBg: '#f8f9fa',
+    border: '#e0e0e0'
+  };
 
   useEffect(() => {
     const checkAuthStatus = () => {
       const token = sessionStorage.getItem("jwt");
-      console.log("Navbar - Checking auth status, token exists:", !!token);
-
       if (token) {
         const user = getUserInfoFromToken();
-        console.log("Navbar - User info from token:", user);
-
         if (user) {
           setUserInfo(user);
           setIsLoggedIn(true);
-          console.log("Navbar - User logged in:", user.name);
         } else {
-          console.warn("Navbar - Token exists but no user info found");
           setUserInfo(null);
           setIsLoggedIn(false);
         }
       } else {
-        console.log("Navbar - No token found, user not logged in");
         setUserInfo(null);
         setIsLoggedIn(false);
       }
     };
 
     checkAuthStatus();
-    // Listen for storage changes (when user logs in/out in another tab)
     window.addEventListener("storage", checkAuthStatus);
     return () => window.removeEventListener("storage", checkAuthStatus);
   }, []);
+
+  // Debounced search effect
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      if (searchValue.trim() && searchValue.length > 2) {
+        performSearch(searchValue.trim());
+      } else {
+        setSearchResults([]);
+        setShowSearchResults(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchValue]);
+
+  // Perform search API call
+  const performSearch = async (query) => {
+    if (!query || query.length < 3) return;
+    
+    setIsSearching(true);
+    try {
+      const response = await getPublicProducts({
+        search: query,
+        limit: 8, // Limit results for dropdown
+        page: 1
+      });
+      
+      if (response.data && response.data.success && response.data.data) {
+        setSearchResults(response.data.data.products || []);
+        setShowSearchResults(true);
+      } else {
+        setSearchResults([]);
+        setShowSearchResults(false);
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+      setShowSearchResults(false);
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   const handleProfileClick = (event) => {
     if (isLoggedIn) {
@@ -71,12 +145,12 @@ const Navbar = () => {
     } else {
       navigate("/login");
     }
+    if (isMobile) {
+      setMobileMenuOpen(false);
+    }
   };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
+  const handleMenuClose = () => setAnchorEl(null);
   const handleProfileMenuClick = () => {
     handleMenuClose();
     navigate("/ecommerceDashboard/profile");
@@ -84,332 +158,832 @@ const Navbar = () => {
 
   const handleLogout = () => {
     handleMenuClose();
-    sessionStorage.removeItem("jwt");
-    sessionStorage.removeItem("userData");
-    sessionStorage.removeItem("userType");
+    sessionStorage.clear();
     setUserInfo(null);
     setIsLoggedIn(false);
     navigate("/login");
   };
 
+  const handleSearch = () => {
+    if (searchValue.trim()) {
+      setShowSearchResults(false);
+      navigate(`/ecommerceDashboard/search?q=${encodeURIComponent(searchValue.trim())}`);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    } else if (e.key === "Escape") {
+      setShowSearchResults(false);
+    }
+  };
+
+  const handleSearchInputChange = (e) => {
+    const value = e.target.value;
+    setSearchValue(value);
+    
+    // Set anchor for search results dropdown
+    if (value.trim() && !searchAnchor) {
+      setSearchAnchor(e.currentTarget);
+    }
+  };
+
+  const handleSearchResultClick = (product) => {
+    setShowSearchResults(false);
+    setSearchValue("");
+    navigate(`/ecommerceDashboard/product/${product._id}`);
+  };
+
+  const clearSearch = () => {
+    setSearchValue("");
+    setSearchResults([]);
+    setShowSearchResults(false);
+  };
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  const handleMobileMenuItemClick = (action) => {
+    setMobileMenuOpen(false);
+    if (action) action();
+  };
+
+  const mobileMenuItems = [
+    {
+      icon: <StorefrontOutlinedIcon />,
+      text: "Shop",
+      action: () => navigate("/ecommerceDashboard/products")
+    },
+    {
+      icon: <LocationOnOutlinedIcon />,
+      text: "Delivery Location",
+      action: () => {}, // Add your location action here
+      subText: "Deliver to all"
+    },
+    {
+      icon: <HelpOutlineIcon />,
+      text: "Help & Support",
+      action: () => setAnchorHelp(document.body), // Will trigger help menu
+      subText: "079-480-58625"
+    },
+    {
+      icon: <ShoppingCartOutlinedIcon />,
+      text: "Cart",
+      action: () => navigate("/ecommerceDashboard/cart"),
+      badge: totalItems || 0
+    },
+    {
+      icon: isLoggedIn ? (
+        <Avatar sx={{ 
+          bgcolor: colors.primary, 
+          width: 24, 
+          height: 24, 
+          fontSize: "12px",
+          fontWeight: 600,
+        }}>
+          {userInfo?.name?.charAt(0).toUpperCase()}
+        </Avatar>
+      ) : (
+        <PersonOutlineIcon />
+      ),
+      text: isLoggedIn && userInfo?.name ? userInfo.name : "Account",
+      action: handleProfileClick
+    }
+  ];
+
   return (
-    <React.Fragment>
+    <>
       <AppBar
+        position="fixed"
         sx={{
-          backgroundColor: "#ffffff",
-          boxShadow: "none",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "end",
-          color: "#000",
-          padding: "10px 0 0px",
-          borderBottom: "solid 1.5px #2424",
+          top: 0,
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          backgroundColor: colors.background,
+          color: colors.accent,
+          boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+          borderBottom: `1px solid ${colors.border}`,
         }}
       >
-        <Toolbar
-          sx={{
-            height: "auto",
-            width: "100%",
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <Box
+        <Container maxWidth="xl" disableGutters>
+          <Toolbar
             sx={{
-              height: "auto",
-              width: "25%",
-              display: "flex",
-              justifyContent: "flex-start",
+              py: { xs: 1, md: 2 },
+              px: { xs: 2, sm: 2, md: 4 },
+              justifyContent: "space-between",
               alignItems: "center",
+              minHeight: { xs: "60px !important", md: "85px !important" },
             }}
           >
-            <Box
-              sx={{
-                height: "auto",
-                width: "auto",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
+            {/* Mobile Menu Button */}
+            {isMobile && (
+              <IconButton
+                onClick={toggleMobileMenu}
+                sx={{
+                  color: colors.accent,
+                  mr: 1,
+                  "&:hover": {
+                    backgroundColor: colors.lightBg,
+                  },
+                }}
+              >
+                <MenuIcon />
+              </IconButton>
+            )}
+
+            {/* Logo */}
+            <Box 
+              onClick={() => navigate("/ecommerceDashboard")} 
+              sx={{ 
                 cursor: "pointer",
+                flexShrink: 0,
               }}
-              onClick={() => navigate("/ecommerceDashboard")}
             >
-              <img
-                src={Logo}
-                alt="Logo"
-                style={{ height: "40px", width: "auto" }}
+              <img 
+                src={Logo} 
+                alt="Logo" 
+                style={{ 
+                  height: isMobile ? "35px" : "45px", 
+                  width: "auto",
+                }} 
               />
             </Box>
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-            }}
-          >
-            <LocationOnOutlinedIcon sx={{ color: "black" }} />
-            <Box
-              sx={{ display: "flex", flexDirection: "column", lineHeight: 1 }}
-            >
-              <Typography variant="caption" color="textSecondary">
-                Deliver to
-              </Typography>
-              <Typography variant="body2" fontWeight="bold">
-                all
-              </Typography>
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              height: "auto",
-              width: "50%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Box
-              sx={{
-                height: "auto",
-                width: "100%",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
+
+            {/* Desktop Delivery Location */}
+            {!isMobile && (
+              <Box sx={{ 
+                display: "flex", 
+                alignItems: "center", 
+                gap: 1,
+                flexShrink: 0,
+                ml: 2,
+              }}>
+                <LocationOnOutlinedIcon sx={{ fontSize: 24, color: colors.lightText }} />
+                <Box>
+                  <Typography variant="caption" sx={{ 
+                    color: colors.lightText, 
+                    lineHeight: 1.2,
+                    fontSize: '12px',
+                    display: 'block'
+                  }}>
+                    Deliver to
+                  </Typography>
+                  <Typography sx={{ 
+                    fontWeight: 'bold', 
+                    color: colors.text, 
+                    fontSize: '14px', 
+                    lineHeight: 1.2 
+                  }}>
+                    all
+                  </Typography>
+                </Box>
+              </Box>
+            )}
+
+            {/* Enhanced Search Bar */}
+            <Box sx={{ 
+              flex: "1 1 auto",
+              maxWidth: { xs: "none", md: "500px" },
+              mx: { xs: 1, md: 2 },
+              minWidth: 0,
+              position: 'relative',
+            }}>
               <TextField
-                placeholder="Search for products..."
+                fullWidth
+                placeholder="Search products..."
+                value={searchValue}
+                onChange={handleSearchInputChange}
+                onKeyPress={handleKeyPress}
+                onFocus={(e) => {
+                  if (searchValue.trim() && searchResults.length > 0) {
+                    setShowSearchResults(true);
+                    setSearchAnchor(e.currentTarget);
+                  }
+                }}
                 variant="outlined"
                 size="small"
                 sx={{
-                  width: "80%",
                   "& .MuiOutlinedInput-root": {
-                    borderRadius: "6px",
-                    backgroundColor: "#f5f5f5",
-                    "& fieldset": {
-                      borderColor: "transparent",
+                    borderRadius: "50px",
+                    backgroundColor: colors.lightBg,
+                    height: { xs: "40px", md: "48px" },
+                    paddingRight: "4px !important",
+                    "&.Mui-focused": {
+                      backgroundColor: colors.background,
+                      borderColor: colors.primary,
+                      boxShadow: `0 0 0 3px ${colors.primary}20`,
                     },
-                    "&:hover fieldset": {
-                      borderColor: "transparent",
+                    "& fieldset": { 
+                      border: `2px solid ${colors.border}`,
+                      borderRadius: "50px",
                     },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "transparent",
+                    "&:hover fieldset": { 
+                      borderColor: colors.primary,
+                    },
+                    "&.Mui-focused fieldset": { 
+                      borderColor: colors.primary,
+                      borderWidth: "2px",
+                    },
+                  },
+                  "& .MuiInputBase-input": {
+                    padding: { xs: "10px 16px", md: "12px 16px" },
+                    fontSize: { xs: "14px", md: "15px" },
+                    fontWeight: 500,
+                    "&::placeholder": {
+                      color: colors.lightText,
+                      opacity: 1,
                     },
                   },
                 }}
                 InputProps={{
+                  startAdornment: searchValue && (
+                    <InputAdornment position="start">
+                      <IconButton
+                        onClick={clearSearch}
+                        size="small"
+                        sx={{
+                          color: colors.lightText,
+                          "&:hover": { color: colors.accent },
+                        }}
+                      >
+                        <ClearIcon sx={{ fontSize: 16 }} />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
                   endAdornment: (
-                    <InputAdornment position="center">
-                      <SearchIcon sx={{ color: "#666" }} />
+                    <InputAdornment position="end" sx={{ mr: 0 }}>
+                      <IconButton
+                        onClick={handleSearch}
+                        disabled={isSearching}
+                        sx={{
+                          backgroundColor: colors.primary,
+                          color: colors.background,
+                          borderRadius: "50%",
+                          width: { xs: "32px", md: "40px" },
+                          height: { xs: "32px", md: "40px" },
+                          mr: 0,
+                          ml: 0,
+                          "&:hover": { 
+                            backgroundColor: colors.accent,
+                            transform: "scale(1.08)",
+                            boxShadow: `0 4px 12px ${colors.primary}40`,
+                          },
+                          "&:disabled": {
+                            backgroundColor: colors.lightText,
+                            color: colors.background,
+                          },
+                          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                          boxShadow: `0 2px 8px ${colors.primary}30`,
+                        }}
+                      >
+                        {isSearching ? (
+                          <CircularProgress size={16} sx={{ color: colors.background }} />
+                        ) : (
+                          <SearchIcon sx={{ fontSize: { xs: 16, md: 20 } }} />
+                        )}
+                      </IconButton>
                     </InputAdornment>
                   ),
                 }}
               />
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              height: "auto",
-              width: "18%",
-              display: "flex",
-              justifyContent: "space-around",
-              alignItems: "center",
-            }}
-          >
-            <Box
-              sx={{
-                height: "auto",
-                width: "auto",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                cursor: "pointer",
-              }}
-              onClick={handleProfileClick}
-            >
-              <IconButton sx={{ width: "30%" }}>
-                {isLoggedIn ? (
-                  <Avatar sx={{ width: 32, height: 32, bgcolor: "#1976d2" }}>
-                    {userInfo?.name ? (
-                      userInfo.name.charAt(0).toUpperCase()
-                    ) : (
-                      <PersonIcon />
-                    )}
-                  </Avatar>
-                ) : (
-                  <PersonOutlineIcon sx={{ fontSize: "2rem", color: "#000" }} />
-                )}
-              </IconButton>
-              <Box sx={{ width: "auto", marginLeft: "8%" }}>
-                {isLoggedIn ? (
-                  <>
-                    {/* <Typography variant='span' sx={{ fontSize: '12px', color: '#323332c2', width: '100%' }}>
-                        Welcome back
-                      </Typography>
-                      <br /> */}
-                    <Typography
-                      variant="p"
-                      sx={{ fontSize: "14px", fontWeight: 500 }}
-                    >
-                      {userInfo?.name || "User"}
-                    </Typography>
-                  </>
-                ) : (
-                  <>
-                    <Typography
-                      variant="span"
+
+              {/* Search Results Dropdown */}
+              <Fade in={showSearchResults && searchResults.length > 0}>
+                <Paper
+                  sx={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: 0,
+                    right: 0,
+                    mt: 1,
+                    maxHeight: '400px',
+                    overflowY: 'auto',
+                    zIndex: 1300,
+                    borderRadius: 3,
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                    border: `1px solid ${colors.border}`,
+                    backgroundColor: colors.background,
+                  }}
+                >
+                  {searchResults.map((product, index) => (
+                    <Box
+                      key={product._id || index}
+                      onClick={() => handleSearchResultClick(product)}
                       sx={{
-                        fontSize: "12px",
-                        color: "#323332c2",
-                        width: "100%",
+                        p: 2,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                        cursor: 'pointer',
+                        borderBottom: index < searchResults.length - 1 ? `1px solid ${colors.border}` : 'none',
+                        '&:hover': {
+                          backgroundColor: colors.lightBg,
+                        },
                       }}
                     >
-                      Sign in
-                    </Typography>
-                    <br />
-                    <Typography variant="p" sx={{ fontSize: "14px" }}>
-                      Account
-                    </Typography>
-                  </>
-                )}
+                      {product.images && product.images[0] && (
+                        <Box
+                          component="img"
+                          src={product.images[0]}
+                          alt={product.name}
+                          sx={{
+                            width: 40,
+                            height: 40,
+                            objectFit: 'cover',
+                            borderRadius: 1,
+                            border: `1px solid ${colors.border}`,
+                          }}
+                        />
+                      )}
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontWeight: 600,
+                            color: colors.text,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {product.name}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: colors.lightText,
+                            display: 'block',
+                          }}
+                        >
+                          {product.category} • ₹{product.sellingPrice || product.price}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  ))}
+                  {searchValue.trim() && (
+                    <Box
+                      onClick={handleSearch}
+                      sx={{
+                        p: 2,
+                        textAlign: 'center',
+                        cursor: 'pointer',
+                        borderTop: `1px solid ${colors.border}`,
+                        backgroundColor: colors.lightBg,
+                        '&:hover': {
+                          backgroundColor: colors.border,
+                        },
+                      }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: colors.primary,
+                          fontWeight: 600,
+                        }}
+                      >
+                        View all results for "{searchValue}"
+                      </Typography>
+                    </Box>
+                  )}
+                </Paper>
+              </Fade>
+            </Box>
+
+            {/* Desktop Navigation Icons */}
+            {!isMobile && (
+              <Box sx={{ 
+                display: "flex", 
+                alignItems: "center", 
+                gap: 3,
+                flexShrink: 0,
+              }}>
+                {/* Shop */}
+                <Box
+                  onClick={() => navigate("/ecommerceDashboard/products")}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    cursor: "pointer",
+                    padding: "10px 16px",
+                    borderRadius: "12px",
+                    "&:hover": { 
+                      backgroundColor: colors.lightBg,
+                      transform: "translateY(-2px)",
+                      boxShadow: `0 4px 12px ${colors.accent}20`,
+                    },
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  }}
+                >
+                  <StorefrontOutlinedIcon sx={{ fontSize: 22, color: colors.accent }} />
+                  <Typography sx={{ 
+                    color: colors.accent, 
+                    fontSize: "15px",
+                    fontWeight: 600,
+                  }}>
+                    Shop
+                  </Typography>
+                </Box>
+
+                {/* Help */}
+                <Box
+                  onClick={(e) => setAnchorHelp(e.currentTarget)}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    cursor: "pointer",
+                    padding: "10px 16px",
+                    borderRadius: "12px",
+                    "&:hover": { 
+                      backgroundColor: colors.lightBg,
+                      transform: "translateY(-2px)",
+                      boxShadow: `0 4px 12px ${colors.accent}20`,
+                    },
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  }}
+                >
+                  <HelpOutlineIcon sx={{ fontSize: 22, color: colors.accent }} />
+                  <Typography sx={{ 
+                    color: colors.accent, 
+                    fontSize: "15px",
+                    fontWeight: 600,
+                  }}>
+                    Help
+                  </Typography>
+                </Box>
+
+                {/* Cart */}
+                <Box
+                  onClick={() => navigate("/ecommerceDashboard/cart")}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    cursor: "pointer",
+                    padding: "8px 12px",
+                    borderRadius: "12px",
+                    "&:hover": {
+                      backgroundColor: colors.lightBg,
+                      transform: "translateY(-2px)",
+                      boxShadow: `0 4px 12px ${colors.accent}20`,
+                    },
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  }}
+                >
+                  <Badge
+                    badgeContent={totalItems || 0}
+                    color="error"
+                    sx={{
+                      "& .MuiBadge-badge": {
+                        fontSize: "12px",
+                        fontWeight: 700,
+                        minWidth: "20px",
+                        height: "20px",
+                        borderRadius: "50%",
+                        backgroundColor: colors.primary,
+                        color: colors.background,
+                        top: -6,
+                        right: -6,
+                        border: `2px solid ${colors.background}`,
+                      },
+                    }}
+                  >
+                    <ShoppingCartOutlinedIcon sx={{ fontSize: 24, color: colors.accent }} />
+                  </Badge>
+                  <Typography sx={{
+                    color: colors.accent,
+                    fontSize: "15px",
+                    fontWeight: 600,
+                    ml: 1,
+                  }}>
+                    Cart
+                  </Typography>
+                </Box>
+
+                {/* Account */}
+                <Box
+                  onClick={handleProfileClick}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    cursor: "pointer",
+                    padding: "10px 16px",
+                    borderRadius: "12px",
+                    "&:hover": { 
+                      backgroundColor: colors.lightBg,
+                      transform: "translateY(-2px)",
+                      boxShadow: `0 4px 12px ${colors.accent}20`,
+                    },
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  }}
+                >
+                  {isLoggedIn ? (
+                    <Avatar sx={{ 
+                      bgcolor: colors.primary, 
+                      width: 24, 
+                      height: 24, 
+                      fontSize: "13px",
+                      fontWeight: 600,
+                      border: `2px solid ${colors.background}`,
+                      boxShadow: `0 2px 8px ${colors.primary}30`,
+                    }}>
+                      {userInfo?.name?.charAt(0).toUpperCase()}
+                    </Avatar>
+                  ) : (
+                    <PersonOutlineIcon sx={{ fontSize: 22, color: colors.accent }} />
+                  )}
+                  <Typography sx={{ 
+                    color: colors.accent, 
+                    fontSize: "15px",
+                    fontWeight: 600,
+                    maxWidth: "100px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}>
+                    {isLoggedIn && userInfo?.name ? userInfo.name : "Account"}
+                  </Typography>
+                </Box>
               </Box>
-            </Box>
+            )}
+          </Toolbar>
+        </Container>
 
-            {/* Profile Menu */}
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={handleMenuClose}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
-              }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              sx={{
-                "& .MuiPaper-root": {
-                  minWidth: 200,
-                  mt: 1,
-                },
-              }}
-            >
-              <MenuItem onClick={handleProfileMenuClick}>
-                <PersonIcon sx={{ mr: 2, fontSize: 20 }} />
-                Profile
-              </MenuItem>
-              <MenuItem onClick={handleLogout}>
-                <PersonOutlineIcon sx={{ mr: 2, fontSize: 20 }} />
-                Logout
-              </MenuItem>
-            </Menu>
-
-            <Box
-              sx={{
-                height: "auto",
-                width: "10%",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                cursor: "pointer",
-              }}
-              onClick={() => navigate("/ecommerceDashboard/cart")}
-            >
-              <Badge badgeContent={totalItems || 0} color="secondary">
-                <ShoppingCartOutlined color="action" sx={{ fontSize: "2rem" }} />
-              </Badge>
-            </Box>
-          </Box>
-        </Toolbar>
-        <Toolbar
-          sx={{
-            height: "auto",
-            width: "75%",
-            display: "flex",
-            justifyContent: "space-between",
+        {/* Help Menu */}
+        <Menu
+          anchorEl={anchorHelp}
+          open={Boolean(anchorHelp)}
+          onClose={() => setAnchorHelp(null)}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          transformOrigin={{ vertical: "top", horizontal: "center" }}
+          PaperProps={{
+            sx: {
+              p: 2.5,
+              borderRadius: 4,
+              boxShadow: "0px 12px 32px rgba(0,0,0,0.15)",
+              minWidth: { xs: 280, md: 320 },
+              mt: 1,
+              border: `1px solid ${colors.border}`,
+            },
           }}
         >
-         
-      {/* Left side menu */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
-        {["Home", "Shop", "About Us","Blog", "Contact"].map((item, idx) => (
-          <Box 
-            key={idx} 
-            sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "pointer" }}
-            onClick={() => {
-              switch(item) {
-                case "Home":
-                  navigate("/ecommerceDashboard");
-                  break;
-                case "Shop":
-                  navigate("/ecommerceDashboard/products");
-                  break;
-                case "About Us":
-                  navigate("/ecommerceDashboard/about-us");
-                  break;
-                case "Blog":
-                  navigate("/ecommerceDashboard/blog");
-                  break;
-                case "Contact":
-                  navigate("/ecommerceDashboard/contact");
-                  break;
-                default:
-                  break;
-              }
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: "14px",
-                fontWeight: item === "Home" ? "bold" : "bold",
-                color: item === "Home" ? "black" : "black",
-                cursor: "pointer",
-                "&:hover": {
-                  color: "#1976d2",
-                  textDecoration: "underline"
-                }
-              }}
-            >
-              {item}
+          <Box sx={{ mb: 2.5 }}>
+            <Box display="flex" alignItems="center" gap={2} mb={1}>
+              <CallOutlinedIcon sx={{ color: colors.primary, fontSize: 20 }} />
+              <Typography variant="body2" fontWeight={600} sx={{ fontSize: '16px' }}>
+                079-480-58625
+              </Typography>
+            </Box>
+            <Typography variant="caption" color={colors.lightText} sx={{ 
+              ml: 5, 
+              display: 'block',
+              fontSize: '13px'
+            }}>
+              Available from 9:00AM - 7:00PM
             </Typography>
-            {/* {(item === "Home" || item === "Shop") && <ExpandMoreIcon sx={{ fontSize: "18px" }} />} */}
           </Box>
-        ))}
-      </Box>
+          
+          <Box display="flex" alignItems="center" gap={2}>
+            <MailOutlineIcon sx={{ color: colors.primary, fontSize: 20 }} />
+            <Typography variant="body2" sx={{ fontSize: '15px' }}>
+              support@medikabazaar.com
+            </Typography>
+          </Box>
+        </Menu>
 
-      {/* Right side menu */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
-        {/* <Box 
-          sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "pointer" }}
-          onClick={() => navigate("/ecommerceDashboard/products")}
+        {/* Profile Menu */}
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleMenuClose}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          transformOrigin={{ vertical: "top", horizontal: "center" }}
+          PaperProps={{
+            sx: {
+              mt: 1,
+              borderRadius: 4,
+              boxShadow: "0px 12px 32px rgba(0,0,0,0.15)",
+              minWidth: { xs: 160, md: 180 },
+              overflow: 'visible',
+              border: `1px solid ${colors.border}`,
+            },
+          }}
         >
-          <Typography 
-            sx={{ 
-              fontSize: "14px", 
-              fontWeight: 500,
-              "&:hover": {
-                color: "#1976d2",
-                textDecoration: "underline"
-              }
+          <MenuItem 
+            onClick={handleProfileMenuClick}
+            sx={{
+              px: 2.5,
+              py: 2,
+              gap: 2,
+              "&:hover": { 
+                backgroundColor: colors.lightBg,
+                transform: "translateX(4px)",
+              },
+              transition: "all 0.2s ease",
             }}
           >
-            Trending Products
-          </Typography>
-          <ExpandMoreIcon sx={{ fontSize: "18px" }} />
-        </Box> */}
-{/*  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "pointer" }}>
-          <Typography sx={{ fontSize: "14px", fontWeight: 600, color: "red" }}>
-            Almost Finished
-          </Typography>
-          <Chip label="SALE" color="error" size="small" sx={{ fontSize: "10px", height: "18px" }} />
-          <ExpandMoreIcon sx={{ fontSize: "18px" }} />
-        </Box> */}
-      </Box>
-        </Toolbar>
+            <PersonIcon sx={{ color: colors.primary, fontSize: 20 }} />
+            <Typography variant="body2" sx={{ fontSize: '15px', fontWeight: 600 }}>
+              My Profile
+            </Typography>
+          </MenuItem>
+          <MenuItem 
+            onClick={handleLogout}
+            sx={{
+              px: 2.5,
+              py: 2,
+              gap: 2,
+              "&:hover": { 
+                backgroundColor: colors.lightBg,
+                transform: "translateX(4px)",
+              },
+              transition: "all 0.2s ease",
+            }}
+          >
+            <PersonOutlineIcon sx={{ color: colors.primary, fontSize: 20 }} />
+            <Typography variant="body2" sx={{ fontSize: '15px', fontWeight: 600 }}>
+              Logout
+            </Typography>
+          </MenuItem>
+        </Menu>
       </AppBar>
-    </React.Fragment>
+
+      {/* Mobile Drawer Menu */}
+      <Drawer
+        anchor="left"
+        open={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        PaperProps={{
+          sx: {
+            width: 280,
+            backgroundColor: colors.background,
+            boxShadow: "0px 8px 32px rgba(0,0,0,0.12)",
+          },
+        }}
+      >
+        <Box sx={{ 
+          p: 2, 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between',
+          borderBottom: `1px solid ${colors.border}`,
+          backgroundColor: colors.lightBg,
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <img 
+              src={Logo} 
+              alt="Logo" 
+              style={{ height: "32px", width: "auto" }} 
+            />
+            <Typography variant="h6" sx={{ 
+              color: colors.accent, 
+              fontWeight: 600,
+              fontSize: '18px'
+            }}>
+              Menu
+            </Typography>
+          </Box>
+          <IconButton 
+            onClick={() => setMobileMenuOpen(false)}
+            sx={{ color: colors.accent }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        <List sx={{ pt: 0 }}>
+          {mobileMenuItems.map((item, index) => (
+            <React.Fragment key={index}>
+              <ListItem
+                component="button"
+                onClick={() => handleMobileMenuItemClick(item.action)}
+                sx={{
+                  py: 2,
+                  px: 3,
+                  transition: "all 0.3s ease",
+                  borderLeft: `4px solid transparent`,
+                  "&:hover": {
+                    borderLeft: `4px solid ${colors.primary}`,
+                    backgroundColor: colors.lightBg,
+                    transform: "translateX(8px)",
+                  },
+                }}
+              >
+                <ListItemIcon sx={{ 
+                  minWidth: 50,
+                  color: colors.accent,
+                  position: 'relative'
+                }}>
+                  {item.badge > 0 ? (
+                    <Badge
+                      badgeContent={item.badge}
+                      color="error"
+                      sx={{
+                        "& .MuiBadge-badge": {
+                          backgroundColor: colors.primary,
+                          color: colors.background,
+                          fontSize: '11px',
+                          fontWeight: 700,
+                        },
+                      }}
+                    >
+                      {item.icon}
+                    </Badge>
+                  ) : (
+                    item.icon
+                  )}
+                </ListItemIcon>
+                <ListItemText 
+                  primary={
+                    <Typography sx={{ 
+                      fontWeight: 600,
+                      color: colors.text,
+                      fontSize: '16px'
+                    }}>
+                      {item.text}
+                    </Typography>
+                  }
+                  secondary={
+                    item.subText && (
+                      <Typography sx={{ 
+                        color: colors.lightText,
+                        fontSize: '13px',
+                        mt: 0.5
+                      }}>
+                        {item.subText}
+                      </Typography>
+                    )
+                  }
+                />
+              </ListItem>
+              {index < mobileMenuItems.length - 1 && (
+                <Divider sx={{ 
+                  mx: 2, 
+                  borderColor: colors.border,
+                  opacity: 0.6 
+                }} />
+              )}
+            </React.Fragment>
+          ))}
+        </List>
+
+        {/* Mobile Help Section */}
+        <Box sx={{ 
+          mt: 'auto', 
+          p: 3, 
+          backgroundColor: colors.lightBg,
+          borderTop: `1px solid ${colors.border}`
+        }}>
+          <Typography variant="body2" fontWeight={600} sx={{ 
+            mb: 2, 
+            color: colors.text,
+            fontSize: '15px'
+          }}>
+            Need Help?
+          </Typography>
+          <Box sx={{ mb: 2 }}>
+            <Box display="flex" alignItems="center" gap={2} mb={1}>
+              <CallOutlinedIcon sx={{ color: colors.primary, fontSize: 18 }} />
+              <Typography variant="body2" sx={{ fontSize: '14px', fontWeight: 600 }}>
+                079-480-58625
+              </Typography>
+            </Box>
+            <Typography variant="caption" color={colors.lightText} sx={{ 
+              ml: 4, 
+              fontSize: '12px'
+            }}>
+              9:00AM - 7:00PM
+            </Typography>
+          </Box>
+          
+          <Box display="flex" alignItems="center" gap={2}>
+            <MailOutlineIcon sx={{ color: colors.primary, fontSize: 18 }} />
+            <Typography variant="body2" sx={{ fontSize: '13px' }}>
+              support@medikabazaar.com
+            </Typography>
+          </Box>
+        </Box>
+      </Drawer>
+
+      {/* Backdrop for search results */}
+      {showSearchResults && (
+        <Box
+          onClick={() => setShowSearchResults(false)}
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 1200,
+            backgroundColor: 'transparent',
+          }}
+        />
+      )}
+    </>
   );
 };
 
