@@ -131,10 +131,36 @@ const EditProfile = () => {
   const [featureImage, setFeatureImage] = useState(null);
   const [labelChanges, setLabelChanges] = useState("");
   const type = sessionStorage.getItem("userType");
+  
+  // Add state variables for prefilling
+  const [prefillData, setPrefillData] = useState({
+    country: null,
+    state: null,
+    city: null
+  });
 
   useEffect(() => {
     fetchVendorData();
   }, []);
+
+  // Handle sequential prefilling of country, state, city
+  useEffect(() => {
+    if (prefillData.country && !country) {
+      setCountry(prefillData.country);
+    }
+  }, [prefillData.country, country]);
+
+  useEffect(() => {
+    if (prefillData.state && country && !currentState) {
+      setCurrentState(prefillData.state);
+    }
+  }, [prefillData.state, country, currentState]);
+
+  useEffect(() => {
+    if (prefillData.city && currentState && !currentCity) {
+      setCurrentCity(prefillData.city);
+    }
+  }, [prefillData.city, currentState, currentCity]);
 
   const fetchVendorData = async () => {
     try {
@@ -204,15 +230,13 @@ const EditProfile = () => {
           setLabelChanges(data.vendorType);
         }
 
-        // Set country, state, city for dropdowns
-        if (data.country) {
-          setCountry({ name: data.country });
-        }
-        if (data.state) {
-          setCurrentState({ name: data.state });
-        }
-        if (data.city) {
-          setCurrentCity({ name: data.city });
+        // Store country, state, city data for sequential prefilling
+        if (data.country || data.state || data.city) {
+          setPrefillData({
+            country: data.country ? { name: data.country } : null,
+            state: data.state ? { name: data.state } : null,
+            city: data.city ? { name: data.city } : null
+          });
         }
 
         // Handle existing files if any
@@ -436,6 +460,40 @@ const EditProfile = () => {
     } else if (allData.vendorType === "") {
       setErrorMsg({ ...errorMsg, vendorTypeError: "Vendor type is required" });
     } else {
+      // Validate mandatory file uploads for vendors
+      let vendorFileError = "";
+      
+      if (allData.vendorType === "manufacturing") {
+        if (!manufacturingImageFile.mdmLicense) {
+          vendorFileError = "MDM License is mandatory for Manufacturing vendors";
+        }
+      } else if (allData.vendorType === "oem") {
+        if (!manufacturingImageFile.loanLicense) {
+          vendorFileError = "Loan License is mandatory for OEM vendors";
+        }
+        if (!manufacturingImageFile.establishmentProof) {
+          vendorFileError = "Establishment Proof is mandatory for OEM vendors";
+        }
+      } else if (allData.vendorType === "dealer") {
+        if (!manufacturingImageFile.cfDL) {
+          vendorFileError = "D/L is mandatory for C&F / Super Stockist / Dealer's vendors";
+        }
+        if (!manufacturingImageFile.cfGumasta) {
+          vendorFileError = "Gumasta is mandatory for C&F / Super Stockist / Dealer's vendors";
+        }
+        if (!manufacturingImageFile.cfEstablishmentProof) {
+          vendorFileError = "Establishment Proof is mandatory for C&F / Super Stockist / Dealer's vendors";
+        }
+        if (!manufacturingImageFile.cfAuthorization) {
+          vendorFileError = "Authorization of Company is mandatory for C&F / Super Stockist / Dealer's vendors";
+        }
+      }
+      
+      if (vendorFileError) {
+        setErrorMsg({ ...errorMsg, vendorTypeError: vendorFileError });
+        return;
+      }
+      
       setErrorMsg({
         addressLine1Error: '', numberError: "", cityError: "", stateError: "", pincodeError: "", vendorTypeError: "",countryError:"", fullNameError: ""
       });
@@ -692,7 +750,7 @@ const EditProfile = () => {
               {allData.vendorType === "manufacturing" && (
                 <>
                   <Grid item size={6}>
-                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>MDM License</Typography>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>MDM License<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
                     <div style={{ display: 'flex', alignItems: 'center', }}>
                       <div >
                         <Button
@@ -782,6 +840,419 @@ const EditProfile = () => {
                     </div>
                   </Grid>
                   {/* Add other manufacturing fields similar to Details.jsx */}
+                </>
+              )}
+              {allData.vendorType === "oem" && (
+                <>
+                  <Grid item size={6}>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Loan License<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                    <div style={{ display: 'flex', alignItems: 'center', }}>
+                      <div >
+                        <Button
+                          sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                          component="label"
+                          variant="contained"
+                          tabIndex={-1}
+                          startIcon={<CloudUpload />}
+                        >
+                          Upload
+                          <VisuallyHiddenInput
+                            type="file"
+                            accept="
+                      image/png,
+                      image/jpeg,
+                      application/pdf,
+                      application/msword,
+                      application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                      application/vnd.ms-excel,
+                      application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                      "
+                            onChange={(e) => handleFileChange(e, 'loanLicense')}
+                          />
+                        </Button>
+                      </div>
+                      <div>
+                        {manufacturingImage.loanLicense && (
+                          <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                            <img src={imageType?.loanLicense === "pdf" ? PDFIcon : imageType?.loanLicense === "docx" ? WordIcon : imageType?.loanLicense === "png" ? PngIcon : imageType?.loanLicense === "jpeg" ? JpegIcon : imageType.loanLicense === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
+                            <a
+                              href={URL.createObjectURL(manufacturingImageFile.loanLicense)}
+                              download={manufacturingImageFile.loanLicense.name}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                            >
+                              {manufacturingImageFile.loanLicense.name}
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </Grid>
+                  <Grid item size={6}>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Establishment Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                    <div style={{ display: 'flex', alignItems: 'center', }}>
+                      <div >
+                        <Button
+                          sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                          component="label"
+                          variant="contained"
+                          tabIndex={-1}
+                          startIcon={<CloudUpload />}
+                        >
+                          Upload
+                          <VisuallyHiddenInput
+                            type="file"
+                            accept="
+                      image/png,
+                      image/jpeg,
+                      application/pdf,
+                      application/msword,
+                      application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                      application/vnd.ms-excel,
+                      application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                      "
+                            onChange={(e) => handleFileChange(e, 'establishmentProof')}
+                          />
+                        </Button>
+                      </div>
+                      <div>
+                        {manufacturingImage.establishmentProof && (
+                          <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                            <img src={imageType?.establishmentProof === "pdf" ? PDFIcon : imageType?.establishmentProof === "docx" ? WordIcon : imageType?.establishmentProof === "png" ? PngIcon : imageType?.establishmentProof === "jpeg" ? JpegIcon : imageType.establishmentProof === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
+                            <a
+                              href={URL.createObjectURL(manufacturingImageFile.establishmentProof)}
+                              download={manufacturingImageFile.establishmentProof.name}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                            >
+                              {manufacturingImageFile.establishmentProof.name}
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </Grid>
+                  <Grid item size={6}>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>D/L (Optional)</Typography>
+                    <div style={{ display: 'flex', alignItems: 'center', }}>
+                      <div >
+                        <Button
+                          sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                          component="label"
+                          variant="contained"
+                          tabIndex={-1}
+                          startIcon={<CloudUpload />}
+                        >
+                          Upload
+                          <VisuallyHiddenInput
+                            type="file"
+                            accept="
+                      image/png,
+                      image/jpeg,
+                      application/pdf,
+                      application/msword,
+                      application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                      application/vnd.ms-excel,
+                      application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                      "
+                            onChange={(e) => handleFileChange(e, 'dl')}
+                          />
+                        </Button>
+                      </div>
+                      <div>
+                        {manufacturingImage.dl && (
+                          <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                            <img src={imageType?.dl === "pdf" ? PDFIcon : imageType?.dl === "docx" ? WordIcon : imageType?.dl === "png" ? PngIcon : imageType?.dl === "jpeg" ? JpegIcon : imageType.dl === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
+                            <a
+                              href={URL.createObjectURL(manufacturingImageFile.dl)}
+                              download={manufacturingImageFile.dl.name}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                            >
+                              {manufacturingImageFile.dl.name}
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </Grid>
+                  <Grid item size={6}>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>ISO/FDA/CE (Optional)</Typography>
+                    <div style={{ display: 'flex', alignItems: 'center', }}>
+                      <div >
+                        <Button
+                          sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                          component="label"
+                          variant="contained"
+                          tabIndex={-1}
+                          startIcon={<CloudUpload />}
+                        >
+                          Upload
+                          <VisuallyHiddenInput
+                            type="file"
+                            accept="
+                      image/png,
+                      image/jpeg,
+                      application/pdf,
+                      application/msword,
+                      application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                      application/vnd.ms-excel,
+                      application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                      "
+                            onChange={(e) => handleFileChange(e, 'fda')}
+                          />
+                        </Button>
+                      </div>
+                      <div>
+                        {manufacturingImage.fda && (
+                          <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                            <img src={imageType?.fda === "pdf" ? PDFIcon : imageType?.fda === "docx" ? WordIcon : imageType?.fda === "png" ? PngIcon : imageType?.fda === "jpeg" ? JpegIcon : imageType.fda === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
+                            <a
+                              href={URL.createObjectURL(manufacturingImageFile.fda)}
+                              download={manufacturingImageFile.fda.name}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                            >
+                              {manufacturingImageFile.fda.name}
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </Grid>
+                </>
+              )}
+              {allData.vendorType === "dealer" && (
+                <>
+                  <Grid item size={6}>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>D/L<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                    <div style={{ display: 'flex', alignItems: 'center', }}>
+                      <div >
+                        <Button
+                          sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                          component="label"
+                          variant="contained"
+                          tabIndex={-1}
+                          startIcon={<CloudUpload />}
+                        >
+                          Upload
+                          <VisuallyHiddenInput
+                            type="file"
+                            accept="
+                      image/png,
+                      image/jpeg,
+                      application/pdf,
+                      application/msword,
+                      application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                      application/vnd.ms-excel,
+                      application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                      "
+                            onChange={(e) => handleFileChange(e, 'cfDL')}
+                          />
+                        </Button>
+                      </div>
+                      <div>
+                        {manufacturingImage.cfDL && (
+                          <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                            <img src={imageType?.cfDL === "pdf" ? PDFIcon : imageType?.cfDL === "docx" ? WordIcon : imageType?.cfDL === "png" ? PngIcon : imageType?.cfDL === "jpeg" ? JpegIcon : imageType.cfDL === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
+                            <a
+                              href={URL.createObjectURL(manufacturingImageFile.cfDL)}
+                              download={manufacturingImageFile.cfDL.name}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                            >
+                              {manufacturingImageFile.cfDL.name}
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </Grid>
+                  <Grid item size={6}>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Gumasta<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                    <div style={{ display: 'flex', alignItems: 'center', }}>
+                      <div >
+                        <Button
+                          sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                          component="label"
+                          variant="contained"
+                          tabIndex={-1}
+                          startIcon={<CloudUpload />}
+                        >
+                          Upload
+                          <VisuallyHiddenInput
+                            type="file"
+                            accept="
+                      image/png,
+                      image/jpeg,
+                      application/pdf,
+                      application/msword,
+                      application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                      application/vnd.ms-excel,
+                      application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                      "
+                            onChange={(e) => handleFileChange(e, 'cfGumasta')}
+                          />
+                        </Button>
+                      </div>
+                      <div>
+                        {manufacturingImage.cfGumasta && (
+                          <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                            <img src={imageType?.cfGumasta === "pdf" ? PDFIcon : imageType?.cfGumasta === "docx" ? WordIcon : imageType?.cfGumasta === "png" ? PngIcon : imageType?.cfGumasta === "jpeg" ? JpegIcon : imageType.cfGumasta === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
+                            <a
+                              href={URL.createObjectURL(manufacturingImageFile.cfGumasta)}
+                              download={manufacturingImageFile.cfGumasta.name}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                            >
+                              {manufacturingImageFile.cfGumasta.name}
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </Grid>
+                  <Grid item size={6}>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>GST (Optional)</Typography>
+                    <div style={{ display: 'flex', alignItems: 'center', }}>
+                      <div >
+                        <Button
+                          sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                          component="label"
+                          variant="contained"
+                          tabIndex={-1}
+                          startIcon={<CloudUpload />}
+                        >
+                          Upload
+                          <VisuallyHiddenInput
+                            type="file"
+                            accept="
+                      image/png,
+                      image/jpeg,
+                      application/pdf,
+                      application/msword,
+                      application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                      application/vnd.ms-excel,
+                      application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                      "
+                            onChange={(e) => handleFileChange(e, 'cfGst')}
+                          />
+                        </Button>
+                      </div>
+                      <div>
+                        {manufacturingImage.cfGst && (
+                          <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                            <img src={imageType?.cfGst === "pdf" ? PDFIcon : imageType?.cfGst === "docx" ? WordIcon : imageType?.cfGst === "png" ? PngIcon : imageType?.cfGst === "jpeg" ? JpegIcon : imageType.cfGst === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
+                            <a
+                              href={URL.createObjectURL(manufacturingImageFile.cfGst)}
+                              download={manufacturingImageFile.cfGst.name}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                            >
+                              {manufacturingImageFile.cfGst.name}
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </Grid>
+                  <Grid item size={6}>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Establishment Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                    <div style={{ display: 'flex', alignItems: 'center', }}>
+                      <div >
+                        <Button
+                          sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                          component="label"
+                          variant="contained"
+                          tabIndex={-1}
+                          startIcon={<CloudUpload />}
+                        >
+                          Upload
+                          <VisuallyHiddenInput
+                            type="file"
+                            accept="
+                      image/png,
+                      image/jpeg,
+                      application/pdf,
+                      application/msword,
+                      application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                      application/vnd.ms-excel,
+                      application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                      "
+                            onChange={(e) => handleFileChange(e, 'cfEstablishmentProof')}
+                          />
+                        </Button>
+                      </div>
+                      <div>
+                        {manufacturingImage.cfEstablishmentProof && (
+                          <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                            <img src={imageType?.cfEstablishmentProof === "pdf" ? PDFIcon : imageType?.cfEstablishmentProof === "docx" ? WordIcon : imageType?.cfEstablishmentProof === "png" ? PngIcon : imageType?.cfEstablishmentProof === "jpeg" ? JpegIcon : imageType.cfEstablishmentProof === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
+                            <a
+                              href={URL.createObjectURL(manufacturingImageFile.cfEstablishmentProof)}
+                              download={manufacturingImageFile.cfEstablishmentProof.name}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                            >
+                              {manufacturingImageFile.cfEstablishmentProof.name}
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </Grid>
+                  <Grid item size={6}>
+                    <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Authorization of Company<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                    <div style={{ display: 'flex', alignItems: 'center', }}>
+                      <div >
+                        <Button
+                          sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                          component="label"
+                          variant="contained"
+                          tabIndex={-1}
+                          startIcon={<CloudUpload />}
+                        >
+                          Upload
+                          <VisuallyHiddenInput
+                            type="file"
+                            accept="
+                      image/png,
+                      image/jpeg,
+                      application/pdf,
+                      application/msword,
+                      application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                      application/vnd.ms-excel,
+                      application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                      "
+                            onChange={(e) => handleFileChange(e, 'cfAuthorization')}
+                          />
+                        </Button>
+                      </div>
+                      <div>
+                        {manufacturingImage.cfAuthorization && (
+                          <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                            <img src={imageType?.cfAuthorization === "pdf" ? PDFIcon : imageType?.cfAuthorization === "docx" ? WordIcon : imageType?.cfAuthorization === "png" ? PngIcon : imageType?.cfAuthorization === "jpeg" ? JpegIcon : imageType.cfAuthorization === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
+                            <a
+                              href={URL.createObjectURL(manufacturingImageFile.cfAuthorization)}
+                              download={manufacturingImageFile.cfAuthorization.name}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                            >
+                              {manufacturingImageFile.cfAuthorization.name}
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </Grid>
                 </>
               )}
               {/* Add OEM and Dealer sections similar to Details.jsx */}

@@ -8,6 +8,43 @@ import EnhancedEncryptionIcon from '@mui/icons-material/EnhancedEncryption';
 
 const LandingNavbar = () => {
     const navigate = useNavigate()
+    
+    const handleShopNowClick = () => {
+        const jwt = sessionStorage.getItem('jwt');
+        const userType = sessionStorage.getItem('userType');
+        
+        if (jwt && userType) {
+            // User is already logged in, redirect to appropriate dashboard
+            if (userType === 'user' || userType === 'customer') {
+                navigate('/customer');
+            } else if (userType === 'vendor') {
+                navigate('/vendor');
+            }
+        } else {
+            // User is not logged in, go to registration
+            sessionStorage.setItem("userType", "user");
+            navigate('/auth/register');
+        }
+    };
+    
+    const handleBeASellerClick = () => {
+        const jwt = sessionStorage.getItem('jwt');
+        const userType = sessionStorage.getItem('userType');
+        
+        if (jwt && userType) {
+            // User is already logged in, redirect to appropriate dashboard
+            if (userType === 'user' || userType === 'customer') {
+                navigate('/customer');
+            } else if (userType === 'vendor') {
+                navigate('/vendor');
+            }
+        } else {
+            // User is not logged in, go to registration
+            sessionStorage.setItem("userType", "vendor");
+            navigate('/auth/register');
+        }
+    };
+    
     return (
         <React.Fragment>
             <AppBar position="static" sx={{ background: 'transparent', boxShadow: 'none', padding: '1% 0 0'}}>
@@ -69,11 +106,11 @@ const LandingNavbar = () => {
                             Reach Us</Typography></Link>
                     </Stack>
                     <Stack direction='row' spacing={3}>
-                        <Box sx={{ height: '50px', width: '150px', borderBottom: 'solid 1.8px #c5225f', display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', cursor: 'pointer' }} onClick={() => { navigate('/auth/register'), sessionStorage.setItem("userType", "user") }}>
+                        <Box sx={{ height: '50px', width: '150px', borderBottom: 'solid 1.8px #c5225f', display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', cursor: 'pointer' }} onClick={handleShopNowClick}>
                             <LocalMallIcon sx={{ color: 'black', fontSize: '1.6rem' }} />
                             <Typography variant='span' component='div' sx={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'black', marginTop: '5px' }}>SHOP NOW</Typography>
                         </Box>
-                        <Box sx={{ height: '50px', width: '160px', borderBottom: 'solid 1.8px #009e92', display: 'flex', justifyContent: 'space-around', alignItems: 'center', cursor: 'pointer' }} onClick={() => { navigate('/auth/register'), sessionStorage.setItem("userType", "vendor") }}>
+                        <Box sx={{ height: '50px', width: '160px', borderBottom: 'solid 1.8px #009e92', display: 'flex', justifyContent: 'space-around', alignItems: 'center', cursor: 'pointer' }} onClick={handleBeASellerClick}>
                             <EnhancedEncryptionIcon sx={{ color: 'black', fontSize: '1.8rem' }} />
                             <Typography variant='span' component='div' sx={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'black', marginTop: '5px' }}>BE A SELLER</Typography>
                         </Box>

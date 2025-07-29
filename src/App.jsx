@@ -36,7 +36,6 @@ import ForgotPassword from "./pages/login/forgotPassword/ForgotPassword.jsx";
 import ThankYou from "./pages/eCommerce/ThankYou.jsx";
 import UserEditProfile from "./pages/user/EditProfile.jsx";
 import VendorEditProfile from "./pages/vendor/EditProfile.jsx";
-import AuthRedirect from "./components/AuthRedirect.jsx";
 
 const App = () => {
   // Use the scroll to top hook
@@ -50,7 +49,6 @@ const App = () => {
         {/* Landing Page */}
         <Route path="/" element={
           <>
-            <AuthRedirect />
           <AnimatedPage animationType="fade" timeout={1000}>
             <LandingHomepage />
           </AnimatedPage>
