@@ -24,7 +24,9 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  CircularProgress
+  CircularProgress,
+  Tooltip,
+  Divider
 } from '@mui/material';
 import {
   Search,
@@ -33,7 +35,11 @@ import {
   Edit,
   Delete,
   Visibility as VisibilityIcon,
-  Add as AddIcon
+  Add as AddIcon,
+  LocalOffer,
+  CalendarToday,
+  Category,
+  PriceCheck
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -41,6 +47,8 @@ import { fetchAllProducts, clearError } from '../reducers/ProductReducer';
 
 const Products = () => {
   const [page, setPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('latest');
   const navigate = useNavigate();
   
   // Redux
@@ -51,7 +59,7 @@ const Products = () => {
   const [pagination, setPagination] = useState({
     total: 0,
     page: 1,
-    limit: 10,
+    limit: 12,
     totalPages: 1
   });
 
@@ -84,14 +92,48 @@ const Products = () => {
   // Get the actual products array from the response
   const productsList = products?.data || products || [];
   
+  // Filter and sort products
+  const filteredProducts = productsList.filter(product => 
+    product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.brandName?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Sort products
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    switch (sortBy) {
+      case 'latest':
+        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+      case 'oldest':
+        return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
+      case 'price-high':
+        return (b.price || 0) - (a.price || 0);
+      case 'price-low':
+        return (a.price || 0) - (b.price || 0);
+      default:
+        return 0;
+    }
+  });
+  
   // Use API pagination if available, otherwise use client-side pagination
   const PRODUCTS_PER_PAGE = 12;
   const startIdx = (page - 1) * PRODUCTS_PER_PAGE;
   const endIdx = startIdx + PRODUCTS_PER_PAGE;
-  const paginatedProducts = productsList.slice(startIdx, endIdx);
+  const paginatedProducts = sortedProducts.slice(startIdx, endIdx);
   
   // Use API pagination count if available, otherwise calculate from client-side
-  const pageCount = products?.pagination?.totalPages || Math.ceil(productsList.length / PRODUCTS_PER_PAGE);
+  const pageCount = products?.pagination?.totalPages || Math.ceil(sortedProducts.length / PRODUCTS_PER_PAGE);
+
+  // Format date
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  };
 
   // Loading state
   if (loading && productsList.length === 0) {
@@ -160,8 +202,90 @@ const Products = () => {
         </Button>
       </Box>
 
+      {/* Search and Filter Bar */}
+      <Box sx={{ 
+        mb: 3, 
+        p: 3, 
+        background: '#ffffff', 
+        borderRadius: 3, 
+        border: '1px solid #e0e0e0',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+      }}>
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} md={6}>
+            <TextField
+              fullWidth
+              placeholder="Search products by name, description, or brand..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search sx={{ color: '#666' }} />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  '&:hover fieldset': {
+                    borderColor: '#2c3e50',
+                  },
+                }
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <FormControl fullWidth>
+              <InputLabel>Sort by</InputLabel>
+              <Select
+                value={sortBy}
+                label="Sort by"
+                onChange={(e) => setSortBy(e.target.value)}
+                sx={{
+                  borderRadius: 2,
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#e0e0e0'
+                  }
+                }}
+              >
+                <MenuItem value="latest">Latest</MenuItem>
+                <MenuItem value="oldest">Oldest</MenuItem>
+                <MenuItem value="price-high">Price: High to Low</MenuItem>
+                <MenuItem value="price-low">Price: Low to High</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Chip 
+                label={`${sortedProducts.length} products`} 
+                size="small" 
+                sx={{ 
+                  background: '#f8f9fa',
+                  color: '#2c3e50',
+                  fontWeight: 500
+                }} 
+              />
+              {searchTerm && (
+                <Chip 
+                  label={`"${searchTerm}"`} 
+                  size="small" 
+                  onDelete={() => setSearchTerm('')}
+                  sx={{ 
+                    background: '#e3f2fd',
+                    color: '#1976d2',
+                    fontWeight: 500
+                  }} 
+                />
+              )}
+            </Box>
+          </Grid>
+        </Grid>
+      </Box>
+
       {/* Products Count */}
-      {productsList.length > 0 && (
+      {sortedProducts.length > 0 && (
         <Box sx={{ 
           mb: 3, 
           p: 2, 
@@ -179,33 +303,24 @@ const Products = () => {
             fontWeight: 500,
             fontSize: '0.875rem'
           }}>
-            Showing {productsList.length} of {products?.pagination?.total || productsList.length} product{(products?.pagination?.total || productsList.length) !== 1 ? 's' : ''}
+            Showing {paginatedProducts.length} of {sortedProducts.length} product{sortedProducts.length !== 1 ? 's' : ''}
+            {searchTerm && ` matching "${searchTerm}"`}
           </Typography>
-          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            <Typography variant="body2" sx={{ color: '#999', fontSize: '0.75rem' }}>
-              Sort by:
-            </Typography>
-            <Select
-              size="small"
-              value="latest"
-              sx={{ 
-                minWidth: 120,
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#e0e0e0'
-                }
-              }}
-            >
-              <MenuItem value="latest">Latest</MenuItem>
-              <MenuItem value="oldest">Oldest</MenuItem>
-              <MenuItem value="price-high">Price: High to Low</MenuItem>
-              <MenuItem value="price-low">Price: Low to High</MenuItem>
-            </Select>
-          </Box>
+          <Typography variant="body2" sx={{ 
+            color: '#999', 
+            fontSize: '0.75rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5
+          }}>
+            <CalendarToday sx={{ fontSize: 14 }} />
+            Last updated: {formatDate(new Date())}
+          </Typography>
         </Box>
       )}
 
       {/* Products Grid */}
-      {productsList.length === 0 && !loading ? (
+      {sortedProducts.length === 0 && !loading ? (
         <Box sx={{ 
           textAlign: 'center', 
           py: 8,
@@ -233,7 +348,7 @@ const Products = () => {
             fontWeight: 600,
             mb: 2
           }}>
-            No products found
+            {searchTerm ? 'No products found' : 'No products yet'}
           </Typography>
           <Typography variant="body1" sx={{ 
             color: '#666',
@@ -242,7 +357,10 @@ const Products = () => {
             mx: 'auto',
             lineHeight: 1.6
           }}>
-            Start building your product catalog by adding your first product. It only takes a few minutes!
+            {searchTerm 
+              ? `No products match your search "${searchTerm}". Try different keywords.`
+              : 'Start building your product catalog by adding your first product. It only takes a few minutes!'
+            }
           </Typography>
           <Button
             variant="contained"
@@ -264,17 +382,27 @@ const Products = () => {
             }}
             onClick={() => navigate('/vendor/products/add')}
           >
-            Add Your First Product
+            {searchTerm ? 'Clear Search' : 'Add Your First Product'}
           </Button>
         </Box>
       ) : (
-        <Grid container spacing={3} sx={{ width: '100%', m: 0 }}>
+        <Box sx={{ 
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            sm: 'repeat(2, 1fr)',
+            md: 'repeat(3, 1fr)',
+            lg: 'repeat(4, 1fr)'
+          },
+          gap: 3,
+          width: '100%'
+        }}>
           {paginatedProducts.map((product) => (
-            <Grid item xs={12} sm={6} md={3} lg={3} xl={3} key={product.id}>
+            <Box key={product.id} sx={{ display: 'flex' }}>
               <Card 
                 sx={{ 
                   borderRadius: 3, 
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)', 
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.08)', 
                   height: '100%', 
                   display: 'flex', 
                   flexDirection: 'column',
@@ -282,12 +410,17 @@ const Products = () => {
                   border: '1px solid #f0f0f0',
                   position: 'relative',
                   overflow: 'hidden',
+                  background: '#ffffff',
                   '&:hover': {
-                    transform: 'translateY(-6px)',
-                    boxShadow: '0 12px 32px rgba(0,0,0,0.12)',
+                    transform: 'translateY(-8px)',
+                    boxShadow: '0 16px 40px rgba(0,0,0,0.15)',
                     borderColor: '#2c3e50',
                     '& .product-image': {
-                      transform: 'scale(1.05)'
+                      transform: 'scale(1.08)'
+                    },
+                    '& .product-actions': {
+                      opacity: 1,
+                      transform: 'translateY(0)'
                     }
                   }
                 }}
@@ -299,48 +432,100 @@ const Products = () => {
                     className="product-image"
                     sx={{
                       width: '100%',
-                      height: 200,
+                      height: 220,
                       objectFit: 'cover',
                       background: '#f8fafc',
-                      transition: 'transform 0.3s ease-in-out'
+                      transition: 'transform 0.4s ease-in-out'
                     }}
-                    image={product.thumbnailImage || 'https://via.placeholder.com/300x200?text=No+Image'}
+                    image={product.thumbnailImage || 'https://via.placeholder.com/300x220?text=No+Image'}
                     alt={product.name}
                     onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
+                      e.target.src = 'https://via.placeholder.com/300x220?text=No+Image';
                     }}
                   />
+                  
                   {/* Status Badge */}
                   <Box sx={{
                     position: 'absolute',
                     top: 12,
-                    right: 12,
-                    background: 'rgba(44, 62, 80, 0.9)',
+                    left: 12,
+                    background: 'rgba(44, 62, 80, 0.95)',
                     color: 'white',
                     px: 1.5,
                     py: 0.5,
                     borderRadius: 2,
                     fontSize: '0.75rem',
                     fontWeight: 600,
-                    backdropFilter: 'blur(4px)'
+                    backdropFilter: 'blur(4px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5
                   }}>
-                    Active
+                    <LocalOffer sx={{ fontSize: 14 }} />
+                    {product.status || 'Active'}
+                  </Box>
+
+                  {/* Price Badge */}
+                  <Box sx={{
+                    position: 'absolute',
+                    top: 12,
+                    right: 12,
+                    background: 'rgba(25, 118, 210, 0.95)',
+                    color: 'white',
+                    px: 1.5,
+                    py: 0.5,
+                    borderRadius: 2,
+                    fontSize: '0.875rem',
+                    fontWeight: 700,
+                    backdropFilter: 'blur(4px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5
+                  }}>
+                    <PriceCheck sx={{ fontSize: 16 }} />
+                    ₹{product.price}
                   </Box>
                 </Box>
                 
                 <CardContent sx={{ flexGrow: 1, p: 3 }}>
-                  {/* Price */}
+                  {/* Product Name */}
                   <Typography 
-                    variant="h5" 
+                    variant="h6" 
                     sx={{ 
                       fontWeight: 700, 
+                      mb: 1.5,
+                      lineHeight: 1.3,
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
                       color: '#2c3e50',
-                      mb: 1,
-                      fontSize: '1.5rem'
+                      fontSize: '1.1rem',
+                      minHeight: '2.6em'
                     }}
                   >
-                    ₹{product.price}
+                    {product.name}
                   </Typography>
+
+                  {/* Brand Name */}
+                  {product.brandName && (
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        mb: 1.5,
+                        color: '#666',
+                        fontWeight: 500,
+                        fontSize: '0.875rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 0.5
+                      }}
+                    >
+                      <Category sx={{ fontSize: 16 }} />
+                      {product.brandName}
+                    </Typography>
+                  )}
                   
                   {/* Price Label */}
                   {product.priceLable && (
@@ -350,58 +535,43 @@ const Products = () => {
                         mb: 1.5,
                         color: '#666',
                         fontStyle: 'italic',
-                        fontSize: '0.875rem'
+                        fontSize: '0.875rem',
+                        background: '#f8f9fa',
+                        px: 1.5,
+                        py: 0.5,
+                        borderRadius: 1,
+                        display: 'inline-block'
                       }}
                     >
                       {product.priceLable}
                     </Typography>
                   )}
                   
-                  {/* Product Name */}
-                  <Typography 
-                    variant="h6" 
-                    sx={{ 
-                      fontWeight: 600, 
-                      mb: 1.5,
-                      lineHeight: 1.3,
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      color: '#333',
-                      fontSize: '1.1rem',
-                      maxWidth: '200px'
-                    }}
-                  >
-                    {product.name}
-                  </Typography>
-                  
-
-                  
                   {/* Category and Subcategory */}
                   <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
-                    <Chip 
-                      label={product.category} 
-                      size="small" 
-                      sx={{ 
-                        background: '#f8f9fa',
-                        color: '#2c3e50',
-                        fontWeight: 500,
-                        textTransform: 'capitalize',
-                        border: '1px solid #e0e0e0'
-                      }} 
-                    />
+                    {product.category && (
+                      <Chip 
+                        label={product.category} 
+                        size="small" 
+                        sx={{ 
+                          background: '#e3f2fd',
+                          color: '#1976d2',
+                          fontWeight: 600,
+                          textTransform: 'capitalize',
+                          border: '1px solid #bbdefb'
+                        }} 
+                      />
+                    )}
                     {product.subCategory && (
                       <Chip 
                         label={product.subCategory} 
                         size="small" 
                         sx={{ 
-                          background: '#f8f9fa',
-                          color: '#2c3e50',
-                          fontWeight: 500,
+                          background: '#f3e5f5',
+                          color: '#7b1fa2',
+                          fontWeight: 600,
                           textTransform: 'capitalize',
-                          border: '1px solid #e0e0e0'
+                          border: '1px solid #e1bee7'
                         }} 
                       />
                     )}
@@ -414,14 +584,14 @@ const Products = () => {
                       sx={{ 
                         mb: 2,
                         display: '-webkit-box',
-                        WebkitLineClamp: 2,
+                        WebkitLineClamp: 3,
                         WebkitBoxOrient: 'vertical',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
-                        lineHeight: 1.4,
+                        lineHeight: 1.5,
                         color: '#666',
                         fontSize: '0.875rem',
-                        maxWidth: '200px'
+                        minHeight: '3.9em'
                       }}
                     >
                       {product.description}
@@ -430,50 +600,85 @@ const Products = () => {
                   
                   {/* Expiry Date */}
                   {product.expiresOn && (
-                    <Typography 
-                      variant="caption" 
-                      sx={{ 
-                        display: 'block',
-                        mb: 2,
-                        color: '#999',
-                        fontSize: '0.75rem',
-                        fontWeight: 500
-                      }}
-                    >
-                      Expires: {product.expiresOn}
-                    </Typography>
+                    <Box sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: 0.5,
+                      mb: 2,
+                      p: 1,
+                      background: '#fff3e0',
+                      borderRadius: 1,
+                      border: '1px solid #ffcc02'
+                    }}>
+                      <CalendarToday sx={{ fontSize: 14, color: '#f57c00' }} />
+                      <Typography 
+                        variant="caption" 
+                        sx={{ 
+                          color: '#e65100',
+                          fontSize: '0.75rem',
+                          fontWeight: 600
+                        }}
+                      >
+                        Expires: {formatDate(product.expiresOn)}
+                      </Typography>
+                    </Box>
                   )}
                 </CardContent>
                 
-                <CardActions sx={{ p: 3, pt: 0 }}>
-                  <Button
-                    variant="outlined"
-                    startIcon={<VisibilityIcon />}
-                    fullWidth
-                    sx={{
-                      borderColor: '#2c3e50',
-                      color: '#2c3e50',
-                      fontWeight: 600,
+                <Divider sx={{ mx: 3 }} />
+                
+                <CardActions sx={{ p: 3, pt: 2 }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    gap: 1, 
+                    width: '100%',
+                    '& .MuiButton-root': {
+                      flex: 1,
                       borderRadius: 2,
-                      py: 1.5,
+                      fontWeight: 600,
                       fontSize: '0.875rem',
-                      '&:hover': {
-                        borderColor: '#34495e',
-                        background: 'rgba(44, 62, 80, 0.04)',
-                        transform: 'translateY(-1px)',
-                        boxShadow: '0 4px 12px rgba(44, 62, 80, 0.15)'
-                      },
+                      py: 1.5,
                       transition: 'all 0.3s ease-in-out'
-                    }}
-                    onClick={() => navigate(`/vendor/products/${product.id}`)}
-                  >
-                    View Details
-                  </Button>
+                    }
+                  }}>
+                    <Button
+                      variant="outlined"
+                      startIcon={<VisibilityIcon />}
+                      sx={{
+                        borderColor: '#2c3e50',
+                        color: '#2c3e50',
+                        '&:hover': {
+                          borderColor: '#34495e',
+                          background: 'rgba(44, 62, 80, 0.04)',
+                          transform: 'translateY(-1px)',
+                          boxShadow: '0 4px 12px rgba(44, 62, 80, 0.15)'
+                        }
+                      }}
+                      onClick={() => navigate(`/vendor/products/${product.id}`)}
+                    >
+                      View
+                    </Button>
+                    <Button
+                      variant="contained"
+                      startIcon={<Edit />}
+                      sx={{
+                        background: '#2c3e50',
+                        '&:hover': {
+                          background: '#34495e',
+                          transform: 'translateY(-1px)',
+                          boxShadow: '0 4px 12px rgba(44, 62, 80, 0.25)'
+                        }
+                      }}
+                      onClick={() => navigate(`/vendor/products/${product.id}`)}
+                    >
+                      Edit
+                    </Button>
+                  </Box>
                 </CardActions>
               </Card>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       )}
 
       {/* Pagination */}
@@ -485,8 +690,9 @@ const Products = () => {
           mb: 3,
           p: 3,
           background: '#ffffff',
-          borderRadius: 2,
-          border: '1px solid #e0e0e0'
+          borderRadius: 3,
+          border: '1px solid #e0e0e0',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
         }}>
           <Pagination
             count={pageCount}
@@ -495,13 +701,17 @@ const Products = () => {
             color="primary"
             shape="rounded"
             size="large"
+            showFirstButton
+            showLastButton
             sx={{
               '& .MuiPaginationItem-root': {
                 borderRadius: 2,
                 fontWeight: 600,
                 border: '1px solid #e0e0e0',
+                margin: '0 2px',
                 '&:hover': {
-                  background: '#f8f9fa'
+                  background: '#f8f9fa',
+                  borderColor: '#2c3e50'
                 }
               },
               '& .Mui-selected': {
