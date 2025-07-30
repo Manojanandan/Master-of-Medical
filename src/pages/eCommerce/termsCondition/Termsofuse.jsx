@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Box, Typography, Container, Paper, Divider } from '@mui/material';
+import { Box, Typography, Container, Paper } from '@mui/material';
 
 const TermsOfUse = () => {
   useEffect(() => {
@@ -31,14 +31,12 @@ const TermsOfUse = () => {
             Terms of Use
           </Typography>
 
-          <Divider sx={{ mb: 4 }} /> {/* Divider from ReturnsRefundsPolicy */}
-
           <Typography
             variant="h6"
             sx={{
               fontWeight: 600,
               mb: 2,
-              color: '#f49507', // Subheading color from ReturnsRefundsPolicy
+              color: '#000', // Changed subtitle color to black
               fontSize: { xs: '1.2rem', md: '1.5rem' },
             }}
           >

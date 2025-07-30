@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Typography, Box, Paper, Divider } from '@mui/material';
+import { Container, Typography, Box, Paper } from '@mui/material';
 
 const ReturnsRefundsPolicy = () => {
   return (
@@ -9,8 +9,6 @@ const ReturnsRefundsPolicy = () => {
           <Typography variant="h4" sx={{ fontWeight: 700, color: '#de3b6f', mb: 3, textAlign: 'center' }}>
             Returns and Refunds Policy
           </Typography>
-          
-          <Divider sx={{ mb: 4 }} />
 
           <Box sx={{ mb: 4 }}>
             <Typography variant="body1" sx={{ color: '#666', lineHeight: 1.7, mb: 3 }}>
@@ -19,7 +17,7 @@ const ReturnsRefundsPolicy = () => {
           </Box>
 
           <Box sx={{ mb: 4 }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, color: '#f49507', mb: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, color: '#000', mb: 2 }}>
               Returns are accepted if:
             </Typography>
             <Typography variant="body1" sx={{ color: '#666', lineHeight: 1.7, mb: 2 }}>
@@ -34,7 +32,7 @@ const ReturnsRefundsPolicy = () => {
           </Box>
 
           <Box sx={{ mb: 4 }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, color: '#f49507', mb: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, color: '#000', mb: 2 }}>
               To request a return:
             </Typography>
             <Typography variant="body1" sx={{ color: '#666', lineHeight: 1.7, mb: 2 }}>
@@ -46,7 +44,7 @@ const ReturnsRefundsPolicy = () => {
           </Box>
 
           <Box sx={{ mb: 4 }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, color: '#f49507', mb: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, color: '#000', mb: 2 }}>
               Refunds:
             </Typography>
             <Typography variant="body1" sx={{ color: '#666', lineHeight: 1.7, mb: 2 }}>

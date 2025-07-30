@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Box, Typography, Container, Paper, Divider } from '@mui/material';
+import { Box, Typography, Container, Paper } from '@mui/material';
 
 const CookiesPolicy = () => {
   useEffect(() => {
@@ -23,7 +23,7 @@ const CookiesPolicy = () => {
             sx={{
               fontWeight: 700,
               mb: 3,
-              color: '#de3b6f', // Title color from ReturnsRefundsPolicy
+              color: '#de3b6f',
               textAlign: 'center',
               fontSize: { xs: '1.8rem', md: '2.5rem' },
             }}
@@ -31,14 +31,12 @@ const CookiesPolicy = () => {
             Cookies Policy
           </Typography>
 
-          <Divider sx={{ mb: 4 }} /> {/* Divider from ReturnsRefundsPolicy */}
-
           <Typography
             variant="h6"
             sx={{
               fontWeight: 600,
               mb: 2,
-              color: '#f49507', // Subheading color from ReturnsRefundsPolicy
+              color: '#000', // Subheading color changed to black
               fontSize: { xs: '1.2rem', md: '1.5rem' },
             }}
           >
@@ -61,7 +59,7 @@ const CookiesPolicy = () => {
             sx={{
               fontWeight: 600,
               mb: 2,
-              color: '#f49507', // Subheading color from ReturnsRefundsPolicy
+              color: '#000', // Subheading color changed to black
               fontSize: { xs: '1.2rem', md: '1.5rem' },
             }}
           >
@@ -84,7 +82,7 @@ const CookiesPolicy = () => {
             sx={{
               fontWeight: 600,
               mb: 2,
-              color: '#f49507', // Subheading color from ReturnsRefundsPolicy
+              color: '#000', // Subheading color changed to black
               fontSize: { xs: '1.2rem', md: '1.5rem' },
             }}
           >
@@ -107,7 +105,7 @@ const CookiesPolicy = () => {
             sx={{
               fontWeight: 600,
               mb: 2,
-              color: '#f49507', // Subheading color from ReturnsRefundsPolicy
+              color: '#000', // Subheading color changed to black
               fontSize: { xs: '1.2rem', md: '1.5rem' },
             }}
           >

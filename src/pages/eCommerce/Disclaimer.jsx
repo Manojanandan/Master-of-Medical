@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Box, Typography, Container, Paper, Divider } from '@mui/material';
+import { Box, Typography, Container, Paper } from '@mui/material';
 
 const Disclaimer = () => {
   useEffect(() => {
@@ -23,7 +23,7 @@ const Disclaimer = () => {
             sx={{
               fontWeight: 700,
               mb: 3,
-              color: '#de3b6f', // Title color from ReturnsRefundsPolicy
+              color: '#de3b6f',
               textAlign: 'center',
               fontSize: { xs: '1.8rem', md: '2.5rem' },
             }}
@@ -31,54 +31,56 @@ const Disclaimer = () => {
             Disclaimer
           </Typography>
 
-          <Divider sx={{ mb: 4 }} /> {/* Divider from ReturnsRefundsPolicy */}
+          {/* Divider removed */}
 
           <Typography
             variant="h6"
             sx={{
               fontWeight: 600,
               mb: 2,
-              color: '#f49507', // Subheading color from ReturnsRefundsPolicy
+              color: '#000000', // Changed to black
               fontSize: { xs: '1.2rem', md: '1.5rem' },
             }}
           >
             Note
           </Typography>
+
           <Box sx={{ pl: { xs: 2, md: 4 }, mb: 4 }}>
             <Typography
               variant="body1"
               sx={{
                 fontSize: { xs: '0.9rem', md: '1rem' },
-                color: '#666', // Body text color from ReturnsRefundsPolicy
+                color: '#666',
                 mb: 2,
-                lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
+                lineHeight: 1.7,
                 display: 'flex',
                 alignItems: 'flex-start',
               }}
             >
-              <Box component="span" sx={{ mr: 2, color: '#873589' }}>1.</Box> {/* Bullet color updated to #873589 */}
+              <Box component="span" sx={{ mr: 2, color: '#873589' }}>1.</Box>
               Master of Medical (M.O.M) provides a platform to facilitate transactions between buyers and certified sellers of medical products. While we ensure sellers are verified and compliant, we do not manufacture or directly supply products. Buyers are encouraged to review product details and specifications before placing orders.
             </Typography>
             <Typography
               variant="body1"
               sx={{
                 fontSize: { xs: '0.9rem', md: '1rem' },
-                color: '#666', // Body text color from ReturnsRefundsPolicy
+                color: '#666',
                 mb: 2,
-                lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
+                lineHeight: 1.7,
                 display: 'flex',
                 alignItems: 'flex-start',
               }}
             >
-              <Box component="span" sx={{ mr: 2, color: '#873589' }}>2.</Box> {/* Bullet color updated to #873589 */}
+              <Box component="span" sx={{ mr: 2, color: '#873589' }}>2.</Box>
               M.O.M is not liable for any misuse or off-label usage of the products listed on the platform. All products must be used as per prescribed medical guidelines and under professional supervision.
             </Typography>
           </Box>
+
           <Typography
             variant="body2"
             sx={{
               fontSize: { xs: '0.8rem', md: '0.9rem' },
-              color: '#873589', // Note color from ReturnsRefundsPolicy
+              color: '#873589',
               textAlign: 'center',
               mt: 4,
             }}
