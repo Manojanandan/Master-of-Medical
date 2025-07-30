@@ -551,7 +551,7 @@ const ProductDetail = () => {
                       }}
                     />
                     <Typography variant="body2" sx={{ color: '#666', fontWeight: 500 }}>
-                      {product.averageRating || 0}
+                    {Math.round((product.averageRating ?? 0) * 10) / 10}
                     </Typography>
                   </Box>
                   <Typography variant="body2" sx={{ color: '#666' }}>
