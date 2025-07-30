@@ -53,6 +53,7 @@ const Details = () => {
         city: "", 
         state: "", 
         pincode: "", 
+        password: "",   
         vendorType: "", 
         country: "",
         type: "", // Add type field
@@ -160,10 +161,12 @@ const Details = () => {
             const tempUserData = sessionStorage.getItem("tempUserData");
             if (tempUserData) {
                 const parsedData = JSON.parse(tempUserData);
+                console.log(parsedData ,    "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS")
                 setAlldata(prev => ({
                     ...prev,
                     email: parsedData.email || "",
-                    userName: parsedData.userName || ""
+                    userName: parsedData.userName || "",
+                    password: parsedData.password || "",
                 }));
             }
         } catch (error) {
@@ -629,7 +632,7 @@ const Details = () => {
                 formData.append('name', allData.fullName);
                 formData.append('email', allData.email);
                 formData.append('phone', allData.number);
-                formData.append('password', tempData[0]?.password || "");
+                formData.append('password', allData.password);
                 formData.append('address', address);
                 formData.append('city', allData.city);
                 formData.append('state', allData.state);
