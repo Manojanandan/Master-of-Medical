@@ -667,7 +667,7 @@ const Details = () => {
                 formData.append('postalCode', allData.pincode);
                 formData.append('name', allData.fullName);
                 formData.append('email', allData.email);
-                formData.append('password', tempData[0]?.password || ""); // Keep password from tempData for now
+                formData.append('password', allData.password); // Keep password from tempData for now
                 formData.append('country', allData.country);
                 formData.append('type', allData.vendorType);
                 const fileData = Object.fromEntries(
