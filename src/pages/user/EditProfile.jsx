@@ -177,6 +177,11 @@ const EditProfile = () => {
     }
   }, [prefillData.city, currentState, currentCity]);
 
+  // Debug useEffect to monitor allData changes
+  useEffect(() => {
+    console.log('allData changed:', allData);
+  }, [allData]);
+
   const fetchUserData = async () => {
     try {
       setLoading(true);
@@ -224,7 +229,7 @@ const EditProfile = () => {
         const addressLine2 = addressParts.slice(1).join(', ') || '';
         
         // Populate form with existing data
-        setAllData({
+        const formData = {
           fullName: data.name || '',
           number: data.phone || '',
           addressLine1: addressLine1,
@@ -237,45 +242,93 @@ const EditProfile = () => {
           additionalInformation: data.additionalInformation || [],
           files: data.files || {},
           email: data.email || '',
-          userName: data.userName || ''
-        });
+          userName: data.name || ''
+        };
+        console.log('Setting form data:', formData);
+        setAllData(formData);
 
         // Set the user type selection based on existing type
         if (data.type) {
+          console.log('Setting user type to:', data.type);
           // Map the type back to the radio button value
           const typeMapping = {
-            "Hospital": "H",
-            "Pathology Labs": "P", 
-            "Diagnostic Centres": "D",
-            "Physiotherapist": "Physio",
-            "Rehabilitation": "Re",
-            "Poly Clinic": "Pc",
-            "Student": "Student"
+            "hospital": "H",
+            "pathology": "P", 
+            "diagnostic": "D",
+            "physiotherapist": "Physio",
+            "rehabilitation": "Re",
+            "polyclinic": "Pc",
+            "student": "Student"
           };
           
-          const userTypeValue = typeMapping[data.type] || data.type;
+          const userTypeValue = typeMapping[data.type.toLowerCase()] || data.type;
+          console.log('Mapped user type value:', userTypeValue);
           setLabelChanges(userTypeValue);
+          
+          // Also set the type in allData for form validation
+          setAllData(prev => ({
+            ...prev,
+            type: data.type
+          }));
         }
 
         // Store country, state, city data for sequential prefilling
         if (data.country || data.state || data.city) {
+          const countryObj = data.country ? { name: data.country, id: 101 } : null; // India has ID 101
+          const stateObj = data.state ? { name: data.state, id: 4035 } : null; // Tamil Nadu has ID 4035
+          const cityObj = data.city ? { name: data.city, id: 1 } : null;
+          
           setPrefillData({
-            country: data.country ? { name: data.country } : null,
-            state: data.state ? { name: data.state } : null,
-            city: data.city ? { name: data.city } : null
+            country: countryObj,
+            state: stateObj,
+            city: cityObj
           });
+          
+          // Set the values immediately for immediate display
+          if (countryObj) setCountry(countryObj);
+          if (stateObj) setCurrentState(stateObj);
+          if (cityObj) setCurrentCity(cityObj);
         }
 
         // Handle existing files if any
-        if (data.files && Object.keys(data.files).length > 0) {
-          // Set manufacturing image files for display
+        if (data.files && Array.isArray(data.files) && data.files.length > 0) {
+          console.log('Processing existing files:', data.files);
+          // Convert array of file URLs to object format for display
           const existingFiles = {};
-          Object.keys(data.files).forEach(key => {
-            if (data.files[key]) {
-              existingFiles[key] = data.files[key];
+          const imagePreviews = {};
+          
+          data.files.forEach((fileUrl, index) => {
+            // Extract filename from URL
+            const fileName = fileUrl.split('/').pop();
+            const fileKey = `file${index}`;
+            
+            existingFiles[fileKey] = {
+              name: fileName,
+              url: fileUrl
+            };
+            imagePreviews[fileKey] = fileUrl;
+          });
+          
+          setManufacturingImageFile(existingFiles);
+          setManufacturingImage(imagePreviews);
+        }
+
+        // Handle additional information if any
+        if (data.additionalInformation && Array.isArray(data.additionalInformation) && data.additionalInformation.length > 0) {
+          console.log('Processing additional information:', data.additionalInformation);
+          const parsedAdditionalInfo = data.additionalInformation.map(item => {
+            try {
+              return typeof item === 'string' ? JSON.parse(item) : item;
+            } catch (e) {
+              console.error('Error parsing additional info item:', item);
+              return item;
             }
           });
-          setManufacturingImageFile(existingFiles);
+          
+          setAllData(prev => ({
+            ...prev,
+            additionalInformation: parsedAdditionalInfo
+          }));
         }
       } else {
         console.error('API returned error:', response.data);
@@ -301,23 +354,23 @@ const EditProfile = () => {
     // Clear error message when user type is selected
     setErrorMsg({ ...errorMsg, vendorTypeError: "" });
     
-    // Map user type values to labels
-    const typeLabels = {
-      "H": "Hospital",
-      "P": "Pathology Labs", 
-      "D": "Diagnostic Centres",
-      "Physio": "Physiotherapist",
-      "Re": "Rehabilitation",
-      "Pc": "Poly Clinic",
-      "Student": "Student"
+    // Map user type values to API format
+    const typeMapping = {
+      "H": "hospital",
+      "P": "pathology", 
+      "D": "diagnostic",
+      "Physio": "physiotherapist",
+      "Re": "rehabilitation",
+      "Pc": "polyclinic",
+      "Student": "student"
     };
     
-    const selectedLabel = typeLabels[userType] || userType;
+    const selectedType = typeMapping[userType] || userType;
     
     // Clear previous type data
     setAllData(prev => ({
       ...prev,
-      type: selectedLabel,
+      type: selectedType,
       additionalInformation: [],
       files: {}
     }));
@@ -597,7 +650,7 @@ const EditProfile = () => {
         let userInputError = "";
         
         // Validate mandatory input fields based on user type
-        if (allData.type === "Pathology Labs") {
+        if (allData.type === "pathology") {
           const pathologyName = allData.additionalInformation.find(item => item.name === 'pathologyName')?.value;
           if (!pathologyName || pathologyName.trim() === "") {
             userInputError = "Pathology Name is mandatory for Pathology Labs type";
@@ -606,12 +659,12 @@ const EditProfile = () => {
           if (!pathologyIdentityProof || pathologyIdentityProof.trim() === "") {
             userInputError = "Identity Proof is mandatory for Pathology Labs type";
           }
-        } else if (allData.type === "Diagnostic Centres") {
+        } else if (allData.type === "diagnostic") {
           const diagnosticIdentityProof = allData.additionalInformation.find(item => item.name === 'diagnosticIdentityProof')?.value;
           if (!diagnosticIdentityProof || diagnosticIdentityProof.trim() === "") {
             userInputError = "Identity Proof is mandatory for Diagnostic Centres type";
           }
-        } else if (allData.type === "Student") {
+        } else if (allData.type === "student") {
           const studentId = allData.additionalInformation.find(item => item.name === 'studentId')?.value;
           if (!studentId || studentId.trim() === "") {
             userInputError = "Student ID is mandatory for Student type";
@@ -623,28 +676,28 @@ const EditProfile = () => {
           return;
         }
         
-        if (allData.type === "Hospital") {
+        if (allData.type === "hospital") {
           if (!manufacturingImageFile.hospitalRegistrationCertificate) {
             userFileError = "Hospital Registration Certificate is mandatory for Hospital type";
           }
           if (!manufacturingImageFile.hospitalAddressProof) {
             userFileError = "Hospital Address Proof is mandatory for Hospital type";
           }
-        } else if (allData.type === "Pathology Labs") {
+        } else if (allData.type === "pathology") {
           if (!manufacturingImageFile.labRegistrationCertificate) {
             userFileError = "Lab Registration Certificate is mandatory for Pathology Labs type";
           }
           if (!manufacturingImageFile.pathologyAddressProof) {
             userFileError = "Pathology Address Proof is mandatory for Pathology Labs type";
           }
-        } else if (allData.type === "Diagnostic Centres") {
+        } else if (allData.type === "diagnostic") {
           if (!manufacturingImageFile.diagnosticRegistrationCertificate) {
             userFileError = "Diagnostic Registration Certificate is mandatory for Diagnostic Centres type";
           }
           if (!manufacturingImageFile.diagnosticAddressProof) {
             userFileError = "Diagnostic Address Proof is mandatory for Diagnostic Centres type";
           }
-        } else if (allData.type === "Physiotherapist") {
+        } else if (allData.type === "physiotherapist") {
           if (!manufacturingImageFile.physioEstablishmentCertificate) {
             userFileError = "Physio Establishment Certificate is mandatory for Physiotherapist type";
           }
@@ -654,14 +707,14 @@ const EditProfile = () => {
           if (!manufacturingImageFile.physioAddressProof) {
             userFileError = "Physio Address Proof is mandatory for Physiotherapist type";
           }
-        } else if (allData.type === "Rehabilitation") {
+        } else if (allData.type === "rehabilitation") {
           if (!manufacturingImageFile.rehabEstablishmentCertificate) {
             userFileError = "Rehabilitation Establishment Certificate is mandatory for Rehabilitation type";
           }
           if (!manufacturingImageFile.rehabAddressProof) {
             userFileError = "Rehabilitation Address Proof is mandatory for Rehabilitation type";
           }
-        } else if (allData.type === "Poly Clinic") {
+        } else if (allData.type === "polyclinic") {
           if (!manufacturingImageFile.polyclinicTradeLicense) {
             userFileError = "Polyclinic Trade License is mandatory for Poly Clinic type";
           }
@@ -671,7 +724,7 @@ const EditProfile = () => {
           if (!manufacturingImageFile.polyclinicAddressProof) {
             userFileError = "Polyclinic Address Proof is mandatory for Poly Clinic type";
           }
-        } else if (allData.type === "Student") {
+        } else if (allData.type === "student") {
           if (!manufacturingImageFile.studentIdCard) {
             userFileError = "Student ID Card is mandatory for Student type";
           }
@@ -744,9 +797,9 @@ const EditProfile = () => {
           sessionStorage.setItem('userData', JSON.stringify(updatedUserData));
           
           // Navigate to customer dashboard after successful update
-          setTimeout(() => {
-            navigate('/customer');
-          }, 2000);
+          // setTimeout(() => {
+          //   navigate('/customer');
+          // }, 2000);
         } else {
           setMessage(response.data.message || 'Failed to update profile');
           setSeverity('error');
@@ -872,6 +925,7 @@ const EditProfile = () => {
                     inputClassName=""
                     onChange={handleCountryChange}
                     onTextChange={(_txt) => console.log(_txt)}
+                    defaultValue={country}
                     placeHolder="Select Country"
                   />
                 </div>
@@ -944,6 +998,56 @@ const EditProfile = () => {
                       </RadioGroup>
                     </FormControl>
                   </Grid>
+                  
+                  {/* Display existing files */}
+                  {userData && userData.files && Array.isArray(userData.files) && userData.files.length > 0 && (
+                    <Grid item size={12}>
+                      <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 1%' }}>Existing Files</Typography>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, marginTop: '10px' }}>
+                        {userData.files.map((fileUrl, index) => {
+                          const fileName = fileUrl.split('/').pop();
+                          const fileExtension = fileName.split('.').pop()?.toLowerCase();
+                          return (
+                            <Box key={index} sx={{ 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              padding: '10px', 
+                              border: '1px solid #ddd', 
+                              borderRadius: '5px',
+                              backgroundColor: '#f9f9f9'
+                            }}>
+                              <img 
+                                src={
+                                  fileExtension === "pdf" ? PDFIcon : 
+                                  fileExtension === "docx" || fileExtension === "doc" ? WordIcon : 
+                                  fileExtension === "png" ? PngIcon : 
+                                  fileExtension === "jpeg" || fileExtension === "jpg" ? JpegIcon : 
+                                  fileExtension === "xlsx" || fileExtension === "xls" ? ExcelIcon : 
+                                  PngIcon
+                                } 
+                                alt='' 
+                                style={{ height: '25px', width: '25px', marginRight: '10px' }} 
+                              />
+                              <a
+                                href={fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ 
+                                  wordBreak: 'break-all', 
+                                  fontWeight: 'bold',
+                                  color: '#1c1c1b',
+                                  textDecoration: 'none'
+                                }}
+                              >
+                                {fileName}
+                              </a>
+                            </Box>
+                          );
+                        })}
+                      </Box>
+                    </Grid>
+                  )}
+                  
                   {labelChanges === "H" && (
                     <>
                       <Grid item size={6}>

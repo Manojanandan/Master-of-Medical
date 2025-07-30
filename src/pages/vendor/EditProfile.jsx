@@ -162,6 +162,11 @@ const EditProfile = () => {
     }
   }, [prefillData.city, currentState, currentCity]);
 
+  // Debug useEffect to monitor allData changes
+  useEffect(() => {
+    console.log('allData changed:', allData);
+  }, [allData]);
+
   const fetchVendorData = async () => {
     try {
       setLoading(true);
@@ -209,7 +214,7 @@ const EditProfile = () => {
         const addressLine2 = addressParts.slice(1).join(', ') || '';
         
         // Populate form with existing data
-        setAllData({
+        const formData = {
           fullName: data.name || '',
           number: data.phone || '',
           addressLine1: addressLine1,
@@ -218,37 +223,59 @@ const EditProfile = () => {
           state: data.state || '',
           city: data.city || '',
           pincode: data.postalCode || '',
-          vendorType: data.vendorType || '',
+          vendorType: data.type || '', // Use data.type instead of data.vendorType
           additionalInformation: data.additionalInformation || [],
           files: data.files || {},
           email: data.email || '',
-          userName: data.userName || ''
-        });
+          userName: data.name || ''
+        };
+        console.log('Setting form data:', formData);
+        setAllData(formData);
 
         // Set the vendor type selection based on existing type
-        if (data.vendorType) {
-          setLabelChanges(data.vendorType);
+        if (data.type) {
+          console.log('Setting vendor type to:', data.type);
+          setLabelChanges(data.type);
         }
 
         // Store country, state, city data for sequential prefilling
         if (data.country || data.state || data.city) {
+          const countryObj = data.country ? { name: data.country, id: 101 } : null; // India has ID 101
+          const stateObj = data.state ? { name: data.state, id: 4035 } : null; // Tamil Nadu has ID 4035
+          const cityObj = data.city ? { name: data.city, id: 1 } : null;
+          
           setPrefillData({
-            country: data.country ? { name: data.country } : null,
-            state: data.state ? { name: data.state } : null,
-            city: data.city ? { name: data.city } : null
+            country: countryObj,
+            state: stateObj,
+            city: cityObj
           });
+          
+          // Set the values immediately for immediate display
+          if (countryObj) setCountry(countryObj);
+          if (stateObj) setCurrentState(stateObj);
+          if (cityObj) setCurrentCity(cityObj);
         }
 
         // Handle existing files if any
-        if (data.files && Object.keys(data.files).length > 0) {
-          // Set manufacturing image files for display
+        if (data.files && Array.isArray(data.files) && data.files.length > 0) {
+          // Convert array of file URLs to object format for display
           const existingFiles = {};
-          Object.keys(data.files).forEach(key => {
-            if (data.files[key]) {
-              existingFiles[key] = data.files[key];
-            }
+          data.files.forEach((fileUrl, index) => {
+            // Extract filename from URL
+            const fileName = fileUrl.split('/').pop();
+            existingFiles[`file${index}`] = {
+              name: fileName,
+              url: fileUrl
+            };
           });
           setManufacturingImageFile(existingFiles);
+          
+          // Also set the manufacturing image previews for display
+          const imagePreviews = {};
+          data.files.forEach((fileUrl, index) => {
+            imagePreviews[`file${index}`] = fileUrl;
+          });
+          setManufacturingImage(imagePreviews);
         }
       } else {
         console.error('API returned error:', response.data);
@@ -549,9 +576,9 @@ const EditProfile = () => {
           sessionStorage.setItem('userData', JSON.stringify(updatedVendorData));
           
           // Navigate to vendor dashboard after successful update
-          setTimeout(() => {
-            navigate('/vendor');
-          }, 2000);
+          // setTimeout(() => {
+          //   navigate('/vendor');
+          // }, 2000);
         } else {
           setMessage(response.data.message || 'Failed to update profile');
           setSeverity('error');
@@ -620,6 +647,7 @@ const EditProfile = () => {
                 <TextField 
                   fullWidth 
                   id="fullName" 
+                  disabled
                   size="small" 
                   onChange={handleChange}
                   placeholder="Enter your full name"
@@ -677,6 +705,7 @@ const EditProfile = () => {
                     inputClassName=""
                     onChange={handleCountryChange}
                     onTextChange={(_txt) => console.log(_txt)}
+                    defaultValue={country}
                     placeHolder="Select Country"
                   />
                 </div>
@@ -741,12 +770,62 @@ const EditProfile = () => {
                       setErrorMsg({ ...errorMsg, vendorTypeError: "" })
                     }}
                   >
-                    <FormControlLabel  value="manufacturing" control={<Radio />} label="Manufacturing" />
+                    <FormControlLabel value="manufacturing" control={<Radio />} label="Manufacturing" />
                     <FormControlLabel value="oem" control={<Radio />} label="OEM" />
                     <FormControlLabel value="dealer" control={<Radio />} label="C&F / Super Stockist / Dealer's" />
                   </RadioGroup>
                 </FormControl>
               </Grid>
+              
+              {/* Display existing files */}
+              {vendorData && vendorData.files && Array.isArray(vendorData.files) && vendorData.files.length > 0 && (
+                <Grid item size={12}>
+                  <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 1%' }}>Existing Files</Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, marginTop: '10px' }}>
+                    {vendorData.files.map((fileUrl, index) => {
+                      const fileName = fileUrl.split('/').pop();
+                      const fileExtension = fileName.split('.').pop()?.toLowerCase();
+                      return (
+                        <Box key={index} sx={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          padding: '10px', 
+                          border: '1px solid #ddd', 
+                          borderRadius: '5px',
+                          backgroundColor: '#f9f9f9'
+                        }}>
+                          <img 
+                            src={
+                              fileExtension === "pdf" ? PDFIcon : 
+                              fileExtension === "docx" || fileExtension === "doc" ? WordIcon : 
+                              fileExtension === "png" ? PngIcon : 
+                              fileExtension === "jpeg" || fileExtension === "jpg" ? JpegIcon : 
+                              fileExtension === "xlsx" || fileExtension === "xls" ? ExcelIcon : 
+                              PngIcon
+                            } 
+                            alt='' 
+                            style={{ height: '25px', width: '25px', marginRight: '10px' }} 
+                          />
+                          <a
+                            href={fileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ 
+                              wordBreak: 'break-all', 
+                              fontWeight: 'bold',
+                              color: '#1c1c1b',
+                              textDecoration: 'none'
+                            }}
+                          >
+                            {fileName}
+                          </a>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                </Grid>
+              )}
+              
               {allData.vendorType === "manufacturing" && (
                 <>
                   <Grid item size={6}>
@@ -780,15 +859,15 @@ const EditProfile = () => {
                         {manufacturingImage.mdmLicense && (
                           <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
                             <img src={imageType?.mdmLicense === "pdf" ? PDFIcon : imageType?.mdmLicense === "docx" ? WordIcon : imageType?.mdmLicense === "png" ? PngIcon : imageType?.mdmLicense === "jpeg" ? JpegIcon : imageType.mdmLicense === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
-                            <a
-                              href={URL.createObjectURL(manufacturingImageFile.mdmLicense)}
-                              download={manufacturingImageFile.mdmLicense.name}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
-                            >
-                              {manufacturingImageFile.mdmLicense.name}
-                            </a>
+                                                          <a
+                                href={manufacturingImageFile.mdmLicense?.url || URL.createObjectURL(manufacturingImageFile.mdmLicense)}
+                                download={manufacturingImageFile.mdmLicense?.name}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                              >
+                                {manufacturingImageFile.mdmLicense?.name}
+                              </a>
                           </div>
                         )}
                       </div>
