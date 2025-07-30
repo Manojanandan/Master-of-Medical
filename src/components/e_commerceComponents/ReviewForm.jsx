@@ -9,7 +9,8 @@ import {
   Alert,
   CircularProgress,
   Divider,
-  Grid
+  Grid,
+  Chip
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { createProductReview, clearCreateReviewSuccess, clearReviewError } from '../../redux/ReviewReducer';
@@ -123,32 +124,33 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
   };
 
   return (
-    <Paper elevation={2} sx={{ p: 4, mb: 4, border: '1px solid #e0e0e0', borderRadius: 2 }}>
-      <Typography variant="h6" sx={{ mb: 3, fontWeight: 600, color: '#333' }}>
+    <Paper elevation={0} sx={{ p: 4, mb: 4, border: '1px solid #e0e0e0', borderRadius: 2 }}>
+      <Typography variant="h6" sx={{ mb: 3, fontWeight: 600, color: '#212121' }}>
         Write a Review
       </Typography>
       
       {createReviewSuccess && (
-        <Alert severity="success" sx={{ mb: 3 }}>
+        <Alert severity="success" sx={{ mb: 3, borderRadius: 1 }}>
           Review submitted successfully! Thank you for your feedback.
         </Alert>
       )}
       
       {createReviewError && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert severity="error" sx={{ mb: 3, borderRadius: 1 }}>
           {createReviewError}
         </Alert>
       )}
       
       {errors.general && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert severity="error" sx={{ mb: 3, borderRadius: 1 }}>
           {errors.general}
         </Alert>
       )}
 
       <Box component="form" onSubmit={handleSubmit}>
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, color: '#333' }}>
+        {/* Rating Section */}
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, color: '#212121' }}>
             Overall Rating *
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -161,18 +163,24 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
               sx={{
                 fontSize: '2.5rem',
                 '& .MuiRating-iconFilled': {
-                  color: '#FFD700',
+                  color: '#f49507',
                 },
                 '& .MuiRating-iconHover': {
-                  color: '#FFD700',
+                  color: '#f49507',
                 },
                 mr: 2
               }}
             />
             {rating > 0 && (
-              <Typography variant="h6" sx={{ fontWeight: 600, color: '#1976d2' }}>
-                {getRatingLabel(Math.round(rating))}
-              </Typography>
+              <Chip
+                label={getRatingLabel(Math.round(rating))}
+                sx={{
+                  bgcolor: '#fff3e0',
+                  color: '#f57c00',
+                  fontWeight: 600,
+                  fontSize: '14px'
+                }}
+              />
             )}
           </Box>
           {errors.rating && (
@@ -182,8 +190,9 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
           )}
         </Box>
 
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, color: '#333' }}>
+        {/* Review Comment Section */}
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, color: '#212121' }}>
             Review Comment *
           </Typography>
           <TextField
@@ -200,25 +209,26 @@ const ReviewForm = ({ productId, onReviewSubmitted }) => {
             sx={{
               '& .MuiOutlinedInput-root': {
                 '&:hover fieldset': {
-                  borderColor: '#1976d2',
+                  borderColor: '#de3b6f',
                 },
                 '&.Mui-focused fieldset': {
-                  borderColor: '#1976d2',
+                  borderColor: '#de3b6f',
                 },
               },
             }}
           />
         </Box>
 
+        {/* Submit Button */}
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
           <Button
             type="submit"
             variant="contained"
             disabled={createReviewLoading}
             sx={{
-              bgcolor: '#1976d2',
+              bgcolor: '#de3b6f',
               '&:hover': {
-                bgcolor: '#1565c0',
+                bgcolor: '#c2185b',
               },
               minWidth: 140,
               height: 44,

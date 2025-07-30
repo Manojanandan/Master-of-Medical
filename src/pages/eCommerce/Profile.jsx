@@ -100,12 +100,10 @@ const Profile = () => {
         setOriginalData(profileDataObj);
       } else {
         console.warn('Failed to fetch customer details:', response.data);
-        // Fallback to JWT data if API fails
         loadUserDataFromJWT();
       }
     } catch (error) {
       console.error('Error fetching customer details:', error);
-      // Fallback to JWT data if API fails
       loadUserDataFromJWT();
     } finally {
       setFetchingData(false);
@@ -298,7 +296,37 @@ const Profile = () => {
     if (section === 'logout') {
       handleLogout();
     } else {
-      setActiveSection(section);
+      // Navigate to the corresponding route
+      switch (section) {
+        case 'profile':
+        case 'orders':
+        case 'addresses':
+          setActiveSection(section);
+          break;
+        case 'faq':
+          navigate('/ecommerceDashboard/faq');
+          break;
+        case 'returns-refunds':
+          navigate('/ecommerceDashboard/returns-refunds');
+          break;
+        case 'orderTracking':
+          navigate('/ecommerceDashboard/orderTracking');
+          break;
+        case 'disclaimer':
+          navigate('/ecommerceDashboard/disclaimer');
+          break;
+        case 'termsofuse':
+          navigate('/ecommerceDashboard/termsofuse');
+          break;
+        case 'privacyPolicy':
+          navigate('/ecommerceDashboard/privacyPolicy');
+          break;
+        case 'cookiesPolicy':
+          navigate('/ecommerceDashboard/cookiesPolicy');
+          break;
+        default:
+          setActiveSection(section);
+      }
     }
   };
 
@@ -600,12 +628,75 @@ const Profile = () => {
                 <span className={styles.navText}>Addresses</span>
               </button>
             </li>
+
+            <li className={styles.navItem}>
+              <button 
+                className={`${styles.navButton} ${activeSection === 'faq' ? styles.active : ''}`}
+                onClick={() => handleSectionChange('faq')}
+              >
+                <span className={styles.navText}>FAQ</span>
+              </button>
+            </li>
+            
+            <li className={styles.navItem}>
+              <button 
+                className={`${styles.navButton} ${activeSection === 'returns-refunds' ? styles.active : ''}`}
+                onClick={() => handleSectionChange('returns-refunds')}
+              >
+                <span className={styles.navText}>Returns and Refunds Policy</span>
+              </button>
+            </li>
+            
+            <li className={styles.navItem}>
+              <button 
+                className={`${styles.navButton} ${activeSection === 'orderTracking' ? styles.active : ''}`}
+                onClick={() => handleSectionChange('orderTracking')}
+              >
+                <span className={styles.navText}>Order Tracking</span>
+              </button>
+            </li>
+            
+            <li className={styles.navItem}>
+              <button 
+                className={`${styles.navButton} ${activeSection === 'disclaimer' ? styles.active : ''}`}
+                onClick={() => handleSectionChange('disclaimer')}
+              >
+                <span className={styles.navText}>Disclaimer</span>
+              </button>
+            </li>
+            
+            <li className={styles.navItem}>
+              <button 
+                className={`${styles.navButton} ${activeSection === 'termsofuse' ? styles.active : ''}`}
+                onClick={() => handleSectionChange('termsofuse')}
+              >
+                <span className={styles.navText}>Terms of Use</span>
+              </button>
+            </li>
+            
+            <li className={styles.navItem}>
+              <button 
+                className={`${styles.navButton} ${activeSection === 'privacyPolicy' ? styles.active : ''}`}
+                onClick={() => handleSectionChange('privacyPolicy')}
+              >
+                <span className={styles.navText}>Privacy Policy</span>
+              </button>
+            </li>
+            
+            <li className={styles.navItem}>
+              <button 
+                className={`${styles.navButton} ${activeSection === 'cookiesPolicy' ? styles.active : ''}`}
+                onClick={() => handleSectionChange('cookiesPolicy')}
+              >
+                <span className={styles.navText}>Cookies Policy</span>
+              </button>
+            </li>
             
             <div className={styles.divider}></div>
             
             <li className={styles.navItem}>
               <button 
-                className={styles.logoutButton}
+                className={`${styles.navButton} ${styles.logoutButton}`}
                 onClick={() => handleSectionChange('logout')}
               >
                 <svg className={styles.logoutIcon} viewBox="0 0 24 24" fill="currentColor">
@@ -661,9 +752,8 @@ const Profile = () => {
         formatDate={formatDate}
         formatCurrency={formatCurrency}
       />
-
     </div>
   );
 };
 
-export default Profile; 
+export default Profile;

@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getCart, addCartItem, updateCartItem, deleteCartItem } from "../utils/Service";
+import { getCart, addCartItem, updateCartItem, deleteCartItem, clearCart as apiClearCart } from "../utils/Service";
 import { getUserInfoFromToken, decodeJWT } from "../utils/jwtUtils";
 
 // Temporary debug function to decode JWT
@@ -149,6 +149,28 @@ export const removeFromCart = createAsyncThunk(
   }
 );
 
+// Async thunk for clearing entire cart
+export const clearCartAsync = createAsyncThunk(
+  "cart/clearCartAsync",
+  async (_, { rejectWithValue }) => {
+    try {
+      const userId = getUserId();
+      if (!userId) {
+        throw new Error("User not authenticated");
+      }
+      
+      console.log('Clearing cart for user:', userId);
+      const response = await apiClearCart(userId);
+      console.log('Clear cart API Response:', response);
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error clearing cart:', error);
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const cartSlice = createSlice({
   name: "cart",
   initialState: {
@@ -161,13 +183,19 @@ const cartSlice = createSlice({
   },
   reducers: {
     clearCart: (state) => {
+      console.log('Clearing cart state locally');
       state.items = [];
       state.totalItems = 0;
       state.totalAmount = 0;
       state.error = null;
+      state.lastUpdated = new Date().toISOString();
     },
     clearError: (state) => {
       state.error = null;
+    },
+    // Add a reducer to force refresh cart
+    forceRefreshCart: (state) => {
+      state.lastUpdated = new Date().toISOString();
     }
   },
   extraReducers: (builder) => {
@@ -193,12 +221,15 @@ const cartSlice = createSlice({
             quantity: item.quantity,
             price: parseFloat(item.Product?.price || 0),
             product: {
+              _id: item.Product?.id, // Add _id for navigation
               id: item.Product?.id,
               name: item.Product?.name,
               description: item.Product?.description,
               thumbnailImage: item.Product?.thumbnailImage,
               galleryImage: item.Product?.galleryImage,
-              price: item.Product?.price
+              price: item.Product?.price,
+              averageRating: item.Product?.averageRating || 0,
+              reviewCount: item.Product?.reviewCount || 0
             }
           }));
           
@@ -209,12 +240,18 @@ const cartSlice = createSlice({
           state.totalAmount = state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
           
           console.log('Cart totals:', { totalItems: state.totalItems, totalAmount: state.totalAmount });
+        } else {
+          // If no success or empty data, clear the cart
+          state.items = [];
+          state.totalItems = 0;
+          state.totalAmount = 0;
         }
         state.lastUpdated = new Date().toISOString();
       })
       .addCase(fetchCart.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to fetch cart";
+        // Don't clear items on error, keep existing state
       })
       
       // Add to cart
@@ -240,12 +277,15 @@ const cartSlice = createSlice({
             quantity: item.quantity,
             price: parseFloat(item.Product?.price || 0),
             product: {
+              _id: item.Product?.id, // Add _id for navigation
               id: item.Product?.id,
               name: item.Product?.name,
               description: item.Product?.description,
               thumbnailImage: item.Product?.thumbnailImage,
               galleryImage: item.Product?.galleryImage,
-              price: item.Product?.price
+              price: item.Product?.price,
+              averageRating: item.Product?.averageRating || 0,
+              reviewCount: item.Product?.reviewCount || 0
             }
           }));
           
@@ -333,9 +373,28 @@ const cartSlice = createSlice({
       .addCase(removeFromCart.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to remove item from cart";
+      })
+
+      // Clear cart async
+      .addCase(clearCartAsync.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(clearCartAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        console.log('Cart cleared successfully via API');
+        state.items = [];
+        state.totalItems = 0;
+        state.totalAmount = 0;
+        state.lastUpdated = new Date().toISOString();
+      })
+      .addCase(clearCartAsync.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to clear cart";
+        console.error('Failed to clear cart via API:', action.payload);
       });
   }
 });
 
-export const { clearCart, clearError } = cartSlice.actions;
-export default cartSlice.reducer; 
+export const { clearCart, clearError, forceRefreshCart } = cartSlice.actions;
+export default cartSlice.reducer;

@@ -24,10 +24,16 @@ import {
   LinearProgress,
   Snackbar,
   Stack,
-  Container
+  Container,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Collapse
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchCart, updateCartItemQuantity, removeFromCart } from '../../../redux/CartReducer';
+import { fetchCart, updateCartItemQuantity, removeFromCart, clearCartAsync } from '../../../redux/CartReducer';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -46,6 +52,9 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import LockIcon from '@mui/icons-material/Lock';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import VerifiedIcon from '@mui/icons-material/Verified';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ReceiptIcon from '@mui/icons-material/Receipt';
 
 // Enhanced professional color palette with original theme
 const colors = {
@@ -93,6 +102,7 @@ const CartList = () => {
   const [animateItems, setAnimateItems] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const [removingItem, setRemovingItem] = useState(null);
+  const [showGSTBreakdown, setShowGSTBreakdown] = useState(false);
 
   // Enhanced constants
   const SHIPPING_COST = 15.00;
@@ -101,20 +111,35 @@ const CartList = () => {
   const DISCOUNT_AMOUNT = 50.00;
   const PREMIUM_THRESHOLD = 1000;
 
-  const calculateTotals = useCallback((cartItems) => {
-    const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  // Calculate individual item GST and totals
+  const calculateEnhancedTotals = useCallback((cartItems) => {
+    const itemsWithGST = cartItems.map(item => {
+      const itemSubtotal = item.price * item.quantity;
+      const itemGST = itemSubtotal * GST_RATE;
+      const itemTotal = itemSubtotal + itemGST;
+      
+      return {
+        ...item,
+        itemSubtotal,
+        itemGST,
+        itemTotal
+      };
+    });
+
+    const subtotal = itemsWithGST.reduce((sum, item) => sum + item.itemSubtotal, 0);
+    const totalGST = itemsWithGST.reduce((sum, item) => sum + item.itemGST, 0);
     const discount = subtotal > 300 ? DISCOUNT_AMOUNT : 0;
     const premiumDiscount = subtotal > PREMIUM_THRESHOLD ? subtotal * 0.05 : 0;
     const totalDiscount = discount + premiumDiscount;
-    const gst = (subtotal - totalDiscount) * GST_RATE;
     const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
-    const total = subtotal + gst + shipping - totalDiscount;
+    const total = subtotal + totalGST + shipping - totalDiscount;
     const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
     const savings = totalDiscount + (subtotal >= FREE_SHIPPING_THRESHOLD ? SHIPPING_COST : 0);
 
     return {
+      itemsWithGST,
       subtotal,
-      gst,
+      gst: totalGST,
       shipping,
       total,
       totalItems,
@@ -127,11 +152,11 @@ const CartList = () => {
   useEffect(() => {
     if (items.length > 0 && localItems.length === 0) {
       setLocalItems(items);
-      const totals = calculateTotals(items);
+      const totals = calculateEnhancedTotals(items);
       setLocalTotals(totals);
       setTimeout(() => setAnimateItems(true), 100);
     }
-  }, [items, calculateTotals, localItems.length]);
+  }, [items, calculateEnhancedTotals, localItems.length]);
 
   useEffect(() => {
     dispatch(fetchCart());
@@ -145,7 +170,7 @@ const CartList = () => {
         const updatedItems = prevItems.map(item =>
           item._id === cartItemId ? { ...item, quantity: newQuantity } : item
         );
-        const totals = calculateTotals(updatedItems);
+        const totals = calculateEnhancedTotals(updatedItems);
         setLocalTotals(totals);
         return updatedItems;
       });
@@ -155,11 +180,11 @@ const CartList = () => {
       const action = change > 0 ? 'increased' : 'decreased';
       setSnackbar({
         open: true,
-        message: `Quantity ${action} successfully!`,
+        message: `Quantity ${action} successfully! GST updated accordingly.`,
         severity: 'success'
       });
     }
-  }, [dispatch, calculateTotals]);
+  }, [dispatch, calculateEnhancedTotals]);
 
   const handleRemoveItem = useCallback((cartItemId) => {
     setRemovingItem(cartItemId);
@@ -167,7 +192,7 @@ const CartList = () => {
     setTimeout(() => {
       setLocalItems(prevItems => {
         const updatedItems = prevItems.filter(item => item._id !== cartItemId);
-        const totals = calculateTotals(updatedItems);
+        const totals = calculateEnhancedTotals(updatedItems);
         setLocalTotals(totals);
         return updatedItems;
       });
@@ -180,7 +205,21 @@ const CartList = () => {
         severity: 'info'
       });
     }, 300);
-  }, [dispatch, calculateTotals]);
+  }, [dispatch, calculateEnhancedTotals]);
+
+  const handleClearCart = useCallback(() => {
+    const confirmClear = window.confirm('Are you sure you want to clear your entire cart?');
+    if (confirmClear) {
+      setLocalItems([]);
+      setLocalTotals({ totalItems: 0, totalAmount: 0 });
+      dispatch(clearCartAsync());
+      setSnackbar({
+        open: true,
+        message: 'Cart cleared successfully!',
+        severity: 'info'
+      });
+    }
+  }, [dispatch]);
 
   const EnhancedLoadingState = () => (
     <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -267,7 +306,7 @@ const CartList = () => {
                 borderRadius: 2,
                 textTransform: 'none',
                 fontWeight: 600,
-                boxShadow: `0 4px 16px ${colors.shadow}`
+                boxShadow: `0 4px 16px ${colors.shadowPrimary}`
               }}
               onClick={() => dispatch(fetchCart())}
             >
@@ -367,7 +406,7 @@ const CartList = () => {
   }
 
   const displayItems = localItems.length > 0 ? localItems : items;
-  const displayTotals = localTotals.totalItems > 0 ? localTotals : calculateTotals(items);
+  const displayTotals = localTotals.totalItems > 0 ? localTotals : calculateEnhancedTotals(items);
   const shippingProgress = Math.min((displayTotals.subtotal / FREE_SHIPPING_THRESHOLD) * 100, 100);
 
   return (
@@ -407,22 +446,42 @@ const CartList = () => {
                       </Typography>
                     </Box>
                   </Box>
-                  <Chip
-                    label={`${displayTotals.totalItems} ${displayTotals.totalItems === 1 ? 'item' : 'items'}`}
-                    sx={{
-                      background: colors.gradient,
-                      color: colors.background,
-                      fontWeight: 600,
-                      fontSize: '0.875rem',
-                      height: 36,
-                      px: 2
-                    }}
-                  />
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <Chip
+                      label={`${displayTotals.totalItems} ${displayTotals.totalItems === 1 ? 'item' : 'items'}`}
+                      sx={{
+                        background: colors.gradient,
+                        color: colors.background,
+                        fontWeight: 600,
+                        fontSize: '0.875rem',
+                        height: 36,
+                        px: 2
+                      }}
+                    />
+                   
+                  </Stack>
                 </Stack>
               </Box>
 
               <Box sx={{ maxHeight: '800px', overflowY: 'auto' }}>
-                {displayItems.map((item, index) => (
+                {displayTotals.itemsWithGST?.map((item, index) => (
+                  <Slide
+                    key={item._id}
+                    direction="up"
+                    in={animateItems}
+                    timeout={400 + (index * 100)}
+                  >
+                    <div>
+                      <EnhancedCartItemCard
+                        item={item}
+                        onQuantityChange={handleQuantityChange}
+                        onRemoveItem={handleRemoveItem}
+                        isLast={index === displayTotals.itemsWithGST.length - 1}
+                        isRemoving={removingItem === item._id}
+                      />
+                    </div>
+                  </Slide>
+                )) || displayItems.map((item, index) => (
                   <Slide
                     key={item._id}
                     direction="up"
@@ -512,6 +571,74 @@ const CartList = () => {
                 <Stack spacing={2.5} sx={{ mb: 3 }}>
                   <PriceRow label="Subtotal" value={displayTotals.subtotal} />
                   
+                  {/* GST Breakdown with Toggle */}
+                  <Box>
+                    <Box 
+                      sx={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center',
+                        cursor: 'pointer',
+                        p: 1,
+                        borderRadius: 1,
+                        '&:hover': {
+                          bgcolor: colors.surface
+                        }
+                      }}
+                      onClick={() => setShowGSTBreakdown(!showGSTBreakdown)}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <ReceiptIcon sx={{ mr: 1, fontSize: 18, color: colors.textSecondary }} />
+                        <Typography variant="body1" sx={{ 
+                          color: colors.textSecondary,
+                          fontWeight: 500
+                        }}>
+                          GST (Total)
+                        </Typography>
+                        {showGSTBreakdown ? <ExpandLessIcon sx={{ ml: 1, fontSize: 18 }} /> : <ExpandMoreIcon sx={{ ml: 1, fontSize: 18 }} />}
+                      </Box>
+                      <Typography variant="body1" sx={{ 
+                        fontWeight: 600,
+                        color: colors.text 
+                      }}>
+                        ₹{displayTotals.gst?.toFixed(2) || '0.00'}
+                      </Typography>
+                    </Box>
+
+                    {/* GST Breakdown Table */}
+                    <Collapse in={showGSTBreakdown}>
+                      <Box sx={{ mt: 2, p: 2, bgcolor: colors.surface, borderRadius: 2, border: `1px solid ${colors.borderLight}` }}>
+                        <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: colors.text }}>
+                          GST Breakdown by Item
+                        </Typography>
+                        <Table size="small">
+                          <TableHead>
+                            <TableRow>
+                              <TableCell sx={{ fontWeight: 600, fontSize: '0.75rem' }}>Item</TableCell>
+                              <TableCell align="center" sx={{ fontWeight: 600, fontSize: '0.75rem' }}>Qty</TableCell>
+                              <TableCell align="right" sx={{ fontWeight: 600, fontSize: '0.75rem' }}>GST</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {displayTotals.itemsWithGST?.map((item) => (
+                              <TableRow key={item._id}>
+                                <TableCell sx={{ fontSize: '0.75rem', py: 0.5 }}>
+                                  {item.product?.name?.substring(0, 20) || 'Product'}...
+                                </TableCell>
+                                <TableCell align="center" sx={{ fontSize: '0.75rem', py: 0.5 }}>
+                                  {item.quantity}
+                                </TableCell>
+                                <TableCell align="right" sx={{ fontSize: '0.75rem', py: 0.5, fontWeight: 600 }}>
+                                  ₹{item.itemGST?.toFixed(2)}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </Box>
+                    </Collapse>
+                  </Box>
+                  
                   {displayTotals.discount > 0 && (
                     <PriceRow 
                       label="Discount Applied" 
@@ -520,8 +647,6 @@ const CartList = () => {
                       icon={<DiscountOutlinedIcon />}
                     />
                   )}
-
-                  <PriceRow label="GST (18%)" value={displayTotals.gst} />
                   
                   <PriceRow 
                     label="Shipping" 
@@ -549,7 +674,7 @@ const CartList = () => {
                     Total Amount
                   </Typography>
                   <Typography variant="h5" sx={{ fontWeight: 800, color: colors.primary }}>
-                    ₹{displayTotals.total.toFixed(2)}
+                    ₹{displayTotals.total?.toFixed(2) || '0.00'}
                   </Typography>
                 </Box>
 
@@ -698,8 +823,8 @@ const EnhancedCartItemCard = ({ item, onQuantityChange, onRemoveItem, isLast, is
   const navigate = useNavigate();
 
   const goToProduct = () => {
-    if (item.product?._id) {
-      navigate(`/ecommerceDashboard/product/${item.product._id}`);
+    if (item.product?._id || item.product?.id) {
+      navigate(`/ecommerceDashboard/product/${item.product._id || item.product.id}`);
     }
   };
 
@@ -863,6 +988,23 @@ const EnhancedCartItemCard = ({ item, onQuantityChange, onRemoveItem, isLast, is
               )}
             </Stack>
 
+            {/* Individual Item GST Display */}
+            {item.itemGST && (
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                p: 1, 
+                bgcolor: `${colors.info}10`, 
+                borderRadius: 1,
+                border: `1px solid ${colors.info}20`
+              }}>
+                <ReceiptIcon sx={{ color: colors.info, fontSize: 16, mr: 1 }} />
+                <Typography variant="caption" sx={{ color: colors.info, fontWeight: 600 }}>
+                  GST (18%): ₹{item.itemGST.toFixed(2)} | Item Total: ₹{item.itemTotal?.toFixed(2)}
+                </Typography>
+              </Box>
+            )}
+
             {/* Stock Status */}
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <CheckCircleIcon sx={{ color: colors.success, fontSize: 16, mr: 0.5 }} />
@@ -984,7 +1126,7 @@ const EnhancedCartItemCard = ({ item, onQuantityChange, onRemoveItem, isLast, is
                   mb: 0.5
                 }}
               >
-                Item Total
+                Item Subtotal
               </Typography>
               <Typography
                 variant="h6"
@@ -995,6 +1137,20 @@ const EnhancedCartItemCard = ({ item, onQuantityChange, onRemoveItem, isLast, is
               >
                 ₹{(item.price * item.quantity).toFixed(2)}
               </Typography>
+              
+              {/* Item Total with GST */}
+              {item.itemTotal && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: colors.primary,
+                    fontWeight: 600,
+                    display: 'block'
+                  }}
+                >
+                  With GST: ₹{item.itemTotal.toFixed(2)}
+                </Typography>
+              )}
               
               {/* Savings Display */}
               {item.originalPrice && item.originalPrice > item.price && (
@@ -1046,4 +1202,3 @@ const EnhancedCartItemCard = ({ item, onQuantityChange, onRemoveItem, isLast, is
 };
 
 export default CartList;
-                

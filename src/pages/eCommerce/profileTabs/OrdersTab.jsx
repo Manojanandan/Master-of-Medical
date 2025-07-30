@@ -14,7 +14,6 @@ const OrdersTab = ({
   handleOrderPageChange,
   openOrderDialog,
   getStatusColor,
-  formatDate,
   formatCurrency
 }) => {
   const navigate = useNavigate();
@@ -142,7 +141,7 @@ const OrdersTab = ({
                 <thead>
                   <tr>
                     <th>Order ID</th>
-                    <th>Date</th>
+                    <th>Customer Name</th>
                     <th>Products</th>
                     <th>Status</th>
                     <th>Total</th>
@@ -155,15 +154,16 @@ const OrdersTab = ({
                       <td className={styles.orderIdCell}>
                         <span className={styles.orderId}>#{order.id}</span>
                       </td>
-                      <td className={styles.orderDateCell}>
-                        {formatDate(order.createdAt)}
+                      <td className={styles.customerNameCell}>
+                        {order.customerInfo.name}
                       </td>
                       <td className={styles.productsCell}>
                         <div className={styles.productsList}>
                           {order.productInfo?.slice(0, 3).map((product, idx) => (
                             <div key={idx} className={styles.productItem}>
-                              <span className={styles.productName}>{product.name}</span>
-                              <span className={styles.productQuantity}>x{product.quantity}</span>
+                              <span className={styles.productName}>
+                                Product {product.productId}
+                              </span>
                             </div>
                           ))}
                           {order.productInfo?.length > 3 && (
