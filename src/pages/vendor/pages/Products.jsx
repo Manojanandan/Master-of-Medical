@@ -398,7 +398,11 @@ const Products = () => {
           width: '100%'
         }}>
           {paginatedProducts.map((product) => (
-            <Box key={product.id} sx={{ display: 'flex' }}>
+            <Box key={product.id} sx={{ 
+              display: 'flex',
+              minWidth: { xs: '280px', sm: '300px', md: '320px' },
+              maxWidth: { xs: '100%', sm: '400px', md: '420px', lg: '380px' }
+            }}>
               <Card 
                 sx={{ 
                   borderRadius: 3, 
@@ -411,6 +415,8 @@ const Products = () => {
                   position: 'relative',
                   overflow: 'hidden',
                   background: '#ffffff',
+                  width: '100%',
+                  minHeight: '500px',
                   '&:hover': {
                     transform: 'translateY(-8px)',
                     boxShadow: '0 16px 40px rgba(0,0,0,0.15)',

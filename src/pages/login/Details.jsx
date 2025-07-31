@@ -639,6 +639,8 @@ const Details = () => {
                 formData.append('country', allData.country);
                 formData.append('postalCode', allData.pincode);
                 formData.append('type', allData.type);
+                formData.append('userName', allData.fullName);
+
                 
                 // Append additional information
                 allData.additionalInformation.forEach(item => {
@@ -660,6 +662,7 @@ const Details = () => {
                 // Handle vendor creation
                 const formData = new FormData();
                 const address = `${allData.addressLine1}, ${allData.addressLine2}`;
+                formData.append('userName', allData.fullName);
                 formData.append('address', address);
                 formData.append('phone', allData.number);
                 formData.append('city', allData.city);
