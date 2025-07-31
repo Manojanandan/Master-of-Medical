@@ -7,7 +7,8 @@ import ValuedCustomers from './components/ValuedCustomers';
 import MeetOurTeam from './components/MeetOurTeam';
 import Testimonial from './components/Testimonial';
 import BlogPost from './components/BlogPost';
-import Footer from './components/Footer';
+import Footer from  '../components/e_commerceComponents/Footer'
+// import Footer from './components/Footer';
 import './MainLayout.css';
 
 const MainLayout = () => {
@@ -21,7 +22,7 @@ const MainLayout = () => {
       <MeetOurTeam />
       <Testimonial />
       <BlogPost />
-      {/* <Footer /> */}
+      <Footer />
     </div>
   );
 };
