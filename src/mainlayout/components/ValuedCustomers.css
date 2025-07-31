@@ -1,6 +1,7 @@
 .valued-customers {
   padding: 4rem 0;
-  background: linear-gradient(135deg, #ff6b35, #c5225f);
+  background: radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.2), transparent 40%),
+  linear-gradient(90deg, #c83785, #d85f6a, #d85f6a, #e27a60, #e27a60, #e6a158);
 }
 
 .customers-container {

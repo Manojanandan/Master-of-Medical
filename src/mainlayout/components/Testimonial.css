@@ -1,6 +1,7 @@
 .testimonial {
   padding: 4rem 0;
-  background: linear-gradient(90deg, #c5225f 0%, #ff6b35 50%, #ffd700 100%);
+  background: radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.2), transparent 40%),
+  linear-gradient(90deg, #c83785, #d85f6a, #d85f6a, #e27a60, #e27a60, #e6a158);
 }
 
 .testimonial-container {
@@ -50,16 +51,17 @@
 
 .testimonial-cards {
   display: flex;
+  justify-content: center;
   gap: 2rem;
-  max-width: 800px;
-  overflow: hidden;
+  max-width: 85%;
+  /* overflow: hidden; */
 }
 
 .testimonial-card {
   background: white;
   border-radius: 15px;
   padding: 2rem;
-  min-width: 350px;
+  /* min-width: 350px; */
   opacity: 1;
   transform: scale(1);
   transition: all 0.3s ease;
@@ -88,6 +90,7 @@
   color: white;
   font-weight: bold;
   z-index: 10;
+  padding: 5px;
 }
 
 .testimonial-header {
@@ -245,3 +248,7 @@
     font-size: 0.8rem;
   }
 } 
+
+.testimonial-card  {
+  width: 45%;
+}

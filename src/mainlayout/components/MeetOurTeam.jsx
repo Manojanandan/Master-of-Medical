@@ -39,7 +39,7 @@ const MeetOurTeam = () => {
                   <p className="member-description">Lorem ipsum dolor</p>
 
                   </h3>
-                  <div className="plus-icon">+</div>
+                  {/* <div className="plus-icon">+</div> */}
                 </div>
                 {/* <div className="member-silhouette">
                   <div className={`silhouette silhouette-${index + 1}`}></div>

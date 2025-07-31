@@ -1,5 +1,9 @@
 import React from 'react';
 import './BrandPartners.css';
+import c1 from '../../assets/c1.jpg';
+import c2 from '../../assets/c2.jpg';
+import c3 from '../../assets/c3.jpg';
+import c4 from '../../assets/c4.jpg';
 
 const BrandPartners = () => {
   return (
@@ -12,22 +16,22 @@ const BrandPartners = () => {
         <div className="brand-cards">
           <div className="brand-card">
             <div className="brand-placeholder">
-              <span></span>
-            </div>
-          </div>
-          <div className="brand-card featured">
-            <div className="brand-placeholder">
-              <span></span>
+              <img src={c1} alt="" srcset="" />
             </div>
           </div>
           <div className="brand-card">
             <div className="brand-placeholder">
-              <span></span>
+              <img src={c2} alt="" srcset="" />
             </div>
           </div>
           <div className="brand-card">
             <div className="brand-placeholder">
-              <span></span>
+              <img src={c3} alt="" srcset="" />
+            </div>
+          </div>
+          <div className="brand-card">
+            <div className="brand-placeholder">
+              <img src={c4} alt="" srcset="" />
             </div>
           </div>
         </div>

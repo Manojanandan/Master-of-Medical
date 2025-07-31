@@ -1,5 +1,8 @@
 import React from 'react';
 import './ValuedCustomers.css';
+import c1 from '../../assets/c1.jpg';
+import c2 from '../../assets/c2.jpg';
+import c3 from '../../assets/c3.jpg';
 
 const ValuedCustomers = () => {
   return (
@@ -12,17 +15,18 @@ const ValuedCustomers = () => {
         <div className="customer-cards">
           <div className="customer-card">
             <div className="customer-placeholder">
-              <span>Customer 1</span>
+              <img src={c1} alt="" srcset="" />
             </div>
           </div>
-          <div className="customer-card featured">
+          {/* featured */}
+          <div className="customer-card ">
             <div className="customer-placeholder">
-              <span>Featured</span>
+              <img src={c2} alt="" srcset="" />
             </div>
           </div>
           <div className="customer-card">
             <div className="customer-placeholder">
-              <span>Customer 2</span>
+              <img src={c3} alt="" srcset="" />
             </div>
           </div>
         </div>
