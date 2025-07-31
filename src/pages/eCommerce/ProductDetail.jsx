@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import {
   Container,
@@ -98,12 +97,13 @@ const ProductDetail = () => {
   
   // Parse additional information from JSON string with default values
   const getParsedAdditionalInfo = () => {
-    if (!product || !product.additionalInformation) return { category: 1, howToUse: "Not available", sideEffects: "Not available", manufacturer: "Not available" };
+    if (!product || !product.additionalInformation) return { howToUse: "Not available", sideEffects: "Not available", manufacturer: "Not available" };
     if (typeof product.additionalInformation === 'string') {
       try {
         const parsed = JSON.parse(product.additionalInformation);
         return {
-          category: parsed.category || 1,
+          categoryName: parsed.categoryName || "Unknown Category",
+          subCategoryName: parsed.subCategoryName || "Unknown Subcategory",
           howToUse: parsed.howToUse || "Not available",
           sideEffects: parsed.sideEffects || "Not available",
           manufacturer: parsed.manufacturer || "Not available",
@@ -111,49 +111,17 @@ const ProductDetail = () => {
         };
       } catch (error) {
         console.error('Error parsing additionalInformation:', error);
-        return { category: 1, howToUse: "Not available", sideEffects: "Not available", manufacturer: "Not available" };
+        return { categoryName: "Unknown Category", subCategoryName: "Unknown Subcategory", howToUse: "Not available", sideEffects: "Not available", manufacturer: "Not available" };
       }
     }
     return {
-      category: product.additionalInformation.category || 1,
+      categoryName: product.additionalInformation.categoryName || "Unknown Category",
+      subCategoryName: product.additionalInformation.subCategoryName || "Unknown Subcategory",
       howToUse: product.additionalInformation.howToUse || "Not available",
       sideEffects: product.additionalInformation.sideEffects || "Not available",
       manufacturer: product.additionalInformation.manufacturer || "Not available",
       ...product.additionalInformation
     };
-  };
-
-  // Get category name from ID with new Category 9
-  const getCategoryName = (categoryId) => {
-    const categoryMap = {
-      1: 'Medical Supplies',
-      2: 'Surgical Equipment',
-      3: 'Diagnostic Tools',
-      4: 'Personal Protective Equipment',
-      5: 'Pharmaceuticals',
-      6: 'First Aid',
-      7: 'Dental Supplies',
-      8: 'Laboratory Equipment',
-      9: 'Specialty Medical Devices' // Added Category 9
-    };
-    return categoryMap[categoryId] || `Category ${categoryId}`;
-  };
-
-  // Get subcategory name from ID
-  const getSubCategoryName = (subCategoryId) => {
-    const subCategoryMap = {
-      1: 'Face Masks',
-      2: 'Gloves',
-      3: 'Gowns',
-      4: 'Bandages',
-      5: 'Antiseptics',
-      6: 'Thermometers',
-      7: 'Stethoscopes',
-      8: 'Adhesive Bandages',
-      9: 'Gauze',
-      10: 'Tapes'
-    };
-    return subCategoryMap[subCategoryId] || `Sub Category ${subCategoryId}`;
   };
 
   // ========================================
@@ -313,14 +281,13 @@ const ProductDetail = () => {
         <Box sx={{ mb: 3 }}>
           <Button
             startIcon={<ArrowBack />}
-            onClick={() => navigate('/customer')}
+            onClick={() => navigate('/ecommerceDashboard')}
             sx={{ color: '#666', fontWeight: 500 }}
           >
             Back to Products
           </Button>
         </Box>
         <Alert severity="error" sx={{ mb: 2, borderRadius: 1 }}>
-
           {error?.message || 'Failed to load product details'}
         </Alert>
       </Container>
@@ -333,14 +300,13 @@ const ProductDetail = () => {
         <Box sx={{ mb: 3 }}>
           <Button
             startIcon={<ArrowBack />}
-            onClick={() => navigate('/customer')}
+            onClick={() => navigate('/ecommerceDashboard')}
             sx={{ color: '#666', fontWeight: 500 }}
           >
             Back to Products
           </Button>
         </Box>
         <Alert severity="error" sx={{ mb: 2, borderRadius: 1 }}>
-
           Product not found
         </Alert>
       </Container>
@@ -354,94 +320,33 @@ const ProductDetail = () => {
   const parsedAdditionalInfo = getParsedAdditionalInfo();
   console.log('Parsed Additional Info:', parsedAdditionalInfo);
   
-  const subCategoryId = product?.subCategoryId || product?.subCategory || 1; // Default to 1 if both are missing
+  const subCategoryName = product?.subCategoryName || parsedAdditionalInfo.subCategoryName || "Unknown Subcategory"; // Fallback to API or parsed data
 
   // ========================================
   // MAIN RENDER
   // ========================================
   
   return (
-//     <Box sx={{ bgcolor: '#ffffff', minHeight: '100vh', py: 2 }}>
-//       <Container maxWidth="xl" sx={{ px: 3 }}>
+    <Box sx={{ bgcolor: '#ffffff', minHeight: '100vh', py: 2 }}>
+      <Container maxWidth="xl" sx={{ px: 3 }}>
         
-//         {/* ========================================
-//             MAIN PRODUCT SECTION
-//         ======================================== */}
-//         <Box sx={{
-//           bgcolor: 'white',
-//           borderRadius: 2,
-//           p: 1,
-//           mb: 4,
-//           mx: { xs: 0, md: 8 }
-//         }}>
-//           <Grid container spacing={8}>
+        {/* ========================================
+            MAIN PRODUCT SECTION
+        ======================================== */}
+        <Box sx={{
+          bgcolor: 'white',
+          borderRadius: 2,
+          p: 1,
+          mb: 4,
+          mx: { xs: 0, md: 8 }
+        }}>
+          <Grid container spacing={8}>
             
-//             {/* ========================================
-//                 LEFT COLUMN - IMAGE GALLERY
-//             ======================================== */}
-//             <Grid item xs={12} md={6}>
-//               <Box sx={{
-    <Box sx={{ py: { xs: 1, md: 4 }, width: '90%', mx: 'auto' }}>
-      {/* Back to Products Button */}
-      {/* <Button
-        startIcon={<ArrowBack />}
-        onClick={() => navigate('/customer')}
-        sx={{ mb: 3, color: 'text.secondary' }}
-      >
-        Back to Products
-      </Button> */}
-      
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: { xs: 'column', md: 'row' },
-          gap: { xs: 3, md: 6 },
-        }}
-      >
-        {/* Main Image Section - 50% width on desktop */}
-        <Box
-          sx={{
-            width: { xs: '100%', md: '50%' },
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: 400,
-          }}
-        >
-          <Card
-            elevation={0}
-            sx={{
-              p: 2,
-              bgcolor: 'background.paper',
-              borderRadius: 4,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '100%',
-              height: { xs: 300, sm: 350, md: 400 },
-              mb: 3,
-            }}
-          >
-            <CardMedia
-              component="img"
-              image={product?.galleryImage && product.galleryImage[selectedImage] ? product.galleryImage[selectedImage] : product?.thumbnailImage}
-              alt={product?.name}
-              sx={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain',
-                borderRadius: 3,
-                background: '#f8f8f8',
-              }}
-            />
-          </Card>
-
-          {/* Thumbnail Images - Now below the main image */}
-          {(product?.galleryImage && product.galleryImage.length > 0) && (
-            <Box
-              sx={{
-
+            {/* ========================================
+                LEFT COLUMN - IMAGE GALLERY
+            ======================================== */}
+            <Grid item xs={12} md={6}>
+              <Box sx={{
                 display: 'flex',
                 gap: 2,
                 alignItems: 'flex-start'
@@ -559,17 +464,17 @@ const ProductDetail = () => {
                     </Link>
                     <Link
                       color="inherit"
-                      onClick={() => navigate(`/ecommerceDashboard?category=${getCategoryName(parsedAdditionalInfo.category)}`)}
+                      onClick={() => navigate(`/ecommerceDashboard?category=${parsedAdditionalInfo.categoryName}`)}
                       sx={{ cursor: 'pointer' }}
                     >
-                      {getCategoryName(parsedAdditionalInfo.category) || (console.warn('Category not found in additionalInformation'), 'Category')}
+                      {parsedAdditionalInfo.categoryName || (console.warn('Category name not found in additionalInformation'), 'Category')}
                     </Link>
                     <Link
                       color="inherit"
-                      onClick={() => navigate(`/ecommerceDashboard?subCategory=${getSubCategoryName(subCategoryId)}`)}
+                      onClick={() => navigate(`/ecommerceDashboard?subCategory=${subCategoryName}`)}
                       sx={{ cursor: 'pointer' }}
                     >
-                      {getSubCategoryName(subCategoryId) || (console.warn('SubCategoryId not found'), 'Sub Category')}
+                      {subCategoryName || (console.warn('Subcategory name not found'), 'Sub Category')}
                     </Link>
                     <Typography color="text.primary" sx={{ color: '#666' }}>
                       {product.name}
@@ -614,7 +519,7 @@ const ProductDetail = () => {
                       }}
                     />
                     <Typography variant="body2" sx={{ color: '#666', fontWeight: 500 }}>
-                    {Math.round((product.averageRating ?? 0) * 10) / 10}
+                      {product.averageRating || 0}
                     </Typography>
                   </Box>
                   <Typography variant="body2" sx={{ color: '#666' }}>
