@@ -165,7 +165,7 @@ const ThankYou = () => {
               }}>
                 <Button
                   variant="contained"
-                  onClick={() => navigate('/ecommerceDashboard')}
+                  onClick={() => navigate('/customer')}
                   sx={{ 
                     borderRadius: 50, 
                     px: 4, 
@@ -187,7 +187,7 @@ const ThankYou = () => {
                 
                 <Button
                   variant="outlined"
-                  onClick={() => navigate('/ecommerceDashboard/profile')}
+                  onClick={() => navigate('/customer/profile')}
                   sx={{ 
                     borderRadius: 50, 
                     px: 4, 

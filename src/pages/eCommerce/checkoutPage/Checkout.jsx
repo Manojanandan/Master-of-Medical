@@ -1578,7 +1578,7 @@ const Checkout = () => {
         <Button 
           variant="contained" 
           size="large"
-          onClick={() => navigate('/ecommerceDashboard')}
+          onClick={() => navigate('/customer')}
           sx={{ bgcolor: colors.primary }}
         >
           Continue Shopping
@@ -1954,7 +1954,7 @@ const Checkout = () => {
                 <Button
                   variant="outlined"
                   fullWidth
-                  onClick={() => navigate('/ecommerceDashboard')}
+                  onClick={() => navigate('/customer')}
                   sx={{ 
                     py: 1.5,
                     borderColor: colors.primary,
@@ -2128,7 +2128,7 @@ const Checkout = () => {
             <Button
               onClick={() => {
                 setOrderSuccessDialogOpen(false);
-                navigate('/ecommerceDashboard');
+                navigate('/customer');
               }}
               variant="contained"
               size="large"
@@ -2146,7 +2146,7 @@ const Checkout = () => {
             <Button
               onClick={() => {
                 setOrderSuccessDialogOpen(false);
-                navigate('/ecommerceDashboard/profile');
+                navigate('/customer/profile');
               }}
               variant="outlined"
               size="large"

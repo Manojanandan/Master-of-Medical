@@ -164,7 +164,7 @@ const Navbar = () => {
 
   const handleProfileMenuClick = () => {
     handleMenuClose();
-    navigate("/ecommerceDashboard/profile");
+    navigate("/customer/profile");
   };
 
   const handleLogout = () => {
@@ -178,7 +178,7 @@ const Navbar = () => {
   const handleSearch = () => {
     if (searchValue.trim()) {
       setShowSearchResults(false);
-      navigate(`/ecommerceDashboard/search?q=${encodeURIComponent(searchValue.trim())}`);
+      // navigate(`/customer/search?q=${encodeURIComponent(searchValue.trim())}`);
     }
   };
 
@@ -203,7 +203,7 @@ const Navbar = () => {
   const handleSearchResultClick = (product) => {
     setShowSearchResults(false);
     setSearchValue("");
-    navigate(`/ecommerceDashboard/product/${product.id}`);
+    navigate(`/customer/product/${product.id}`);
   };
 
   const clearSearch = () => {
@@ -225,7 +225,7 @@ const Navbar = () => {
     {
       icon: <StorefrontOutlinedIcon />,
       text: "Shop",
-      action: () => navigate("/ecommerceDashboard/products"),
+      action: () => navigate("/customer/products"),
     },
     {
       icon: <LocationOnOutlinedIcon />,
@@ -242,7 +242,7 @@ const Navbar = () => {
     {
       icon: <ShoppingCartOutlinedIcon />,
       text: "Cart",
-      action: () => navigate("/ecommerceDashboard/cart"),
+      action: () => navigate("/customer/cart"),
       badge: totalItems || 0,
     },
     {
@@ -307,7 +307,7 @@ const Navbar = () => {
 
             {/* Logo */}
             <Box
-              onClick={() => navigate("/ecommerceDashboard")}
+              onClick={() => navigate("/customer")}
               sx={{
                 cursor: "pointer",
                 flexShrink: 0,
@@ -584,7 +584,7 @@ const Navbar = () => {
               >
                 {/* Shop */}
                 <Box
-                  onClick={() => navigate("/ecommerceDashboard/products")}
+                  onClick={() => navigate("/customer/products")}
                   sx={{
                     display: "flex",
                     alignItems: "center",
@@ -646,7 +646,7 @@ const Navbar = () => {
 
                 {/* Cart */}
                 <Box
-                  onClick={() => navigate("/ecommerceDashboard/cart")}
+                  onClick={() => navigate("/customer/cart")}
                   sx={{
                     display: "flex",
                     alignItems: "center",

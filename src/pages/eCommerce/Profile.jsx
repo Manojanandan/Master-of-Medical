@@ -304,25 +304,25 @@ const Profile = () => {
           setActiveSection(section);
           break;
         case 'faq':
-          navigate('/ecommerceDashboard/faq');
+          navigate('/customer/faq');
           break;
         case 'returns-refunds':
-          navigate('/ecommerceDashboard/returns-refunds');
+          navigate('/customer/returns-refunds');
           break;
         case 'orderTracking':
-          navigate('/ecommerceDashboard/orderTracking');
+          navigate('/customer/orderTracking');
           break;
         case 'disclaimer':
-          navigate('/ecommerceDashboard/disclaimer');
+          navigate('/customer/disclaimer');
           break;
         case 'termsofuse':
-          navigate('/ecommerceDashboard/termsofuse');
+          navigate('/customer/termsofuse');
           break;
         case 'privacyPolicy':
-          navigate('/ecommerceDashboard/privacyPolicy');
+          navigate('/customer/privacyPolicy');
           break;
         case 'cookiesPolicy':
-          navigate('/ecommerceDashboard/cookiesPolicy');
+          navigate('/customer/cookiesPolicy');
           break;
         default:
           setActiveSection(section);
