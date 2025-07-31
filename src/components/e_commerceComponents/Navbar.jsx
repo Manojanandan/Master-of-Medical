@@ -153,7 +153,7 @@ const Navbar = () => {
     if (isLoggedIn) {
       setAnchorEl(event.currentTarget);
     } else {
-      navigate("/login");
+      navigate("/auth/login");
     }
     if (isMobile) {
       setMobileMenuOpen(false);
@@ -172,7 +172,7 @@ const Navbar = () => {
     sessionStorage.clear();
     setUserInfo(null);
     setIsLoggedIn(false);
-    navigate("/login");
+    navigate("/auth/login");
   };
 
   const handleSearch = () => {
