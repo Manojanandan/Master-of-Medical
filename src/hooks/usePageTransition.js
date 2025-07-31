@@ -24,14 +24,29 @@ export const usePageTransition = () => {
     // Define animation types based on route
     const animationMap = {
       '/': 'fade',
-      '/ecommerceDashboard': 'fade',
-      '/ecommerceDashboard/products': 'slide',
-      '/ecommerceDashboard/product': 'zoom',
-      '/ecommerceDashboard/cart': 'slide',
-      '/ecommerceDashboard/checkout': 'grow',
-      '/ecommerceDashboard/profile': 'fade',
+      '/customer': 'fade',
+      '/customer/products': 'slide',
+      '/customer/products/': 'zoom',
+      '/customer/cart': 'slide',
+      '/customer/checkout': 'grow',
+      '/customer/profile': 'fade',
+      '/auth/login': 'slide',
+      '/auth/register': 'slide',
+      '/auth/complete-profile': 'fade',
+      '/auth/forgot-password': 'slide',
+      '/vendor': 'fade',
+      '/vendor/products': 'slide',
+      '/vendor/products/': 'zoom',
+      '/vendor/orders': 'slide',
+      '/vendor/profile': 'fade',
+      '/profile/customer/edit': 'fade',
+      '/profile/vendor/edit': 'fade',
+      '/legal/terms-of-use': 'slide',
+      '/legal/privacy-policy': 'slide',
+      // Legacy routes for backward compatibility
       '/login': 'slide',
       '/signup': 'slide',
+      '/ecommerceDashboard': 'fade',
       '/vendorDashboard': 'fade',
     };
 
@@ -48,10 +63,22 @@ export const usePageTransition = () => {
   const getAnimationDirection = (pathname) => {
     // Define animation directions based on route
     const directionMap = {
-      '/ecommerceDashboard/products': 'up',
-      '/ecommerceDashboard/cart': 'right',
-      '/ecommerceDashboard/checkout': 'up',
-      '/ecommerceDashboard/profile': 'up',
+      '/customer/products': 'up',
+      '/customer/cart': 'right',
+      '/customer/checkout': 'up',
+      '/customer/profile': 'up',
+      '/auth/login': 'up',
+      '/auth/register': 'up',
+      '/auth/complete-profile': 'fade',
+      '/auth/forgot-password': 'up',
+      '/vendor/products': 'up',
+      '/vendor/orders': 'up',
+      '/vendor/profile': 'up',
+      '/profile/customer/edit': 'fade',
+      '/profile/vendor/edit': 'fade',
+      '/legal/terms-of-use': 'left',
+      '/legal/privacy-policy': 'left',
+      // Legacy routes
       '/login': 'up',
       '/signup': 'up',
     };
@@ -69,10 +96,23 @@ export const usePageTransition = () => {
     // Define animation timeouts based on route
     const timeoutMap = {
       '/': 1000,
+      '/customer': 800,
+      '/customer/products/': 700,
+      '/customer/checkout': 800,
+      '/customer/profile': 1000,
+      '/auth/login': 600,
+      '/auth/register': 600,
+      '/auth/complete-profile': 600,
+      '/auth/forgot-password': 600,
+      '/vendor': 800,
+      '/vendor/products/': 700,
+      '/vendor/profile': 800,
+      '/profile/customer/edit': 800,
+      '/profile/vendor/edit': 800,
+      '/legal/terms-of-use': 600,
+      '/legal/privacy-policy': 600,
+      // Legacy routes
       '/ecommerceDashboard': 800,
-      '/ecommerceDashboard/product': 700,
-      '/ecommerceDashboard/checkout': 800,
-      '/ecommerceDashboard/profile': 1000,
       '/vendorDashboard': 800,
     };
 

@@ -59,35 +59,16 @@ const ProfileTab = ({
           <div className={styles.formGrid}>
             <div className={styles.formGroup}>
               <label className={styles.formLabel}>
-                First Name <span className={styles.required}>*</span>
+                User Name <span className={styles.required}>*</span>
               </label>
               <input
                 type="text"
                 className={styles.formInput}
-                value={profileData.name ? profileData.name.split(' ')[0] : ''}
-                onChange={(e) => {
-                  const lastName = profileData.name ? profileData.name.split(' ').slice(1).join(' ') : '';
-                  handleInputChange('name', `${e.target.value} ${lastName}`.trim());
-                }}
+                value={profileData.name || ''}
+                onChange={(e) => handleInputChange('name', e.target.value)}
                 disabled={!isEditing}
                 required
-              />
-            </div>
-
-            <div className={styles.formGroup}>
-              <label className={styles.formLabel}>
-                Last Name <span className={styles.required}>*</span>
-              </label>
-              <input
-                type="text"
-                className={styles.formInput}
-                value={profileData.name ? profileData.name.split(' ').slice(1).join(' ') : ''}
-                onChange={(e) => {
-                  const firstName = profileData.name ? profileData.name.split(' ')[0] : '';
-                  handleInputChange('name', `${firstName} ${e.target.value}`.trim());
-                }}
-                disabled={!isEditing}
-                required
+                placeholder="Enter your user name"
               />
             </div>
 

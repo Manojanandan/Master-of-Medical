@@ -24,28 +24,11 @@ import DeleteIcon from '@mui/icons-material/Close';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProductById, clearError, clearSuccess, updateProductData } from '../reducers/ProductReducer';
 import { useNavigate, useParams } from 'react-router-dom';
+import { getAllCategoriesAndSubcategories } from '../../../utils/Service';
 
 const MAX_FILES = 5;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
-
-const SUBCATEGORY_OPTIONS = {
-  medical: [
-    { value: 'bandages', label: 'Bandages' },
-    { value: 'masks', label: 'Masks' },
-    { value: 'syringes', label: 'Syringes' },
-  ],
-  surgical: [
-    { value: 'gloves', label: 'Gloves' },
-    { value: 'scissors', label: 'Scissors' },
-    { value: 'forceps', label: 'Forceps' },
-  ],
-  equipment: [
-    { value: 'monitor', label: 'Monitor' },
-    { value: 'stethoscope', label: 'Stethoscope' },
-    { value: 'thermometer', label: 'Thermometer' },
-  ],
-};
 
 const getFileIcon = (type) => {
   if (type === 'application/pdf') return <PictureAsPdfIcon sx={{ color: '#e53935' }} />;
@@ -65,8 +48,10 @@ const ProductDetail = () => {
   const [category, setCategory] = useState('');
   const [subcategory, setSubcategory] = useState('');
   const [productName, setProductName] = useState('');
+  const [mrpPrice, setMrpPrice] = useState('');
   const [price, setPrice] = useState('');
   const [priceLabel, setPriceLabel] = useState('');
+  const [bulkDiscount, setBulkDiscount] = useState('');
   const [description, setDescription] = useState('');
   const [shelfLife, setShelfLife] = useState('');
   const [brandName, setBrandName] = useState('');
@@ -76,6 +61,9 @@ const ProductDetail = () => {
   const [benefits, setBenefits] = useState('');
   const [sideEffects, setSideEffects] = useState('');
   const [manufacturer, setManufacturer] = useState('');
+  const [mediguardEssentials, setMediguardEssentials] = useState('');
+  const [gst, setGst] = useState('');
+  const [hsnCode, setHsnCode] = useState('');
   const [files, setFiles] = useState([]);
   const [thumbnail, setThumbnail] = useState(null);
   const [fileError, setFileError] = useState('');
@@ -83,6 +71,8 @@ const ProductDetail = () => {
   const [formError, setFormError] = useState({});
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
   const [isEditing, setIsEditing] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
   const fileInputRef = useRef();
   const thumbnailInputRef = useRef();
 
@@ -94,19 +84,65 @@ const ProductDetail = () => {
     }
   }, [dispatch, id]);
 
+  // Load categories on component mount
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        const response = await getAllCategoriesAndSubcategories();
+        console.log('Full API response:', response);
+        console.log('Response data:', response.data);
+        console.log('Response data type:', typeof response.data);
+        console.log('Is response.data an array?', Array.isArray(response.data));
+        
+        // Ensure categories is an array
+        const categoriesData = Array.isArray(response.data) ? response.data : 
+                              Array.isArray(response.data?.categories) ? response.data.categories :
+                              Array.isArray(response.data?.data) ? response.data.data :
+                              Array.isArray(response.data?.result) ? response.data.result :
+                              Array.isArray(response.data?.items) ? response.data.items : [];
+        
+        console.log('Processed categories:', categoriesData);
+        console.log('First category structure:', categoriesData[0]);
+        console.log('Available category IDs:', categoriesData.map(cat => ({ id: cat.id, name: cat.name })));
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error('Error loading categories:', error);
+        setSnackbar({ 
+          open: true, 
+          message: 'Failed to load categories. Please try again.', 
+          severity: 'error' 
+        });
+        setCategories([]); // Set empty array on error
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    loadCategories();
+  }, []);
+
   // Populate form when product data is loaded
   useEffect(() => {
     if (currentProduct) {
       console.log('Product data loaded:', currentProduct);
       setCategory(currentProduct.category || '');
-      setSubcategory(currentProduct.subCategory || '');
+      setSubcategory(currentProduct.subCategoryId || '');
       setProductName(currentProduct.name || '');
       setPrice(currentProduct.price || '');
       setPriceLabel(currentProduct.priceLable || '');
+      setBulkDiscount(currentProduct.bulkDiscount || '');
       setDescription(currentProduct.description || '');
       setBrandName(currentProduct.brandName || '');
       setBenefits(currentProduct.benefits || '');
-      setExpiresOn(currentProduct.expiresOn || '');
+      setGst(currentProduct.gst || '');
+      setHsnCode(currentProduct.hsnCode || '');
+      
+      // Format expiresOn date for date input (remove time part)
+      if (currentProduct.expiresOn) {
+        const dateOnly = currentProduct.expiresOn.split(' ')[0];
+        setExpiresOn(dateOnly);
+      }
       
       // Handle additional information
       if (currentProduct.additionalInformation) {
@@ -114,11 +150,13 @@ const ProductDetail = () => {
           ? JSON.parse(currentProduct.additionalInformation) 
           : currentProduct.additionalInformation;
         
+        setMrpPrice(additionalInfo.mrpPrice || '');
         setShelfLife(additionalInfo.shelfLife || '');
         setCountry(additionalInfo.country || '');
         setHowToUse(additionalInfo.howToUse || '');
         setSideEffects(additionalInfo.sideEffects || '');
         setManufacturer(additionalInfo.manufacturer || '');
+        setMediguardEssentials(additionalInfo.mediguardDetails || '');
       }
     }
   }, [currentProduct]);
@@ -205,6 +243,7 @@ const ProductDetail = () => {
     if (!category) errors.category = 'Category is required';
     if (!subcategory) errors.subcategory = 'Subcategory is required';
     if (!productName) errors.productName = 'Product name is required';
+    if (!mrpPrice) errors.mrpPrice = 'MRP price is required';
     if (!price) errors.price = 'Price is required';
     if (!priceLabel) errors.priceLabel = 'Price label is required';
     if (!description) errors.description = 'Description is required';
@@ -213,6 +252,9 @@ const ProductDetail = () => {
     if (!expiresOn) errors.expiresOn = 'Expiry date is required';
     if (!country) errors.country = 'Country is required';
     if (!manufacturer) errors.manufacturer = 'Manufacturer details required';
+    if (!mediguardEssentials) errors.mediguardEssentials = 'Mediguard Essentials is required';
+    if (!gst) errors.gst = 'GST is required';
+    if (!hsnCode) errors.hsnCode = 'HSN Code is required';
     if (!thumbnail && !currentProduct?.thumbnailImage) errors.thumbnail = 'Thumbnail image is required';
     if (files.length === 0 && (!currentProduct?.galleryImage || currentProduct.galleryImage.length === 0)) {
       errors.files = 'At least one gallery image is required';
@@ -247,7 +289,12 @@ const ProductDetail = () => {
       sideEffects: sideEffects,
       manufacturer: manufacturer,
       files: files,
-      thumbnail: thumbnail
+      thumbnail: thumbnail,
+      mrpPrice: mrpPrice,
+      bulkDiscount: bulkDiscount,
+      mediguardEssentials: mediguardEssentials,
+      gst: gst,
+      hsnCode: hsnCode,
     };
 
     // Dispatch update action
@@ -259,25 +306,36 @@ const ProductDetail = () => {
     // Reset form to original data
     if (currentProduct) {
       setCategory(currentProduct.category || '');
-      setSubcategory(currentProduct.subCategory || '');
+      setSubcategory(currentProduct.subCategoryId || '');
       setProductName(currentProduct.name || '');
       setPrice(currentProduct.price || '');
       setPriceLabel(currentProduct.priceLable || '');
+      setBulkDiscount(currentProduct.bulkDiscount || '');
       setDescription(currentProduct.description || '');
       setBrandName(currentProduct.brandName || '');
       setBenefits(currentProduct.benefits || '');
-      setExpiresOn(currentProduct.expiresOn || '');
+      setGst(currentProduct.gst || '');
+      setHsnCode(currentProduct.hsnCode || '');
       
+      // Format expiresOn date for date input (remove time part)
+      if (currentProduct.expiresOn) {
+        const dateOnly = currentProduct.expiresOn.split(' ')[0];
+        setExpiresOn(dateOnly);
+      }
+      
+      // Handle additional information
       if (currentProduct.additionalInformation) {
         const additionalInfo = typeof currentProduct.additionalInformation === 'string' 
           ? JSON.parse(currentProduct.additionalInformation) 
           : currentProduct.additionalInformation;
         
+        setMrpPrice(additionalInfo.mrpPrice || '');
         setShelfLife(additionalInfo.shelfLife || '');
         setCountry(additionalInfo.country || '');
         setHowToUse(additionalInfo.howToUse || '');
         setSideEffects(additionalInfo.sideEffects || '');
         setManufacturer(additionalInfo.manufacturer || '');
+        setMediguardEssentials(additionalInfo.mediguardDetails || '');
       }
     }
   };
@@ -285,6 +343,15 @@ const ProductDetail = () => {
   const handleCategoryChange = (e) => {
     setCategory(e.target.value);
     setSubcategory(''); // Reset subcategory when category changes
+  };
+
+  // Get subcategories for selected category
+  const getSubcategoriesForCategory = (selectedCategory) => {
+    if (!selectedCategory || !Array.isArray(categories) || !categories.length) return [];
+    const categoryData = categories.find(cat => cat.id === selectedCategory || cat._id === selectedCategory || cat.name === selectedCategory);
+    console.log('Selected category:', selectedCategory);
+    console.log('Found category data:', categoryData);
+    return categoryData ? (Array.isArray(categoryData.SubCategories) ? categoryData.SubCategories : []) : [];
   };
 
   // Loading state
@@ -308,7 +375,7 @@ const ProductDetail = () => {
         <Button 
           startIcon={<ArrowBackIosNewIcon />} 
           sx={{ color: '#222', fontWeight: 600, textTransform: 'uppercase', fontSize: 13, pl: 0 }}
-          onClick={() => navigate('/vendorDashboard/products')}
+          onClick={() => navigate('/vendor/products')}
         >
           Back
         </Button>
@@ -336,19 +403,21 @@ const ProductDetail = () => {
             {/* Category */}
             <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 48%' }, minWidth: 220 }}>
               <FormControl fullWidth size="small">
-                <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.1rem' }} id="category-label">Category</InputLabel>
+                <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.1rem' }} id="category-label">
+                  Category {loadingCategories && <CircularProgress size={16} sx={{ ml: 1 }} />}
+                </InputLabel>
                 <Select
                   labelId="category-label"
-                  value={category}
+                  value={category || ''}
                   label="Category"
                   onChange={handleCategoryChange}
                   error={!!formError.category}
-                  disabled={!isEditing}
+                  disabled={!isEditing || loadingCategories}
                 >
                   <MenuItem value="">Select Category</MenuItem>
-                  <MenuItem value="medical">Medical</MenuItem>
-                  <MenuItem value="surgical">Surgical</MenuItem>
-                  <MenuItem value="equipment">Equipment</MenuItem>
+                  {Array.isArray(categories) && categories.map(cat => (
+                    <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem>
+                  ))}
                 </Select>
                 {formError.category && <Typography color="error" fontSize={13}>{formError.category}</Typography>}
               </FormControl>
@@ -359,16 +428,23 @@ const ProductDetail = () => {
                 <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.1rem' }} id="subcategory-label">Subcategory</InputLabel>
                 <Select
                   labelId="subcategory-label"
-                  value={subcategory}
+                  value={subcategory || ''}
                   label="Subcategory"
-                  onChange={e => setSubcategory(e.target.value)}
+                  onChange={e => {
+                    console.log('Subcategory changed to:', e.target.value);
+                    setSubcategory(e.target.value);
+                  }}
                   error={!!formError.subcategory}
-                  disabled={!category || !isEditing}
+                  disabled={!category || !isEditing || loadingCategories}
                 >
                   <MenuItem value="">Select Subcategory</MenuItem>
-                  {category && SUBCATEGORY_OPTIONS[category].map(opt => (
-                    <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
-                  ))}
+                  {(() => {
+                    const subcategories = getSubcategoriesForCategory(category);
+                    console.log('Available subcategories for category', category, ':', subcategories);
+                    return subcategories.map(subcat => (
+                      <MenuItem key={subcat.id} value={subcat.id}>{subcat.name}</MenuItem>
+                    ));
+                  })()}
                 </Select>
                 {formError.subcategory && <Typography color="error" fontSize={13}>{formError.subcategory}</Typography>}
               </FormControl>
@@ -391,6 +467,20 @@ const ProductDetail = () => {
           </Box>
           {/* Price and Price Label side by side */}
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+            <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 48%' }, minWidth: 180 }}>
+              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>MRP Price</InputLabel>
+              <TextField 
+                fullWidth 
+                size="small" 
+                value={mrpPrice} 
+                onChange={e => setMrpPrice(e.target.value.replace(/[^0-9.]/g, ''))} 
+                placeholder="1170" 
+                sx={{ mb: 2 }} 
+                error={!!formError.mrpPrice} 
+                helperText={formError.mrpPrice}
+                disabled={!isEditing}
+              />
+            </Box>
             <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 48%' }, minWidth: 180 }}>
               <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Price</InputLabel>
               <TextField 
@@ -416,6 +506,20 @@ const ProductDetail = () => {
                 sx={{ mb: 2 }} 
                 error={!!formError.priceLabel} 
                 helperText={formError.priceLabel}
+                disabled={!isEditing}
+              />
+            </Box>
+            <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 48%' }, minWidth: 180 }}>
+              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Bulk Discount</InputLabel>
+              <TextField 
+                fullWidth 
+                size="small" 
+                value={bulkDiscount} 
+                onChange={e => setBulkDiscount(e.target.value)} 
+                placeholder="10%" 
+                sx={{ mb: 2 }} 
+                error={!!formError.bulkDiscount} 
+                helperText={formError.bulkDiscount}
                 disabled={!isEditing}
               />
             </Box>
@@ -474,8 +578,12 @@ const ProductDetail = () => {
               <TextField 
                 fullWidth 
                 size="small" 
+                type="date"
                 value={expiresOn} 
                 onChange={e => setExpiresOn(e.target.value)} 
+                InputLabelProps={{
+                  shrink: true,
+                }}
                 sx={{ mb: 2 }} 
                 error={!!formError.expiresOn} 
                 helperText={formError.expiresOn}
@@ -576,6 +684,59 @@ const ProductDetail = () => {
               }} 
             />
             {formError.manufacturer && <Typography color="error" fontSize={13}>{formError.manufacturer}</Typography>}
+          </Box>
+          {/* Mediguard Essentials */}
+          <Box sx={{ mb: 2 }}>
+            <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Mediguard Essentials*</InputLabel>
+            <TextareaAutosize 
+              minRows={2} 
+              value={mediguardEssentials} 
+              onChange={e => setMediguardEssentials(e.target.value)} 
+              placeholder="Enter Mediguard Essentials details"
+              style={{ 
+                width: '100%', 
+                marginBottom: 8, 
+                borderRadius: 6, 
+                border: '1px solid #e0e0e0', 
+                padding: 10, 
+                fontFamily: 'inherit', 
+                fontSize: 16, 
+                background: '#f8fafc',
+                opacity: isEditing ? 1 : 0.7,
+                pointerEvents: isEditing ? 'auto' : 'none'
+              }} 
+            />
+            {formError.mediguardEssentials && <Typography color="error" fontSize={13}>{formError.mediguardEssentials}</Typography>}
+          </Box>
+
+          {/* GST and HSN Code */}
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+            <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 32%' }, minWidth: 160 }}>
+              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>GST</InputLabel>
+              <TextField 
+                fullWidth 
+                size="small" 
+                value={gst} 
+                onChange={e => setGst(e.target.value.replace(/[^0-9.]/g, ''))} 
+                sx={{ mb: 2 }} 
+                error={!!formError.gst} 
+                helperText={formError.gst}
+                disabled={!isEditing}
+              />
+            </Box>
+            <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 32%' }, minWidth: 160 }}>
+              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>HSN Code</InputLabel>
+              <TextField 
+                fullWidth 
+                size="small" 
+                value={hsnCode} 
+                onChange={e => setHsnCode(e.target.value)} 
+                sx={{ mb: 2 }} 
+                error={!!formError.hsnCode} 
+                helperText={formError.hsnCode}
+                disabled={!isEditing}
+              />
+            </Box>
           </Box>
 
           {/* Display Current Thumbnail - Only show when not editing */}

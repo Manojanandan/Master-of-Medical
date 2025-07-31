@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Box, 
   Card, 
@@ -15,7 +15,10 @@ import {
   Avatar, 
   useTheme,
   Chip,
-  Divider
+  Divider,
+  Button,
+  CircularProgress,
+  Alert
 } from '@mui/material';
 import { 
   ShoppingBagOutlined, 
@@ -26,6 +29,8 @@ import {
   TrendingUp,
   Inventory2Outlined
 } from '@mui/icons-material';
+import { getAllOrders } from '../../../utils/Service';
+import { getVendorIdFromToken } from '../../../utils/jwtUtils';
 
 const salesData = {
   amount: '₹9,328.55',
@@ -54,7 +59,7 @@ const transactions = [
   { name: 'Ava Patel', type: 'Cancelled', date: '17 Jun 2024', qty: 1, amount: '₹60.00' },
 ];
 
-// Calculate total sales and total products
+// Calculate totals from real orders data (will be updated with API data)
 const totalSales = transactions.reduce((sum, t) => sum + Number(t.amount.replace(/[^\d.]/g, '')), 0);
 const totalProducts = transactions.reduce((sum, t) => sum + t.qty, 0);
 
@@ -64,27 +69,45 @@ const StatCard = ({ title, value, subtitle, icon, increase, increaseText, dark }
   return (
     <Card sx={{
       minWidth: '250px',
-      borderRadius: 2,
+      borderRadius: 3,
       boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',
-      backgroundColor: dark ? '#1976d2' : '#ffffff',
-      color: dark ? 'white' : '#1a1a1a',
+      backgroundColor: dark ? '#2c3e50' : '#ffffff',
+      color: dark ? 'white' : '#333',
       height: '100%',
-      transition: 'all 0.2s ease-in-out',
+      transition: 'all 0.3s ease-in-out',
       border: '1px solid #e0e0e0',
+      position: 'relative',
+      overflow: 'hidden',
       '&:hover': {
-        transform: 'translateY(-2px)',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-        borderColor: dark ? '#1565c0' : '#1976d2'
+        transform: 'translateY(-4px)',
+        boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+        borderColor: dark ? '#34495e' : '#2c3e50',
+        '&::before': {
+          transform: 'scaleX(1)',
+        }
+      },
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '3px',
+        background: dark ? '#3498db' : '#2c3e50',
+        transform: 'scaleX(0)',
+        transition: 'transform 0.3s ease',
       }
     }}>
-      <CardContent sx={{ p: 3 }}>
+      <CardContent sx={{ p: 3, position: 'relative', zIndex: 1 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
           <Box>
             <Typography variant="subtitle2" sx={{ 
               fontWeight: 600, 
               fontSize: '0.875rem',
               color: dark ? 'rgba(255,255,255,0.9)' : '#666',
-              mb: 0.5
+              mb: 0.5,
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
             }}>
               {title}
             </Typography>
@@ -97,13 +120,14 @@ const StatCard = ({ title, value, subtitle, icon, increase, increaseText, dark }
             </Typography>
           </Box>
           <Avatar sx={{ 
-            bgcolor: dark ? 'rgba(255,255,255,0.15)' : '#f5f5f5', 
-            color: dark ? 'white' : '#1976d2', 
-            borderRadius: 1.5, 
-            width: 40, 
-            height: 40,
+            bgcolor: dark ? 'rgba(255,255,255,0.15)' : '#f8f9fa', 
+            color: dark ? 'white' : '#2c3e50', 
+            borderRadius: 2, 
+            width: 48, 
+            height: 48,
+            transition: 'all 0.3s ease',
             '& .MuiSvgIcon-root': {
-              fontSize: '1.2rem'
+              fontSize: '1.4rem'
             }
           }}>
             {icon}
@@ -112,8 +136,8 @@ const StatCard = ({ title, value, subtitle, icon, increase, increaseText, dark }
         <Typography variant="h4" sx={{ 
           mb: 1, 
           fontWeight: 700,
-          fontSize: '1.75rem',
-          color: dark ? 'white' : '#1a1a1a',
+          fontSize: '2rem',
+          color: dark ? 'white' : '#333',
           letterSpacing: '-0.02em'
         }}>
           {value}
@@ -121,7 +145,7 @@ const StatCard = ({ title, value, subtitle, icon, increase, increaseText, dark }
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
           <TrendingUp sx={{ 
             fontSize: '0.875rem', 
-            color: dark ? 'rgba(255,255,255,0.7)' : '#4caf50' 
+            color: dark ? 'rgba(255,255,255,0.7)' : '#27ae60' 
           }} />
           <Typography variant="body2" sx={{ 
             color: dark ? 'rgba(255,255,255,0.7)' : '#666',
@@ -138,19 +162,61 @@ const StatCard = ({ title, value, subtitle, icon, increase, increaseText, dark }
 
 const Overview = () => {
   const theme = useTheme();
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        setLoading(true);
+        const vendorId = getVendorIdFromToken();
+        
+        if (!vendorId) {
+          throw new Error('Vendor ID not found. Please login again.');
+        }
+
+        const response = await getAllOrders({ 
+          vendorId: vendorId,
+          page: 1,
+          limit: 10 
+        });
+
+        if (response.data.success) {
+          setOrders(response.data.data || []);
+        } else {
+          throw new Error('Failed to fetch orders');
+        }
+      } catch (err) {
+        console.error('Error fetching orders:', err);
+        setError(err.message || 'Failed to fetch orders');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+
+  // Calculate totals from real orders data
+  const totalSales = orders.reduce((sum, order) => sum + (order.totalCost || 0), 0);
+  const totalProducts = orders.reduce((sum, order) => sum + (order.productInfo?.quantity || 1), 0);
+  const pendingOrders = orders.filter(order => order.status === 'pending').length;
+  const shippedOrders = orders.filter(order => order.status === 'shipped').length;
+
   return (
     <Box sx={{ 
-      background: '#fafafa', 
+      background: '#f8f9fa', 
       minHeight: '100vh', 
       width: '100%', 
-      p: { xs: 2, sm: 4, md: 6 }
+      p: { xs: 1, sm: 2, md: 3 }
     }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" sx={{ 
-          fontWeight: 600, 
-          fontSize: { xs: '1.75rem', sm: '2rem' }, 
-          color: '#1a1a1a',
+          fontWeight: 700, 
+          fontSize: { xs: '1.75rem', sm: '2.125rem' }, 
+          color: '#2c3e50',
           letterSpacing: '-0.02em',
           mb: 1
         }}>
@@ -158,23 +224,23 @@ const Overview = () => {
         </Typography>
         <Typography variant="body1" sx={{ 
           color: '#666', 
-          fontSize: '0.875rem',
-          fontWeight: 400
+          fontSize: '1rem',
+          fontWeight: 400,
+          lineHeight: 1.6
         }}>
           Monitor your business performance and recent activities
         </Typography>
       </Box>
 
       {/* Stat Cards */}
-      <Grid container spacing={2} sx={{ mb: 4, width: '100%', m: 0 }}>
+      <Grid container spacing={2} sx={{ mb: 4, width: '100%', m: 0, p: 0 }}>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Total Sales"
             value={`₹${totalSales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-            subtitle={`${salesData.orders} Orders`}
+            subtitle={`${orders.length} Orders`}
             icon={<Inventory2Outlined />}
-
-            increaseText={salesData.increaseText}
+            increaseText="Last 10 orders"
             dark
           />
         </Grid>
@@ -184,84 +250,117 @@ const Overview = () => {
             value={totalProducts}
             subtitle="Products Sold"
             icon={<ShoppingBagOutlined />}
-            increaseText={visitorsData.increaseText}
+            increaseText="Last 10 orders"
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
-            title="New Orders"
-            value="+1,235"
-            subtitle="23% from last week"
+            title="Pending Orders"
+            value={pendingOrders}
+            subtitle="Awaiting processing"
             icon={<AddShoppingCart />}
-            increaseText="+320 this week"
+            increaseText="From last 10 orders"
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
-            title="Pending Shipments"
-            value="42"
-            subtitle="5 shipped today"
+            title="Shipped Orders"
+            value={shippedOrders}
+            subtitle="In transit"
             icon={<LocalShippingOutlined />}
-            increaseText="+2 this week"
+            increaseText="From last 10 orders"
           />
         </Grid>
       </Grid>
 
+      {/* Error Alert */}
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {error}
+        </Alert>
+      )}
+
       {/* Transaction Table */}
       <Paper sx={{
         width: '100%',
-        borderRadius: 2,
+        borderRadius: 3,
         boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',
         overflow: 'hidden',
         mb: 4,
-        mt: 3
+        mt: 3,
+        border: '1px solid #e0e0e0'
       }}>
-        <Box sx={{ p: 3, borderBottom: '1px solid #e0e0e0' }}>
+        <Box sx={{ p: 3, borderBottom: '1px solid #e0e0e0', background: '#f8f9fa' }}>
           <Typography variant="h6" sx={{ 
             fontWeight: 600,
             fontSize: '1.125rem',
-            color: '#1a1a1a',
+            color: '#2c3e50',
             letterSpacing: '-0.01em'
           }}>
-            Recent Orders
+            Recent Orders ({orders.length})
           </Typography>
         </Box>
         <TableContainer>
-          <Table sx={{ minWidth: 650 }} aria-label="transaction table">
+          <Table sx={{ minWidth: 650 }} aria-label="orders table">
             <TableHead>
-              <TableRow>
-                <TableCell sx={{ fontWeight: 900 }}>Date</TableCell>
-                <TableCell sx={{ fontWeight: 900 }}>Product Name</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 900 }}>Quantity</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 900 }}>Amount</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 900 }}>Status</TableCell>
+              <TableRow sx={{ background: '#f8f9fa' }}>
+                <TableCell sx={{ fontWeight: 700, color: '#2c3e50', fontSize: '0.875rem' }}>Order ID</TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#2c3e50', fontSize: '0.875rem' }}>Customer</TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#2c3e50', fontSize: '0.875rem' }}>Amount</TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#2c3e50', fontSize: '0.875rem' }}>Status</TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#2c3e50', fontSize: '0.875rem' }}>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {transactions.map((row, index) => (
-                <TableRow key={row.name}>
-                  <TableCell>{row.date}</TableCell>
-                  <TableCell>{row.name}</TableCell>
-                  <TableCell align="right">{row.qty}</TableCell>
-                  <TableCell align="right">{row.amount}</TableCell>
-                  <TableCell align="right">
-                    <Chip
-                      label={row.type}
-                      size="small"
-                      sx={{
-                        backgroundColor: getTypeColor(row.type),
-                        color: 'white',
-                        fontSize: '0.75rem',
-                        fontWeight: 600,
-                        borderRadius: 1,
-                        '& .MuiChip-label': {
-                          px: 1.5
-                        }
-                      }}
-                    />
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
+                    <CircularProgress />
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : orders.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} align="center" sx={{ py: 6, color: 'grey.500' }}>
+                    No orders found.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                orders.map((order, index) => (
+                  <TableRow 
+                    key={order.id}
+                    sx={{ 
+                      '&:nth-of-type(odd)': { background: '#fafbfc' },
+                      '&:hover': { background: '#f5f5f5' },
+                      transition: 'background 0.2s ease'
+                    }}
+                  >
+                    <TableCell sx={{ color: '#666', fontWeight: 500 }}>#{order.id}</TableCell>
+                    <TableCell sx={{ color: '#333', fontWeight: 600 }}>{order.customerInfo?.name || 'N/A'}</TableCell>
+                    <TableCell  sx={{ color: '#333', fontWeight: 600 }}>₹{order.totalCost || order.productInfo?.total || '0.00'}</TableCell>
+                    <TableCell >
+                      <Chip
+                        label={order.status?.charAt(0).toUpperCase() + order.status?.slice(1) || 'N/A'}
+                        size="small"
+                        sx={{
+                          backgroundColor: getTypeColor(order.status),
+                          color: 'white',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          borderRadius: 2,
+                          '& .MuiChip-label': {
+                            px: 1.5
+                          }
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Button variant="contained" color="primary">
+                        View Detail
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>
@@ -270,19 +369,21 @@ const Overview = () => {
   );
 };
 
-// Helper function to get color based on transaction type
-function getTypeColor(type) {
+// Helper function to get color based on order status
+function getTypeColor(status) {
   const colors = {
+    delivered: '#4caf50',
+    pending: '#ff9800',
+    shipped: '#2196f3',
+    cancelled: '#f44336',
+    processing: '#ff9800',
     Delivered: '#4caf50',
     Processing: '#ff9800',
     Shipped: '#2196f3',
     Cancelled: '#f44336',
-    Shopping: '#4caf50',
-    Food: '#ff9800',
-    Sport: '#2196f3',
     Default: '#9e9e9e'
   };
-  return colors[type] || colors.Default;
+  return colors[status] || colors.Default;
 }
 
 export default Overview;

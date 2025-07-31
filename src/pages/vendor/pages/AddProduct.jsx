@@ -13,6 +13,7 @@ import {
   IconButton,
   Snackbar,
   Alert,
+  CircularProgress,
 } from '@mui/material';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -23,6 +24,7 @@ import DeleteIcon from '@mui/icons-material/Close';
 import { useDispatch, useSelector } from 'react-redux';
 import { createProductData, clearError, clearSuccess } from '../reducers/ProductReducer';
 import { useNavigate } from 'react-router-dom';
+import { getAllCategoriesAndSubcategories } from '../../../utils/Service';
 
 const MAX_FILES = 5;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -57,8 +59,10 @@ const AddProduct = () => {
   const [category, setCategory] = useState('');
   const [subcategory, setSubcategory] = useState('');
   const [productName, setProductName] = useState('');
+  const [mrpPrice, setMrpPrice] = useState('');
   const [price, setPrice] = useState('');
   const [priceLabel, setPriceLabel] = useState('');
+  const [bulkDiscount, setBulkDiscount] = useState('');
   const [description, setDescription] = useState('');
   const [shelfLife, setShelfLife] = useState('');
   const [brandName, setBrandName] = useState('');
@@ -68,12 +72,17 @@ const AddProduct = () => {
   const [benefits, setBenefits] = useState('');
   const [sideEffects, setSideEffects] = useState('');
   const [manufacturer, setManufacturer] = useState('');
+  const [mediguardEssentials, setMediguardEssentials] = useState('');
+  const [gst, setGst] = useState('');
+  const [hsnCode, setHsnCode] = useState('');
   const [files, setFiles] = useState([]);
   const [thumbnail, setThumbnail] = useState(null);
   const [fileError, setFileError] = useState('');
   const [thumbnailError, setThumbnailError] = useState('');
   const [formError, setFormError] = useState({});
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
   const fileInputRef = useRef();
   const thumbnailInputRef = useRef();
 
@@ -84,6 +93,44 @@ const AddProduct = () => {
   // Navigation
   const navigate = useNavigate();
 
+  // Load categories on component mount
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        const response = await getAllCategoriesAndSubcategories();
+        console.log('Full API response:', response);
+        console.log('Response data:', response.data);
+        console.log('Response data type:', typeof response.data);
+        console.log('Is response.data an array?', Array.isArray(response.data));
+        
+        // Ensure categories is an array
+        const categoriesData = Array.isArray(response.data) ? response.data : 
+                              Array.isArray(response.data?.categories) ? response.data.categories :
+                              Array.isArray(response.data?.data) ? response.data.data :
+                              Array.isArray(response.data?.result) ? response.data.result :
+                              Array.isArray(response.data?.items) ? response.data.items : [];
+        
+        console.log('Processed categories:', categoriesData);
+        console.log('First category structure:', categoriesData[0]);
+        console.log('Available category IDs:', categoriesData.map(cat => ({ id: cat.id, name: cat.name })));
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error('Error loading categories:', error);
+        setSnackbar({ 
+          open: true, 
+          message: 'Failed to load categories. Please try again.', 
+          severity: 'error' 
+        });
+        setCategories([]); // Set empty array on error
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    loadCategories();
+  }, []);
+
   // Handle success and error messages
   useEffect(() => {
     if (success && message) {
@@ -93,8 +140,10 @@ const AddProduct = () => {
       setCategory('');
       setSubcategory('');
       setProductName('');
+      setMrpPrice('');
       setPrice('');
       setPriceLabel('');
+      setBulkDiscount('');
       setDescription('');
       setShelfLife('');
       setBrandName('');
@@ -104,6 +153,9 @@ const AddProduct = () => {
       setBenefits('');
       setSideEffects('');
       setManufacturer('');
+      setMediguardEssentials('');
+      setGst('');
+      setHsnCode('');
       setFiles([]);
       setThumbnail(null);
       setFormError({});
@@ -182,6 +234,7 @@ const AddProduct = () => {
     if (!category) errors.category = 'Category is required';
     if (!subcategory) errors.subcategory = 'Subcategory is required';
     if (!productName) errors.productName = 'Product name is required';
+    if (!mrpPrice) errors.mrpPrice = 'MRP price is required';
     if (!price) errors.price = 'Price is required';
     if (!priceLabel) errors.priceLabel = 'Price label is required';
     if (!description) errors.description = 'Description is required';
@@ -190,6 +243,9 @@ const AddProduct = () => {
     if (!expiresOn) errors.expiresOn = 'Expiry date is required';
     if (!country) errors.country = 'Country is required';
     if (!manufacturer) errors.manufacturer = 'Manufacturer details required';
+    if (!mediguardEssentials) errors.mediguardEssentials = 'Mediguard Essentials is required';
+    if (!gst) errors.gst = 'GST is required';
+    if (!hsnCode) errors.hsnCode = 'HSN Code is required';
     if (!thumbnail) errors.thumbnail = 'Thumbnail image is required';
     if (files.length === 0) errors.files = 'At least one gallery image is required';
     setFormError(errors);
@@ -204,33 +260,64 @@ const AddProduct = () => {
       return;
     }
 
+    // Get vendor ID from localStorage or context
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const vendorId = user.id || user._id || user.vendorId || '';
+
     // Prepare product data for Redux
     const productData = {
       name: productName,
       description: description,
-      category: category,
-      subcategory: subcategory,
       price: price,
-      priceLabel: priceLabel,
+      category: category,
+      subCategoryId: subcategory,
+      postedBy: vendorId,
+      priceLable: priceLabel,
+      gst: gst,
+      hsnCode: hsnCode,
       brandName: brandName,
       benefits: benefits,
       expiresOn: expiresOn,
-      shelfLife: shelfLife,
-      country: country,
-      howToUse: howToUse,
-      sideEffects: sideEffects,
-      manufacturer: manufacturer,
+      additionalInformation: [
+        { name: 'mrpPrice', value: mrpPrice },
+        { name: 'bulkDiscount', value: bulkDiscount },
+        { name: 'shelfLife', value: shelfLife },
+        { name: 'country', value: country },
+        { name: 'howToUse', value: howToUse },
+        { name: 'sideEffects', value: sideEffects },
+        { name: 'manufacturer', value: manufacturer },
+        { name: 'mediguardEssentials', value: mediguardEssentials },
+      ],
+      thumbnailImage: thumbnail,
+      galleryImage: files,
       files: files,
       thumbnail: thumbnail
     };
+
+    console.log('Vendor ID:', vendorId);
+    console.log('User data from localStorage:', user);
+    console.log('Price Label value:', priceLabel);
+    console.log('Price Label type:', typeof priceLabel);
+    console.log('Submitting product data:', productData);
 
     // Dispatch the action
     dispatch(createProductData(productData));
   };
 
   const handleCategoryChange = (e) => {
-    setCategory(e.target.value);
+    const selectedValue = e.target.value;
+    console.log('Category changed to:', selectedValue);
+    setCategory(selectedValue);
     setSubcategory(''); // Reset subcategory when category changes
+  };
+
+  // Get subcategories for selected category
+  const getSubcategoriesForCategory = (selectedCategory) => {
+    if (!selectedCategory || !Array.isArray(categories) || !categories.length) return [];
+    const categoryData = categories.find(cat => cat.id === selectedCategory || cat._id === selectedCategory || cat.name === selectedCategory);
+    console.log('Selected category:', selectedCategory);
+    console.log('Found category data:', categoryData);
+    return categoryData ? (Array.isArray(categoryData.SubCategories) ? categoryData.SubCategories : []) : [];
   };
 
   return (
@@ -242,30 +329,33 @@ const AddProduct = () => {
         <Button 
           startIcon={<ArrowBackIosNewIcon />} 
           sx={{ color: '#222', fontWeight: 600, textTransform: 'uppercase', fontSize: 13, pl: 0 }}
-          onClick={() => navigate('/vendorDashboard/products')}
+          onClick={() => navigate('/vendor/products')}
         >
           Back
         </Button>
       </Box>
       <form onSubmit={handleSubmit} autoComplete="off">
         <Paper elevation={3} sx={{ p: { xs: 2, sm: 4, md: 6 }, width: '100%', borderRadius: 3, boxShadow: 2, background: '#fff' }}>
-          {/* Top Section: Category, Subcategory, Product Name, Price, Price Label */}
+          {/* Top Section: Category, Subcategory */}
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
             {/* Category */}
             <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 48%' }, minWidth: 220 }}>
               <FormControl fullWidth size="small">
-                <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.1rem' }} id="category-label">Category</InputLabel>
+                <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.1rem' }} id="category-label">
+                  Category {loadingCategories && <CircularProgress size={16} sx={{ ml: 1 }} />}
+                </InputLabel>
                 <Select
                   labelId="category-label"
-                  value={category}
+                  value={category || ''}
                   label="Category"
                   onChange={handleCategoryChange}
                   error={!!formError.category}
+                  disabled={loadingCategories}
                 >
                   <MenuItem value="">Select Category</MenuItem>
-                  <MenuItem value="medical">Medical</MenuItem>
-                  <MenuItem value="surgical">Surgical</MenuItem>
-                  <MenuItem value="equipment">Equipment</MenuItem>
+                  {Array.isArray(categories) && categories.map(cat => (
+                    <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem>
+                  ))}
                 </Select>
                 {formError.category && <Typography color="error" fontSize={13}>{formError.category}</Typography>}
               </FormControl>
@@ -276,78 +366,271 @@ const AddProduct = () => {
                 <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.1rem' }} id="subcategory-label">Subcategory</InputLabel>
                 <Select
                   labelId="subcategory-label"
-                  value={subcategory}
+                  value={subcategory || ''}
                   label="Subcategory"
-                  onChange={e => setSubcategory(e.target.value)}
+                  onChange={e => {
+                    console.log('Subcategory changed to:', e.target.value);
+                    setSubcategory(e.target.value);
+                  }}
                   error={!!formError.subcategory}
-                  disabled={!category}
+                  disabled={!category || loadingCategories}
                 >
                   <MenuItem value="">Select Subcategory</MenuItem>
-                  {category && SUBCATEGORY_OPTIONS[category].map(opt => (
-                    <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
-                  ))}
+                  {(() => {
+                    const subcategories = getSubcategoriesForCategory(category);
+                    console.log('Available subcategories for category', category, ':', subcategories);
+                    return subcategories.map(subcat => (
+                      <MenuItem key={subcat.id} value={subcat.id}>{subcat.name}</MenuItem>
+                    ));
+                  })()}
                 </Select>
                 {formError.subcategory && <Typography color="error" fontSize={13}>{formError.subcategory}</Typography>}
               </FormControl>
             </Box>
           </Box>
-          {/* Product Name full width */}
+
+          {/* Product Name */}
           <Box sx={{ mb: 2 }}>
-            <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Product name</InputLabel>
-            <TextField fullWidth size="small" value={productName} onChange={e => setProductName(e.target.value)} placeholder="3-Ply Disposable Surgical Face Mask (Pack of 100)" sx={{ mb: 2 }} error={!!formError.productName} helperText={formError.productName} />
+            <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Product Name*</InputLabel>
+            <TextField 
+              fullWidth 
+              size="small" 
+              value={productName} 
+              onChange={e => setProductName(e.target.value)} 
+              placeholder="Enter your product name" 
+              sx={{ mb: 2 }} 
+              error={!!formError.productName} 
+              helperText={formError.productName} 
+            />
           </Box>
-          {/* Price and Price Label side by side */}
+
+          {/* MRP Price and Price */}
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
             <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 48%' }, minWidth: 180 }}>
-              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Price</InputLabel>
-              <TextField fullWidth size="small" value={price} onChange={e => setPrice(e.target.value.replace(/[^0-9.]/g, ''))} placeholder="1170" sx={{ mb: 2 }} error={!!formError.price} helperText={formError.price} />
+              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>MRP Price</InputLabel>
+              <TextField 
+                fullWidth 
+                size="small" 
+                value={mrpPrice} 
+                onChange={e => setMrpPrice(e.target.value.replace(/[^0-9.]/g, ''))} 
+                placeholder="Enter MRP price" 
+                sx={{ mb: 2 }} 
+                error={!!formError.mrpPrice} 
+                helperText={formError.mrpPrice} 
+              />
             </Box>
             <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 48%' }, minWidth: 180 }}>
-              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Price Label</InputLabel>
-              <TextField fullWidth size="small" value={priceLabel} onChange={e => setPriceLabel(e.target.value)} placeholder="Pack of 100 masks" sx={{ mb: 2 }} error={!!formError.priceLabel} helperText={formError.priceLabel} />
+              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Price*</InputLabel>
+              <TextField 
+                fullWidth 
+                size="small" 
+                value={price} 
+                onChange={e => setPrice(e.target.value.replace(/[^0-9.]/g, ''))} 
+                placeholder="Enter your price" 
+                sx={{ mb: 2 }} 
+                error={!!formError.price} 
+                helperText={formError.price} 
+              />
             </Box>
           </Box>
-          {/* The rest of the form fields */}
+
+          {/* Price Label and Bulk Discount */}
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+            <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 48%' }, minWidth: 180 }}>
+              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Price Label*</InputLabel>
+              <TextField 
+                fullWidth 
+                size="small" 
+                value={priceLabel} 
+                onChange={e => {
+                  console.log('Price label changed to:', e.target.value);
+                  setPriceLabel(e.target.value);
+                }} 
+                placeholder="Enter your price label" 
+                sx={{ mb: 2 }} 
+                error={!!formError.priceLabel} 
+                helperText={formError.priceLabel} 
+              />
+            </Box>
+            <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 48%' }, minWidth: 180 }}>
+              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Bulk Discount</InputLabel>
+              <TextField 
+                fullWidth 
+                size="small" 
+                value={bulkDiscount} 
+                onChange={e => setBulkDiscount(e.target.value)} 
+                placeholder="Discount Offers" 
+                sx={{ mb: 2 }} 
+              />
+            </Box>
+          </Box>
+
+          {/* Product Description */}
           <Box sx={{ mb: 2 }}>
-            <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Product Description</InputLabel>
-            <TextareaAutosize minRows={3} value={description} onChange={e => setDescription(e.target.value)} style={{ width: '100%', marginBottom: 8, borderRadius: 6, border: '1px solid #e0e0e0', padding: 10, fontFamily: 'inherit', fontSize: 16, background: '#f8fafc' }} />
+            <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Product Description*</InputLabel>
+            <TextareaAutosize 
+              minRows={3} 
+              value={description} 
+              onChange={e => setDescription(e.target.value)} 
+              placeholder="Enter your product description"
+              style={{ width: '100%', marginBottom: 8, borderRadius: 6, border: '1px solid #e0e0e0', padding: 10, fontFamily: 'inherit', fontSize: 16, background: '#f8fafc' }} 
+            />
             {formError.description && <Typography color="error" fontSize={13}>{formError.description}</Typography>}
           </Box>
+
+          {/* Shelf Life, Brand Name, Expires On */}
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
             <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 32%' }, minWidth: 160 }}>
-              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Shelf Life</InputLabel>
-              <TextField fullWidth size="small" value={shelfLife} onChange={e => setShelfLife(e.target.value)} sx={{ mb: 2 }} error={!!formError.shelfLife} helperText={formError.shelfLife} />
+              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Shelf Life*</InputLabel>
+              <TextField 
+                fullWidth 
+                size="small" 
+                value={shelfLife} 
+                onChange={e => setShelfLife(e.target.value)} 
+                placeholder="Shelf Life"
+                sx={{ mb: 2 }} 
+                error={!!formError.shelfLife} 
+                helperText={formError.shelfLife} 
+              />
             </Box>
             <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 32%' }, minWidth: 160 }}>
-              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Brand Name</InputLabel>
-              <TextField fullWidth size="small" value={brandName} onChange={e => setBrandName(e.target.value)} sx={{ mb: 2 }} error={!!formError.brandName} helperText={formError.brandName} />
+              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Brand Name*</InputLabel>
+              <TextField 
+                fullWidth 
+                size="small" 
+                value={brandName} 
+                onChange={e => setBrandName(e.target.value)} 
+                placeholder="Brand Name"
+                sx={{ mb: 2 }} 
+                error={!!formError.brandName} 
+                helperText={formError.brandName} 
+              />
             </Box>
             <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 32%' }, minWidth: 160 }}>
-              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Expires On or After</InputLabel>
-              <TextField fullWidth size="small" value={expiresOn} onChange={e => setExpiresOn(e.target.value)} sx={{ mb: 2 }} error={!!formError.expiresOn} helperText={formError.expiresOn} />
+              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Expires On or After*</InputLabel>
+              <TextField 
+                fullWidth 
+                size="small" 
+                type="date"
+                value={expiresOn} 
+                onChange={e => setExpiresOn(e.target.value)} 
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                sx={{ mb: 2 }} 
+                error={!!formError.expiresOn} 
+                helperText={formError.expiresOn} 
+              />
             </Box>
-            <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 32%' }, minWidth: 160 }}>
-              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Country of Origin</InputLabel>
-              <TextField fullWidth size="small" value={country} onChange={e => setCountry(e.target.value)} sx={{ mb: 2 }} error={!!formError.country} helperText={formError.country} />
+          </Box>
+
+          {/* How to Use */}
+          <Box sx={{ mb: 2 }}>
+            <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>How to Use</InputLabel>
+            <TextareaAutosize 
+              minRows={2} 
+              value={howToUse} 
+              onChange={e => setHowToUse(e.target.value)} 
+              placeholder="Enter how to use the product"
+              style={{ width: '100%', marginBottom: 8, borderRadius: 6, border: '1px solid #e0e0e0', padding: 10, fontFamily: 'inherit', fontSize: 16, background: '#f8fafc' }} 
+            />
+          </Box>
+
+          {/* Benefits and Side Effects */}
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+            <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 48%' }, minWidth: 180 }}>
+              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Benefits*</InputLabel>
+              <TextareaAutosize 
+                minRows={2} 
+                value={benefits} 
+                onChange={e => setBenefits(e.target.value)} 
+                placeholder="Enter product benefits"
+                style={{ width: '100%', marginBottom: 8, borderRadius: 6, border: '1px solid #e0e0e0', padding: 10, fontFamily: 'inherit', fontSize: 16, background: '#f8fafc' }} 
+              />
+            </Box>
+            <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 48%' }, minWidth: 180 }}>
+              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Side Effects</InputLabel>
+              <TextareaAutosize 
+                minRows={2} 
+                value={sideEffects} 
+                onChange={e => setSideEffects(e.target.value)} 
+                placeholder="Enter side effects if any"
+                style={{ width: '100%', marginBottom: 8, borderRadius: 6, border: '1px solid #e0e0e0', padding: 10, fontFamily: 'inherit', fontSize: 16, background: '#f8fafc' }} 
+              />
             </Box>
           </Box>
+
+          {/* Mediguard Essentials */}
           <Box sx={{ mb: 2 }}>
-            <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>How to Use:</InputLabel>
-            <TextareaAutosize minRows={2} value={howToUse} onChange={e => setHowToUse(e.target.value)} style={{ width: '100%', marginBottom: 8, borderRadius: 6, border: '1px solid #e0e0e0', padding: 10, fontFamily: 'inherit', fontSize: 16, background: '#f8fafc' }} />
+            <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Mediguard Essentials*</InputLabel>
+            <TextareaAutosize 
+              minRows={2} 
+              value={mediguardEssentials} 
+              onChange={e => setMediguardEssentials(e.target.value)} 
+              placeholder="Enter Mediguard Essentials details"
+              style={{ width: '100%', marginBottom: 8, borderRadius: 6, border: '1px solid #e0e0e0', padding: 10, fontFamily: 'inherit', fontSize: 16, background: '#f8fafc' }} 
+            />
+            {formError.mediguardEssentials && <Typography color="error" fontSize={13}>{formError.mediguardEssentials}</Typography>}
           </Box>
-          <Box sx={{ mb: 2 }}>
-            <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Benefits</InputLabel>
-            <TextareaAutosize minRows={2} value={benefits} onChange={e => setBenefits(e.target.value)} style={{ width: '100%', marginBottom: 8, borderRadius: 6, border: '1px solid #e0e0e0', padding: 10, fontFamily: 'inherit', fontSize: 16, background: '#f8fafc' }} />
+
+          {/* Manufacturer Details and Country of Origin */}
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+            <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 48%' }, minWidth: 180 }}>
+              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Manufacturer Details*</InputLabel>
+              <TextareaAutosize 
+                minRows={2} 
+                value={manufacturer} 
+                onChange={e => setManufacturer(e.target.value)} 
+                placeholder="Enter manufacturer details"
+                style={{ width: '100%', marginBottom: 8, borderRadius: 6, border: '1px solid #e0e0e0', padding: 10, fontFamily: 'inherit', fontSize: 16, background: '#f8fafc' }} 
+              />
+              {formError.manufacturer && <Typography color="error" fontSize={13}>{formError.manufacturer}</Typography>}
+            </Box>
+            <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 48%' }, minWidth: 180 }}>
+              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Country of Origin*</InputLabel>
+              <TextField 
+                fullWidth 
+                size="small" 
+                value={country} 
+                onChange={e => setCountry(e.target.value)} 
+                placeholder="India"
+                sx={{ mb: 2 }} 
+                error={!!formError.country} 
+                helperText={formError.country} 
+              />
+            </Box>
           </Box>
-          <Box sx={{ mb: 2 }}>
-            <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Side Effects</InputLabel>
-            <TextareaAutosize minRows={2} value={sideEffects} onChange={e => setSideEffects(e.target.value)} style={{ width: '100%', marginBottom: 8, borderRadius: 6, border: '1px solid #e0e0e0', padding: 10, fontFamily: 'inherit', fontSize: 16, background: '#f8fafc' }} />
+
+          {/* GST and HSN Code */}
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+            <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 48%' }, minWidth: 180 }}>
+              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>GST*</InputLabel>
+              <TextField 
+                fullWidth 
+                size="small" 
+                value={gst} 
+                onChange={e => setGst(e.target.value)} 
+                placeholder="Enter GST"
+                sx={{ mb: 2 }} 
+                error={!!formError.gst} 
+                helperText={formError.gst} 
+              />
+            </Box>
+            <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 48%' }, minWidth: 180 }}>
+              <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>HSN Code*</InputLabel>
+              <TextField 
+                fullWidth 
+                size="small" 
+                value={hsnCode} 
+                onChange={e => setHsnCode(e.target.value)} 
+                placeholder="Enter HSN Code"
+                sx={{ mb: 2 }} 
+                error={!!formError.hsnCode} 
+                helperText={formError.hsnCode} 
+              />
+            </Box>
           </Box>
-          <Box sx={{ mb: 2 }}>
-            <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Manufacturer Details:</InputLabel>
-            <TextareaAutosize minRows={2} value={manufacturer} onChange={e => setManufacturer(e.target.value)} style={{ width: '100%', marginBottom: 8, borderRadius: 6, border: '1px solid #e0e0e0', padding: 10, fontFamily: 'inherit', fontSize: 16, background: '#f8fafc' }} />
-            {formError.manufacturer && <Typography color="error" fontSize={13}>{formError.manufacturer}</Typography>}
-          </Box>
+
           {/* Thumbnail Upload */}
           <Box sx={{ mb: 2 }}>
             <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Product Thumbnail</InputLabel>
@@ -391,6 +674,7 @@ const AddProduct = () => {
             {formError.thumbnail && <Typography color="error" fontSize={13}>{formError.thumbnail}</Typography>}
             {thumbnailError && <Typography color="error" fontSize={13}>{thumbnailError}</Typography>}
           </Box>
+
           {/* File Upload */}
           <Box sx={{ mb: 2 }}>
             <InputLabel sx={{ fontWeight: 'bold', fontSize: '1.5rem' }} shrink>Product Images</InputLabel>
@@ -432,6 +716,7 @@ const AddProduct = () => {
               )}
             </Box>
           </Box>
+
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
             <Button 
               type="submit" 

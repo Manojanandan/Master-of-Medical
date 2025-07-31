@@ -20,6 +20,7 @@ const StatusCheck = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [userData, setUserData] = useState(null);
 
+
   useEffect(() => {
     // Immediately check if we're on a profile page and hide popup if so
     if (shouldPreventPopup()) {
@@ -80,8 +81,8 @@ const StatusCheck = () => {
   const isProfilePage = () => {
     const currentPath = location.pathname;
     const isProfile = currentPath.includes('/profile') || 
-                     currentPath.includes('/vendorDashboard/profile') || 
-                     currentPath.includes('/ecommerceDashboard/profile');
+                     currentPath.includes('/vendor/profile') || 
+                     currentPath.includes('/customer/profile');
     
     console.log('Profile page check:', { currentPath, isProfile });
     return isProfile;
@@ -150,8 +151,7 @@ const StatusCheck = () => {
     // First check local status
     if (isUserStatusPending()) {
       // Get user info from token
-      const user = getUserInfoFromToken();
-      
+      const user = getUserInfoFromToken();      
       // Also check sessionStorage for user data
       const sessionUserData = sessionStorage.getItem('userData');
       let parsedUserData = null;
@@ -174,6 +174,7 @@ const StatusCheck = () => {
         if (apiResponse && apiResponse.success) {
           const currentStatus = apiResponse.data?.status || apiResponse.data?.approvalStatus;
           console.log('Current status from API:', currentStatus);
+          console.log('API Response data:', apiResponse.data);
           
           if (currentStatus === 'approved' || currentStatus === 'active') {
             console.log('✅ User has been approved! Hiding popup and updating session data');
@@ -190,7 +191,8 @@ const StatusCheck = () => {
             return;
           } else if (currentStatus === 'pending') {
             console.log('✅ User status is still pending, showing popup');
-            setUserData(currentUser);
+            // Use API response data instead of currentUser to get the correct type
+            setUserData(apiResponse.data);
             setShowPopup(true);
           } else {
             console.log('❌ Unknown status:', currentStatus);
@@ -217,20 +219,20 @@ const StatusCheck = () => {
     sessionStorage.clear();
     localStorage.removeItem('token');
     
-    // Redirect to login
-    window.location.href = '/login';
+    // Redirect to main home page
+    window.location.href = '/';
   };
 
   const handleEditProfile = () => {
     // Close the popup
     setShowPopup(false);
     
-    // Navigate to profile page based on user type
+    // Navigate to edit profile page based on user type
     const userType = sessionStorage.getItem('userType');
     if (userType === 'vendor') {
-      navigate('/vendorDashboard/profile');
+              navigate('/profile/vendor/edit');
     } else {
-      navigate('/ecommerceDashboard/profile');
+              navigate('/profile/customer/edit');
     }
   };
 
@@ -274,7 +276,7 @@ const StatusCheck = () => {
             <div className="account-details">
               <div className="detail-item">
                 <span className="detail-label">Account Type:</span>
-                <span className="detail-value">{userData?.role || userData?.type || 'customer'}</span>
+                <span className="detail-value">{userData?.type || '-'}</span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">Email:</span>
@@ -295,15 +297,21 @@ const StatusCheck = () => {
                 <li>Our admin team will review your account and verify</li>
                 <li>You'll receive an approval status within 24-48 hours</li>
                 <li>Once approved, you can access all features of the platform</li>
+                <li>For immediate approval, please contact our support team at +91 00000 00000</li>
               </ul>
             </div>
 
-            {/* Review Status Note */}
+            {/* Review Status Note - Only show if there are remarks */}
+            {userData?.remarks && userData.remarks.trim() !== '' && (
             <div className="review-status-note">
+                <Typography variant="h6" className="review-status-note-title" sx={{ marginBottom: '10px', fontWeight: 'bold' }}>
+                  Review Status Note
+                </Typography>
               <Typography variant="body2" className="review-note-text">
-                Your account is currently pending approval our admin will review you submitted details. This process usually takes 4 - 48 hours
+                  {userData.remarks}
               </Typography>
             </div>
+            )}
 
             {/* Action Buttons */}
             <div className="action-buttons">

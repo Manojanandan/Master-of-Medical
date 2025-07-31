@@ -28,7 +28,7 @@ instance.interceptors.response.use(
         if (error.response?.status === 401) {
             // Token is invalid or expired
             sessionStorage.removeItem("jwt");
-            window.location.href = "/loginform";
+            window.location.href = "/";
         }
         return Promise.reject(error);
     }

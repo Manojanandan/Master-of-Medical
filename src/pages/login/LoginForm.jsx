@@ -25,6 +25,7 @@ import {
 
 // Validation patterns
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
 const passwordRegex = /^(?=.[A-Za-z])(?=.\d)(?=.[@$!%#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
 
 const LoginForm = () => {
@@ -69,9 +70,9 @@ const LoginForm = () => {
             setOpenModal(true);
             setTimeout(() => {
                 if (type === 'vendor') {
-                    navigate("/vendorDashboard");
+                    navigate("/vendor");
                 } else {
-                    navigate("/ecommerceDashboard");
+                    navigate("/customer");
                 }
             }, 1000);
         } else if (message && !success) {
@@ -84,10 +85,10 @@ const LoginForm = () => {
         const newErrors = { emailError: '', passwordError: "" };
 
         if (!formData.email) {
-            newErrors.emailError = "Email is required";
+            newErrors.emailError = "Email or username is required";
             isValid = false;
-        } else if (!emailRegex.test(formData.email)) {
-            newErrors.emailError = "Invalid email format";
+        } else if (!emailRegex.test(formData.email) && !usernameRegex.test(formData.email)) {
+            newErrors.emailError = "Please enter a valid email or username (3-20 characters, letters, numbers, and underscores only)";
             isValid = false;
         }
 
@@ -105,14 +106,16 @@ const LoginForm = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        
         if (!validateForm()) return;
 
         const payload = {
             email: formData.email,
             password: formData.password,
         };
+        console.log("dddd", payload);
 
-        dispatch(loginUser({ data: payload, type }));
+        dispatch(loginUser({ data: payload, type: type == "vendor" ? "vendor" : "customer" }));
         setOpenModal(true);
     };
 
@@ -130,13 +133,13 @@ const LoginForm = () => {
         }}>
             {/* Back Button */}
             <Box 
-                onClick={() => navigate('/signup')} 
+                onClick={() => navigate('/auth/register')} 
                 sx={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.5rem',
                     cursor: 'pointer',
-                    alignSelf: 'flex-start',
+                    alignSelf: 'flex-end',
                     mb: 2,
                     '&:hover': {
                         color: 'primary.main'
@@ -197,7 +200,7 @@ const LoginForm = () => {
                         <Typography variant="body1" sx={{ color: 'text.secondary' }}>
                             Don't have an account?{' '}
                             <Link 
-                                to="/signup" 
+                                to="/auth/register" 
                                 style={{ 
                                     color: '#009e92',
                                     fontWeight: '600',
@@ -213,22 +216,22 @@ const LoginForm = () => {
                     {/* Form */}
                     <Box component="form" onSubmit={handleSubmit}>
                         <Stack spacing={2.5}>
-                            {/* Email Field */}
+                            {/* Email/Username Field */}
                             <Box>
                                 <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-                                    Email <span style={{ color: 'red' }}>*</span>
+                                    Login using email or username <span style={{ color: 'red' }}>*</span>
                                 </Typography>
                                 <TextField
                                     fullWidth
                                     id="email"
                                     size="medium"
                                     variant="outlined"
-                                    autoComplete="email"
+                                    autoComplete="username"
                                     value={formData.email}
                                     onChange={handleChange}
                                     error={!!errorMsg.emailError}
                                     helperText={errorMsg.emailError}
-                                    placeholder="Enter your email"
+                                    placeholder="Enter your email or username"
                                     sx={{
                                         '& .MuiOutlinedInput-root': {
                                             borderRadius: '8px'
@@ -277,7 +280,7 @@ const LoginForm = () => {
                             {/* Forgot Password Link */}
                             <Box sx={{ textAlign: 'right' }}>
                                 <Link 
-                                    to="/forgotpassword"
+                                    to="/auth/forgot-password"
                                     style={{ 
                                         color: '#009e92',
                                         textDecoration: 'none',
@@ -313,13 +316,13 @@ const LoginForm = () => {
                             </Button>
                             
                             {/* Divider */}
-                            <Box sx={{ display: 'flex', alignItems: 'center', my: 2 }}>
+                            {/* <Box sx={{ display: 'flex', alignItems: 'center', my: 2 }}>
                                 <Divider sx={{ flexGrow: 1 }} />
                                 <Typography variant="body2" sx={{ px: 2, color: 'text.secondary' }}>
                                     OR
                                 </Typography>
                                 <Divider sx={{ flexGrow: 1 }} />
-                            </Box>
+                            </Box> */}
                             
                             {/* Google Sign In */}
                             {/* <Button

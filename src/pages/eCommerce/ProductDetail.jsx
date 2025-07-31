@@ -1,35 +1,27 @@
 
-
-
 import React, { useEffect, useState } from "react";
 import {
   Container,
   Grid,
-  Card,
   CardMedia,
   Typography,
   Box,
   Button,
-  Chip,
   Rating,
   Skeleton,
   Alert,
   IconButton,
-  Paper,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Tabs,
-  Tab,
   Breadcrumbs,
   Link,
   Divider,
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
-import { useTheme } from '@mui/material/styles';
 import {
   ShoppingCart,
   Favorite,
@@ -52,45 +44,42 @@ import ReviewForm from "../../components/e_commerceComponents/ReviewForm";
 import ReviewList from "../../components/e_commerceComponents/ReviewList";
 
 const ProductDetail = () => {
+  // ========================================
+  // HOOKS AND STATE MANAGEMENT
+  // ========================================
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  // Redux state selectors
   const { currentProduct, loading, error } = useSelector((state) => state.publicProductReducer);
   const { cart, loading: cartLoading } = useSelector((state) => state.cartReducer);
 
+  // Local state
   const [cartMessage, setCartMessage] = useState('');
-  const product = currentProduct;
-
-  console.log('ProductDetail Debug Info:', {
-    id,
-    currentProduct,
-    product,
-    loading,
-    error,
-    category: product?.category,
-    subCategory: product?.subCategory,
-    categoryType: typeof product?.category,
-    subCategoryType: typeof product?.subCategory,
-    allProductKeys: product ? Object.keys(product) : []
-  });
-
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [localQuantity, setLocalQuantity] = useState(1);
   const [activeAccordion, setActiveAccordion] = useState('description');
 
+  const product = currentProduct;
+
+  // ========================================
+  // DATA FETCHING AND API CALLS
+  // ========================================
   useEffect(() => {
     if (id) {
-      console.log('ProductDetail: Fetching product and reviews for ID:', id);
-      dispatch(fetchPublicProductById(id));
       const productId = parseInt(id) || id;
-      console.log('ProductDetail: Fetching reviews with productId:', productId);
-      dispatch(fetchProductReviews({ productId }));
+      console.log('ProductDetail: Fetching product details for productId:', productId);
+      dispatch(fetchPublicProductById(productId)); // Fetch product by ID
+      
+      console.log('ProductDetail: Fetching reviews for productId:', productId);
+      dispatch(fetchProductReviews({ productId })); // Fetch reviews by product ID
     }
-    dispatch(fetchCart());
+    
+    dispatch(fetchCart()); // Fetch cart data
 
+    // Cleanup function
     return () => {
       dispatch(clearCurrentProduct());
       dispatch(clearReviews());
@@ -103,6 +92,74 @@ const ProductDetail = () => {
     }
   }, [cart, product?.id]);
 
+  // ========================================
+  // HELPER FUNCTIONS
+  // ========================================
+  
+  // Parse additional information from JSON string with default values
+  const getParsedAdditionalInfo = () => {
+    if (!product || !product.additionalInformation) return { category: 1, howToUse: "Not available", sideEffects: "Not available", manufacturer: "Not available" };
+    if (typeof product.additionalInformation === 'string') {
+      try {
+        const parsed = JSON.parse(product.additionalInformation);
+        return {
+          category: parsed.category || 1,
+          howToUse: parsed.howToUse || "Not available",
+          sideEffects: parsed.sideEffects || "Not available",
+          manufacturer: parsed.manufacturer || "Not available",
+          ...parsed
+        };
+      } catch (error) {
+        console.error('Error parsing additionalInformation:', error);
+        return { category: 1, howToUse: "Not available", sideEffects: "Not available", manufacturer: "Not available" };
+      }
+    }
+    return {
+      category: product.additionalInformation.category || 1,
+      howToUse: product.additionalInformation.howToUse || "Not available",
+      sideEffects: product.additionalInformation.sideEffects || "Not available",
+      manufacturer: product.additionalInformation.manufacturer || "Not available",
+      ...product.additionalInformation
+    };
+  };
+
+  // Get category name from ID with new Category 9
+  const getCategoryName = (categoryId) => {
+    const categoryMap = {
+      1: 'Medical Supplies',
+      2: 'Surgical Equipment',
+      3: 'Diagnostic Tools',
+      4: 'Personal Protective Equipment',
+      5: 'Pharmaceuticals',
+      6: 'First Aid',
+      7: 'Dental Supplies',
+      8: 'Laboratory Equipment',
+      9: 'Specialty Medical Devices' // Added Category 9
+    };
+    return categoryMap[categoryId] || `Category ${categoryId}`;
+  };
+
+  // Get subcategory name from ID
+  const getSubCategoryName = (subCategoryId) => {
+    const subCategoryMap = {
+      1: 'Face Masks',
+      2: 'Gloves',
+      3: 'Gowns',
+      4: 'Bandages',
+      5: 'Antiseptics',
+      6: 'Thermometers',
+      7: 'Stethoscopes',
+      8: 'Adhesive Bandages',
+      9: 'Gauze',
+      10: 'Tapes'
+    };
+    return subCategoryMap[subCategoryId] || `Sub Category ${subCategoryId}`;
+  };
+
+  // ========================================
+  // EVENT HANDLERS
+  // ========================================
+  
   const handleImageChange = (index) => {
     setSelectedImage(index);
   };
@@ -143,11 +200,6 @@ const ProductDetail = () => {
       });
   };
 
-  const handleWishlist = () => {
-    setIsWishlisted(!isWishlisted);
-    console.log('Wishlist toggled:', !isWishlisted);
-  };
-
   const handleRemoveFromCart = () => {
     if (!product) {
       console.error('Product not available');
@@ -173,30 +225,12 @@ const ProductDetail = () => {
       });
   };
 
-  const getCartItemQuantity = () => {
-    if (!cart || !cart.items || !product) return 0;
-    const productId = product.id;
-    const cartItem = cart.items.find(item => item.productId === productId);
-    return cartItem ? cartItem.quantity : 0;
-  };
-
-  const isProductInCart = () => {
-    return getCartItemQuantity() > 0;
-  };
-
-  const getCurrentQuantity = () => {
-    if (isProductInCart()) {
-      return getCartItemQuantity();
-    }
-    return localQuantity;
-  };
-
   const handleQuantityChange = (newQuantity) => {
     if (!product) {
       console.error('Product not available');
       return;
     }
-    if (newQuantity >= 1 && newQuantity <= 10) {
+    if (newQuantity >= 1 && newQuantity <= (product.quantityAvailable || 10)) {
       if (isProductInCart()) {
         const productId = product.id;
         const cartItem = cart.items.find(item => item.productId === productId);
@@ -221,23 +255,32 @@ const ProductDetail = () => {
     }
   };
 
-  const theme = useTheme();
-
-  const getParsedAdditionalInfo = () => {
-    if (!product || !product.additionalInformation) return {};
-
-    if (typeof product.additionalInformation === 'string') {
-      try {
-        return JSON.parse(product.additionalInformation);
-      } catch (error) {
-        console.error('Error parsing additionalInformation:', error);
-        return {};
-      }
-    }
-
-    return product.additionalInformation;
+  // ========================================
+  // CART UTILITY FUNCTIONS
+  // ========================================
+  
+  const getCartItemQuantity = () => {
+    if (!cart || !cart.items || !product) return 0;
+    const productId = product.id;
+    const cartItem = cart.items.find(item => item.productId === productId);
+    return cartItem ? cartItem.quantity : 0;
   };
 
+  const isProductInCart = () => {
+    return getCartItemQuantity() > 0;
+  };
+
+  const getCurrentQuantity = () => {
+    if (isProductInCart()) {
+      return getCartItemQuantity();
+    }
+    return localQuantity;
+  };
+
+  // ========================================
+  // LOADING STATES
+  // ========================================
+  
   if (loading) {
     return (
       <Container maxWidth="xl" sx={{ py: 4, px: 3 }}>
@@ -270,13 +313,14 @@ const ProductDetail = () => {
         <Box sx={{ mb: 3 }}>
           <Button
             startIcon={<ArrowBack />}
-            onClick={() => navigate('/ecommerceDashboard')}
+            onClick={() => navigate('/customer')}
             sx={{ color: '#666', fontWeight: 500 }}
           >
             Back to Products
           </Button>
         </Box>
         <Alert severity="error" sx={{ mb: 2, borderRadius: 1 }}>
+
           {error?.message || 'Failed to load product details'}
         </Alert>
       </Container>
@@ -289,40 +333,120 @@ const ProductDetail = () => {
         <Box sx={{ mb: 3 }}>
           <Button
             startIcon={<ArrowBack />}
-            onClick={() => navigate('/ecommerceDashboard')}
+            onClick={() => navigate('/customer')}
             sx={{ color: '#666', fontWeight: 500 }}
           >
             Back to Products
           </Button>
         </Box>
         <Alert severity="error" sx={{ mb: 2, borderRadius: 1 }}>
+
           Product not found
         </Alert>
       </Container>
     );
   }
 
+  // ========================================
+  // DATA PARSING
+  // ========================================
+  
   const parsedAdditionalInfo = getParsedAdditionalInfo();
+  console.log('Parsed Additional Info:', parsedAdditionalInfo);
+  
+  const subCategoryId = product?.subCategoryId || product?.subCategory || 1; // Default to 1 if both are missing
 
+  // ========================================
+  // MAIN RENDER
+  // ========================================
+  
   return (
-    <Box sx={{ bgcolor: '#ffffff', minHeight: '100vh', py: 2 }}>
-      <Container maxWidth="xl" sx={{ px: 3 }}>
-        {/* Main Product Section */}
-        <Box sx={{
-          bgcolor: 'white',
-          borderRadius: 2,
-          p: 1,
-          mb: 4,
-          mx: { xs: 0, md: 8 }
-        }}>
-          <Grid container spacing={8}>
-            {/* Left Column - Image Gallery */}
-            <Grid item xs={12} md={6}>
-              <Box sx={{
+//     <Box sx={{ bgcolor: '#ffffff', minHeight: '100vh', py: 2 }}>
+//       <Container maxWidth="xl" sx={{ px: 3 }}>
+        
+//         {/* ========================================
+//             MAIN PRODUCT SECTION
+//         ======================================== */}
+//         <Box sx={{
+//           bgcolor: 'white',
+//           borderRadius: 2,
+//           p: 1,
+//           mb: 4,
+//           mx: { xs: 0, md: 8 }
+//         }}>
+//           <Grid container spacing={8}>
+            
+//             {/* ========================================
+//                 LEFT COLUMN - IMAGE GALLERY
+//             ======================================== */}
+//             <Grid item xs={12} md={6}>
+//               <Box sx={{
+    <Box sx={{ py: { xs: 1, md: 4 }, width: '90%', mx: 'auto' }}>
+      {/* Back to Products Button */}
+      {/* <Button
+        startIcon={<ArrowBack />}
+        onClick={() => navigate('/customer')}
+        sx={{ mb: 3, color: 'text.secondary' }}
+      >
+        Back to Products
+      </Button> */}
+      
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          gap: { xs: 3, md: 6 },
+        }}
+      >
+        {/* Main Image Section - 50% width on desktop */}
+        <Box
+          sx={{
+            width: { xs: '100%', md: '50%' },
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: 400,
+          }}
+        >
+          <Card
+            elevation={0}
+            sx={{
+              p: 2,
+              bgcolor: 'background.paper',
+              borderRadius: 4,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%',
+              height: { xs: 300, sm: 350, md: 400 },
+              mb: 3,
+            }}
+          >
+            <CardMedia
+              component="img"
+              image={product?.galleryImage && product.galleryImage[selectedImage] ? product.galleryImage[selectedImage] : product?.thumbnailImage}
+              alt={product?.name}
+              sx={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                borderRadius: 3,
+                background: '#f8f8f8',
+              }}
+            />
+          </Card>
+
+          {/* Thumbnail Images - Now below the main image */}
+          {(product?.galleryImage && product.galleryImage.length > 0) && (
+            <Box
+              sx={{
+
                 display: 'flex',
                 gap: 2,
                 alignItems: 'flex-start'
               }}>
+                
                 {/* Thumbnail Images - Left Side */}
                 {(product?.galleryImage && product.galleryImage.length > 0) && (
                   <Box
@@ -396,27 +520,16 @@ const ProductDetail = () => {
                       }
                     }}
                   />
-                  <IconButton
-                    sx={{
-                      position: 'absolute',
-                      top: 12,
-                      right: 12,
-                      bgcolor: 'white',
-                      boxShadow: 1,
-                      '&:hover': { bgcolor: 'grey.100' },
-                      borderRadius: '50%'
-                    }}
-                    onClick={handleWishlist}
-                  >
-                    {isWishlisted ? <Favorite sx={{ color: '#de3b6f' }} /> : <FavoriteBorder />}
-                  </IconButton>
                 </Box>
               </Box>
             </Grid>
 
-            {/* Right Column - Product Information */}
+            {/* ========================================
+                RIGHT COLUMN - PRODUCT INFORMATION
+            ======================================== */}
             <Grid item xs={12} md={6}>
               <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                
                 {/* Breadcrumb Navigation */}
                 <Box sx={{ mb: 1 }}>
                   <Breadcrumbs
@@ -446,17 +559,17 @@ const ProductDetail = () => {
                     </Link>
                     <Link
                       color="inherit"
-                      onClick={() => navigate('/ecommerceDashboard')}
+                      onClick={() => navigate(`/ecommerceDashboard?category=${getCategoryName(parsedAdditionalInfo.category)}`)}
                       sx={{ cursor: 'pointer' }}
                     >
-                      Category
+                      {getCategoryName(parsedAdditionalInfo.category) || (console.warn('Category not found in additionalInformation'), 'Category')}
                     </Link>
                     <Link
                       color="inherit"
-                      onClick={() => navigate('/ecommerceDashboard')}
+                      onClick={() => navigate(`/ecommerceDashboard?subCategory=${getSubCategoryName(subCategoryId)}`)}
                       sx={{ cursor: 'pointer' }}
                     >
-                      Sub Category
+                      {getSubCategoryName(subCategoryId) || (console.warn('SubCategoryId not found'), 'Sub Category')}
                     </Link>
                     <Typography color="text.primary" sx={{ color: '#666' }}>
                       {product.name}
@@ -477,6 +590,8 @@ const ProductDetail = () => {
                 >
                   {product?.name}
                 </Typography>
+
+                {/* Brand Information */}
                 {product.brandName && (
                   <Typography
                     variant="body1"
@@ -499,7 +614,7 @@ const ProductDetail = () => {
                       }}
                     />
                     <Typography variant="body2" sx={{ color: '#666', fontWeight: 500 }}>
-                      {product.averageRating || 0}
+                    {Math.round((product.averageRating ?? 0) * 10) / 10}
                     </Typography>
                   </Box>
                   <Typography variant="body2" sx={{ color: '#666' }}>
@@ -510,63 +625,72 @@ const ProductDetail = () => {
                 {/* Price Section */}
                 <Box sx={{ mb: 2 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                    <Typography 
-                      variant="body1" 
-                      sx={{ 
+                    <Typography
+                      variant="body1"
+                      sx={{
                         color: '#666',
                         textDecoration: 'line-through',
                         fontSize: { xs: '1rem', sm: '1.25rem' }
                       }}
                     >
-                      ₹{product.originalPrice || (product.price * 1.5).toFixed(0)}
+                      ₹{parsedAdditionalInfo.mrpPrice || (product.price * 1.2).toFixed(0)}
                     </Typography>
-                    <Typography 
-                      variant="h5" 
-                      sx={{ 
-                        fontWeight: 700, 
+                    <Typography
+                      variant="h5"
+                      sx={{
+                        fontWeight: 700,
                         color: '#212121',
                         fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' }
                       }}
                     >
                       ₹{product.price}
                     </Typography>
-                    <Typography 
-                      variant="body2" 
-                      sx={{ 
-                        color: '#666',
-                        fontSize: '0.85rem',
-                        fontWeight: 500,
-                        fontStyle: 'italic'
-                      }}
-                    >
-                      (Adhesive Bandages)
-                    </Typography>
+                    {product.priceLable && (
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: '#873589',
+                          fontSize: '0.95rem',
+                          fontWeight: 600,
+                          fontStyle: 'italic',
+                          ml: 1,
+                          px: 1.2,
+                          py: 0.2,
+                          borderRadius: 1,
+                          bgcolor: 'rgba(135,53,137,0.08)',
+                          display: 'inline-block',
+                        }}
+                      >
+                        [ {product.priceLable} ]
+                      </Typography>
+                    )}
                   </Box>
-                  {product.originalPrice && product.originalPrice > product.price && (
-                    <Typography 
-                      variant="body2" 
-                      sx={{ 
+                  {parsedAdditionalInfo.mrpPrice && parsedAdditionalInfo.mrpPrice > product.price && (
+                    <Typography
+                      variant="body2"
+                      sx={{
                         color: '#873589',
                         fontWeight: 600,
                         fontSize: '0.85rem'
                       }}
                     >
-                      {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% off
-                    </Typography>
-                  )}
-                  {product.priceLabel && (
-                    <Typography 
-                      variant="body2" 
-                      sx={{ 
-                        color: '#666',
-                        mt: 1,
-                        fontSize: '0.85rem'
-                      }}
-                    >
-                      {product.priceLabel}
+                      {Math.round(((parsedAdditionalInfo.mrpPrice - product.price) / parsedAdditionalInfo.mrpPrice) * 100)}% off
                     </Typography>
                   )}
                 </Box>
+
+                {/* Stock Status */}
+                <Typography
+                  variant="body2"
+                  sx={{
+                    mb: 2,
+                    color: product.quantityAvailable > 0 ? '#2e7d32' : '#d32f2f',
+                    fontSize: '0.85rem',
+                    fontWeight: 500
+                  }}
+                >
+                  {product.quantityAvailable > 0 ? `In Stock (${product.quantityAvailable} available)` : 'Out of Stock'}
+                </Typography>
 
                 {/* Expire Date */}
                 {product.expiresOn && (
@@ -576,15 +700,17 @@ const ProductDetail = () => {
                       mb: 2,
                       color: '#de3b6f',
                       fontSize: '0.75rem',
-                      display: 'flex',
+                      display: 'inline-flex',
                       alignItems: 'center',
                       gap: 1,
                       fontWeight: 500,
                       bgcolor: '#fff1f4',
-                      px: 1.5,
-                      py: 0.5,
-                      borderRadius: 1,
-                      border: '1px solid #de3b6f'
+                      border: '1px solid #873589',
+                      borderRadius: 5,
+                      p: 0.5,
+                      maxWidth: 260,
+                      minWidth: 0,
+                      whiteSpace: 'nowrap',
                     }}
                   >
                     <span>⚠️</span>
@@ -593,17 +719,19 @@ const ProductDetail = () => {
                 )}
 
                 {/* HSN Code */}
-                <Typography
-                  variant="body2"
-                  sx={{
-                    mb: 2,
-                    color: '#666',
-                    fontSize: '0.85rem',
-                    fontWeight: 500
-                  }}
-                >
-                  <strong>HSN Code:</strong> 2323242
-                </Typography>
+                {product.hsnCode && (
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      mb: 2,
+                      color: '#666',
+                      fontSize: '0.85rem',
+                      fontWeight: 500
+                    }}
+                  >
+                    <strong>HSN Code:</strong> {product.hsnCode}
+                  </Typography>
+                )}
 
                 {/* Quantity Section */}
                 <Box sx={{ mb: 3 }}>
@@ -625,7 +753,7 @@ const ProductDetail = () => {
                       <IconButton
                         size="small"
                         onClick={() => handleQuantityChange(getCurrentQuantity() - 1)}
-                        disabled={getCurrentQuantity() <= 1}
+                        disabled={getCurrentQuantity() <= 1 || product.quantityAvailable === 0}
                         sx={{
                           border: '1.5px solid #d1d5db',
                           color: getCurrentQuantity() <= 1 ? '#ccc' : '#de3b6f',
@@ -664,17 +792,17 @@ const ProductDetail = () => {
                       <IconButton
                         size="small"
                         onClick={() => handleQuantityChange(getCurrentQuantity() + 1)}
-                        disabled={getCurrentQuantity() >= 10}
+                        disabled={getCurrentQuantity() >= (product.quantityAvailable || 10)}
                         sx={{
                           border: '1.5px solid #d1d5db',
-                          color: getCurrentQuantity() >= 10 ? '#ccc' : '#de3b6f',
+                          color: getCurrentQuantity() >= (product.quantityAvailable || 10) ? '#ccc' : '#de3b6f',
                           borderRadius: '50%',
                           width: 32,
                           height: 32,
                           bgcolor: 'white',
                           '&:hover': {
-                            bgcolor: getCurrentQuantity() >= 10 ? 'white' : '#f1f3f6',
-                            borderColor: getCurrentQuantity() >= 10 ? '#d1d5db' : '#de3b6f',
+                            bgcolor: getCurrentQuantity() >= (product.quantityAvailable || 10) ? 'white' : '#f1f3f6',
+                            borderColor: getCurrentQuantity() >= (product.quantityAvailable || 10) ? '#d1d5db' : '#de3b6f',
                           },
                         }}
                       >
@@ -689,7 +817,7 @@ const ProductDetail = () => {
                         size="large"
                         color="error"
                         onClick={handleRemoveFromCart}
-                        disabled={cartLoading}
+                        disabled={cartLoading || product.quantityAvailable === 0}
                         sx={{
                           py: 2,
                           px: 3,
@@ -714,6 +842,7 @@ const ProductDetail = () => {
                         size="large"
                         startIcon={<ShoppingCart />}
                         onClick={handleAddToCart}
+                        disabled={cartLoading || product.quantityAvailable === 0}
                         sx={{
                           py: 2,
                           px: 3,
@@ -732,13 +861,21 @@ const ProductDetail = () => {
                   </Box>
                 </Box>
 
-                {/* Country of Origin */}
-                {parsedAdditionalInfo?.countryOfOrigin && (
+                {/* Additional Product Information */}
+                {parsedAdditionalInfo.shelfLife && (
                   <Typography
                     variant="body2"
                     sx={{ mb: 2, color: '#666', fontSize: '0.85rem' }}
                   >
-                    <strong>Country of Origin:</strong> {parsedAdditionalInfo.countryOfOrigin}
+                    <strong>Shelf Life:</strong> {parsedAdditionalInfo.shelfLife}
+                  </Typography>
+                )}
+                {parsedAdditionalInfo.country && (
+                  <Typography
+                    variant="body2"
+                    sx={{ mb: 2, color: '#666', fontSize: '0.85rem' }}
+                  >
+                    <strong>Country of Origin:</strong> {parsedAdditionalInfo.country}
                   </Typography>
                 )}
 
@@ -755,33 +892,22 @@ const ProductDetail = () => {
                     {cartMessage}
                   </Alert>
                 )}
-
-                {/* Shelf Life */}
-                <Typography
-                  variant="body2"
-                  sx={{ mb: 2, color: '#666', fontSize: '0.85rem' }}
-                >
-                  <strong>Shelf Life:</strong> 3 Years from the date of manufacture
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ mb: 2, color: '#666', fontSize: '0.85rem' }}
-                >
-                  <strong>Country of Origin:</strong> India
-                </Typography>
               </Box>
             </Grid>
           </Grid>
         </Box>
 
-       {/* Individual Accordions */}
-       <Box sx={{
+        {/* ========================================
+            PRODUCT DETAILS ACCORDIONS
+        ======================================== */}
+        <Box sx={{
           bgcolor: 'white',
           mb: 4,
           borderRadius: 2,
           mx: { xs: 0, md: 11 },
           boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
         }}>
+          
           {/* Product Description Accordion */}
           <Accordion
             expanded={activeAccordion === 'description'}
@@ -812,7 +938,7 @@ const ProductDetail = () => {
             <Divider />
             <AccordionDetails>
               <Typography variant="body1" sx={{ color: '#666', lineHeight: 1.6, fontSize: '0.95rem' }}>
-                A high-filtration, 3-layer disposable face mask designed for medical environments such as hospitals, clinics, and diagnostic labs. Offers optimal protection against airborne particles, droplets, and fluid splashes. Ideal for healthcare professionals and frontline workers.
+                {product?.description || "No description available."}
               </Typography>
             </AccordionDetails>
           </Accordion>
@@ -846,53 +972,9 @@ const ProductDetail = () => {
             </AccordionSummary>
             <Divider />
             <AccordionDetails>
-              <List dense>
-                <ListItem sx={{ py: 0.5 }}>
-                  <ListItemIcon sx={{ minWidth: 32 }}>
-                    <CheckCircle sx={{ color: '#873589' }} fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Wash hands before touching the mask"
-                    sx={{ '& .MuiListItemText-primary': { color: '#666', fontSize: '0.95rem' } }}
-                  />
-                </ListItem>
-                <ListItem sx={{ py: 0.5 }}>
-                  <ListItemIcon sx={{ minWidth: 32 }}>
-                    <CheckCircle sx={{ color: '#873589' }} fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Place the mask with the colored side facing outwards"
-                    sx={{ '& .MuiListItemText-primary': { color: '#666', fontSize: '0.95rem' } }}
-                  />
-                </ListItem>
-                <ListItem sx={{ py: 0.5 }}>
-                  <ListItemIcon sx={{ minWidth: 32 }}>
-                    <CheckCircle sx={{ color: '#873589' }} fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Pinch the nose strip for a snug fit"
-                    sx={{ '& .MuiListItemText-primary': { color: '#666', fontSize: '0.95rem' } }}
-                  />
-                </ListItem>
-                <ListItem sx={{ py: 0.5 }}>
-                  <ListItemIcon sx={{ minWidth: 32 }}>
-                    <CheckCircle sx={{ color: '#873589' }} fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Cover nose, mouth, and chin completely"
-                    sx={{ '& .MuiListItemText-primary': { color: '#666', fontSize: '0.95rem' } }}
-                  />
-                </ListItem>
-                <ListItem sx={{ py: 0.5 }}>
-                  <ListItemIcon sx={{ minWidth: 32 }}>
-                    <CheckCircle sx={{ color: '#873589' }} fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Dispose after single use in a closed bin"
-                    sx={{ '& .MuiListItemText-primary': { color: '#666', fontSize: '0.95rem' } }}
-                  />
-                </ListItem>
-              </List>
+              <Typography variant="body1" sx={{ color: '#666', lineHeight: 1.6, fontSize: '0.95rem', whiteSpace: 'pre-line' }}>
+                {parsedAdditionalInfo.howToUse}
+              </Typography>
             </AccordionDetails>
           </Accordion>
 
@@ -925,53 +1007,9 @@ const ProductDetail = () => {
             </AccordionSummary>
             <Divider />
             <AccordionDetails>
-              <List dense>
-                <ListItem sx={{ py: 0.5 }}>
-                  <ListItemIcon sx={{ minWidth: 32 }}>
-                    <CheckCircle sx={{ color: '#873589' }} fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="3-layer protection: non-woven outer, melt-blown middle, soft inner layer"
-                    sx={{ '& .MuiListItemText-primary': { color: '#666', fontSize: '0.95rem' } }}
-                  />
-                </ListItem>
-                <ListItem sx={{ py: 0.5 }}>
-                  <ListItemIcon sx={{ minWidth: 32 }}>
-                    <CheckCircle sx={{ color: '#873589' }} fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="BFE ≥ 98% (Bacterial Filtration Efficiency)"
-                    sx={{ '& .MuiListItemText-primary': { color: '#666', fontSize: '0.95rem' } }}
-                  />
-                </ListItem>
-                <ListItem sx={{ py: 0.5 }}>
-                  <ListItemIcon sx={{ minWidth: 32 }}>
-                    <CheckCircle sx={{ color: '#873589' }} fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Hypoallergenic, breathable, and latex-free"
-                    sx={{ '& .MuiListItemText-primary': { color: '#666', fontSize: '0.95rem' } }}
-                  />
-                </ListItem>
-                <ListItem sx={{ py: 0.5 }}>
-                  <ListItemIcon sx={{ minWidth: 32 }}>
-                    <CheckCircle sx={{ color: '#873589' }} fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Ultrasonic sealing for secure fit"
-                    sx={{ '& .MuiListItemText-primary': { color: '#666', fontSize: '0.95rem' } }}
-                  />
-                </ListItem>
-                <ListItem sx={{ py: 0.5 }}>
-                  <ListItemIcon sx={{ minWidth: 32 }}>
-                    <CheckCircle sx={{ color: '#873589' }} fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Ideal for medical staff, labs, and pharma logistics teams"
-                    sx={{ '& .MuiListItemText-primary': { color: '#666', fontSize: '0.95rem' } }}
-                  />
-                </ListItem>
-              </List>
+              <Typography variant="body1" sx={{ color: '#666', lineHeight: 1.6, fontSize: '0.95rem', whiteSpace: 'pre-line' }}>
+                {product.benefits || "No benefits available."}
+              </Typography>
             </AccordionDetails>
           </Accordion>
 
@@ -1004,8 +1042,8 @@ const ProductDetail = () => {
             </AccordionSummary>
             <Divider />
             <AccordionDetails>
-              <Typography variant="body1" sx={{ color: '#666', lineHeight: 1.6, fontSize: '0.95rem' }}>
-                Prolonged use may cause minor skin irritation in sensitive users. Not recommended for individuals with respiratory issues without consulting a doctor.
+              <Typography variant="body1" sx={{ color: '#666', lineHeight: 1.6, fontSize: '0.95rem', whiteSpace: 'pre-line' }}>
+                {parsedAdditionalInfo.sideEffects}
               </Typography>
             </AccordionDetails>
           </Accordion>
@@ -1039,20 +1077,16 @@ const ProductDetail = () => {
             </AccordionSummary>
             <Divider />
             <AccordionDetails>
-              <Typography variant="body1" sx={{ color: '#666', lineHeight: 1.6, fontSize: '0.95rem', mb: 1 }}>
-                <strong>Mediguard Technologies Pvt. Ltd.</strong>
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#666', lineHeight: 1.6, fontSize: '0.9rem', mb: 1 }}>
-                Plot No. 12, Industrial Area, Sector 64, Noida, Uttar Pradesh – 201301
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#666', lineHeight: 1.6, fontSize: '0.9rem' }}>
-                <strong>GSTIN:</strong> 09AAECM8390K1Z8 | <strong>CIN:</strong> U33112UP2020PTC128720
+              <Typography variant="body1" sx={{ color: '#666', lineHeight: 1.6, fontSize: '0.95rem', whiteSpace: 'pre-line' }}>
+                {parsedAdditionalInfo.manufacturer}
               </Typography>
             </AccordionDetails>
           </Accordion>
         </Box>
 
-        {/* Shipping Info */}
+        {/* ========================================
+            SHIPPING INFORMATION
+        ======================================== */}
         {product.shipping && (
           <Box sx={{
             bgcolor: 'white',
@@ -1071,7 +1105,7 @@ const ProductDetail = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                   <LocalShipping sx={{ color: '#de3b6f' }} fontSize="small" />
                   <Typography variant="body2" sx={{ color: '#666', fontSize: '0.85rem' }}>
-                    {product.shipping.freeShipping ? 'Free Shipping' : 'Shipping charges apply'}
+                    {product.shipping.freeShipping ? 'Free Shipping' : `Shipping: ₹${product.shipping.shippingCost || 'TBD'}`}
                   </Typography>
                 </Box>
                 {product.shipping.deliveryTime && (
@@ -1097,7 +1131,9 @@ const ProductDetail = () => {
           </Box>
         )}
 
-        {/* Customer Reviews Section */}
+        {/* ========================================
+            CUSTOMER REVIEWS SECTION
+        ======================================== */}
         <Box sx={{
           bgcolor: 'white',
           borderRadius: 2,

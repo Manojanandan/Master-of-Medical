@@ -101,7 +101,7 @@ const OrdersTab = ({
             {!orderFilters.search && !orderFilters.status && (
               <button 
                 className={`${styles.button} ${styles.buttonPrimary}`}
-                onClick={() => navigate('/ecommerceDashboard')}
+                onClick={() => navigate('/customer')}
               >
                 Start Shopping
               </button>

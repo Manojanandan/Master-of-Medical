@@ -1,32 +1,13 @@
-/* import React from 'react'
-import BreadCrumbs from '../../../components/e_commerceComponents/BreadCrumbs'
-import { Box, Typography } from '@mui/material'
-
-const PrivacyPolicy = () => {
-  return (
-    <Box sx={{height:'auto',width:'100%',}}>
-        <BreadCrumbs title={"Privacy-Policy"} />
-        <Box sx={{height:'100%',width:'90%',margin:'2% auto'}}>
-            <Typography variant='h5' sx={{fontWeight:'bold',margin:'1% 0'}}>Note</Typography>
-            <Typography variant='p' sx={{fontSize:'16px',}}>At Master of Medical, your data privacy is our priority.</Typography><br />
-            <Typography variant='p' sx={{fontSize:'16px',lineHeight:'50px',marginLeft:'2%'}}>1. 	We collect only necessary information to deliver services—such as name, contact, business info, and payment data.</Typography><br/>
-            <Typography variant='p' sx={{fontSize:'16px',lineHeight:'50px',marginLeft:'2%'}}>2.	All user data is encrypted and stored securely.</Typography><br />
-            <Typography variant='p' sx={{fontSize:'16px',lineHeight:'50px',marginLeft:'2%'}}>3.	We do not sell or share your information with third parties for advertising.</Typography><br />
-            <Typography variant='p' sx={{fontSize:'16px',lineHeight:'50px',marginLeft:'2%'}}>4.	Data is used solely to process orders, support logistics, and improve user experience.</Typography><br />
-            <Typography variant='p' sx={{fontSize:'16px',lineHeight:'50px'}}>You can request to review or delete your data anytime by contacting our support team.</Typography><br />
-        </Box>
-    </Box>
-  )
-}
-
-export default PrivacyPolicy */
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Typography, Container, Paper } from '@mui/material';
 
 const PrivacyPolicy = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#ffffff', py: 4 }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: '#ffffff', py: 0}}>
       <Container maxWidth="lg">
         <Paper
           elevation={0}
@@ -40,21 +21,22 @@ const PrivacyPolicy = () => {
           <Typography
             variant="h4"
             sx={{
-              fontWeight: 'bold',
+              fontWeight: 700,
               mb: 3,
-              color: '#003087',
+              color: '#de3b6f',
               textAlign: 'center',
               fontSize: { xs: '1.8rem', md: '2.5rem' },
             }}
           >
             Privacy Policy
           </Typography>
+
           <Typography
             variant="h6"
             sx={{
-              fontWeight: 'medium',
+              fontWeight: 600,
               mb: 2,
-              color: '#1e40af',
+              color: '#000', // Subheading color changed to black
               fontSize: { xs: '1.2rem', md: '1.5rem' },
             }}
           >
@@ -64,9 +46,9 @@ const PrivacyPolicy = () => {
             variant="body1"
             sx={{
               fontSize: { xs: '0.9rem', md: '1rem' },
-              color: '#374151',
+              color: '#666', // Body text color from ReturnsRefundsPolicy
               mb: 4,
-              lineHeight: 1.8,
+              lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
             }}
           >
             At Master of Medical, your data privacy is our top priority.
@@ -76,65 +58,65 @@ const PrivacyPolicy = () => {
               variant="body1"
               sx={{
                 fontSize: { xs: '0.9rem', md: '1rem' },
-                color: '#212121',
+                color: '#666', // Body text color from ReturnsRefundsPolicy
                 mb: 2,
-                lineHeight: 2,
+                lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
                 display: 'flex',
                 alignItems: 'flex-start',
               }}
             >
-              <Box component="span" sx={{ mr: 2, color: '#1a237e' }}>1.</Box>
+              <Box component="span" sx={{ mr: 2, color: '#873589' }}>1.</Box> {/* Bullet color updated to #873589 */}
               We collect only necessary information to deliver services—such as name, contact, business info, and payment data.
             </Typography>
             <Typography
               variant="body1"
               sx={{
                 fontSize: { xs: '0.9rem', md: '1rem' },
-                color: '#212121',
+                color: '#666', // Body text color from ReturnsRefundsPolicy
                 mb: 2,
-                lineHeight: 2,
+                lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
                 display: 'flex',
                 alignItems: 'flex-start',
               }}
             >
-              <Box component="span" sx={{ mr: 2, color: '#1a237e' }}>2.</Box>
+              <Box component="span" sx={{ mr: 2, color: '#873589' }}>2.</Box> {/* Bullet color updated to #873589 */}
               All user data is encrypted and stored securely.
             </Typography>
             <Typography
               variant="body1"
               sx={{
                 fontSize: { xs: '0.9rem', md: '1rem' },
-                color: '#212121',
+                color: '#666', // Body text color from ReturnsRefundsPolicy
                 mb: 2,
-                lineHeight: 2,
+                lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
                 display: 'flex',
                 alignItems: 'flex-start',
               }}
             >
-              <Box component="span" sx={{ mr: 2, color: '#1a237e' }}>3.</Box>
+              <Box component="span" sx={{ mr: 2, color: '#873589' }}>3.</Box> {/* Bullet color updated to #873589 */}
               We do not sell or share your information with third parties for advertising.
             </Typography>
             <Typography
               variant="body1"
               sx={{
                 fontSize: { xs: '0.9rem', md: '1rem' },
-                color: '#212121',
+                color: '#666', // Body text color from ReturnsRefundsPolicy
                 mb: 2,
-                lineHeight: 2,
+                lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
                 display: 'flex',
                 alignItems: 'flex-start',
               }}
             >
-              <Box component="span" sx={{ mr: 2, color: '#1a237e' }}>4.</Box>
+              <Box component="span" sx={{ mr: 2, color: '#873589' }}>4.</Box> {/* Bullet color updated to #873589 */}
               Data is used solely to process orders, support logistics, and improve user experience.
             </Typography>
             <Typography
               variant="body1"
               sx={{
                 fontSize: { xs: '0.9rem', md: '1rem' },
-                color: '#212121',
+                color: '#666', // Body text color from ReturnsRefundsPolicy
                 mt: 2,
-                lineHeight: 2,
+                lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
               }}
             >
               You can request to review or delete your data anytime by contacting our support team.
@@ -144,7 +126,7 @@ const PrivacyPolicy = () => {
             variant="body2"
             sx={{
               fontSize: { xs: '0.8rem', md: '0.9rem' },
-              color: '#6b7280',
+              color: '#873589', // Note color from ReturnsRefundsPolicy
               textAlign: 'center',
               mt: 4,
             }}
