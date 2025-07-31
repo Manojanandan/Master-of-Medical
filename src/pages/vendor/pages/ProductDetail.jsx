@@ -23,7 +23,7 @@ import ImageIcon from '@mui/icons-material/Image';
 import DeleteIcon from '@mui/icons-material/Close';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProductById, clearError, clearSuccess, updateProductData } from '../reducers/ProductReducer';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { getAllCategoriesAndSubcategories } from '../../../utils/Service';
 
 const MAX_FILES = 5;
@@ -39,7 +39,12 @@ const getFileIcon = (type) => {
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
+  
+  // Check if edit mode should be enabled from URL parameter
+  const urlParams = new URLSearchParams(location.search);
+  const shouldEnableEdit = urlParams.get('edit') === 'true';
   
   // Redux state
   const { currentProduct, loading, error, success, message } = useSelector((state) => state.productReducer);
@@ -75,6 +80,16 @@ const ProductDetail = () => {
   const [loadingCategories, setLoadingCategories] = useState(false);
   const fileInputRef = useRef();
   const thumbnailInputRef = useRef();
+
+  // Enable edit mode if edit parameter is present in URL
+  useEffect(() => {
+    if (shouldEnableEdit) {
+      setIsEditing(true);
+      console.log('Edit mode enabled via URL parameter');
+    }
+  }, [shouldEnableEdit]);
+
+
 
   // Fetch product data on component mount
   useEffect(() => {
@@ -131,7 +146,6 @@ const ProductDetail = () => {
       setProductName(currentProduct.name || '');
       setPrice(currentProduct.price || '');
       setPriceLabel(currentProduct.priceLable || '');
-      setBulkDiscount(currentProduct.bulkDiscount || '');
       setDescription(currentProduct.description || '');
       setBrandName(currentProduct.brandName || '');
       setBenefits(currentProduct.benefits || '');
@@ -150,13 +164,17 @@ const ProductDetail = () => {
           ? JSON.parse(currentProduct.additionalInformation) 
           : currentProduct.additionalInformation;
         
+        console.log('Parsed additional information:', additionalInfo);
+        console.log('Available additionalInfo fields:', Object.keys(additionalInfo));
+        
         setMrpPrice(additionalInfo.mrpPrice || '');
         setShelfLife(additionalInfo.shelfLife || '');
         setCountry(additionalInfo.country || '');
         setHowToUse(additionalInfo.howToUse || '');
         setSideEffects(additionalInfo.sideEffects || '');
         setManufacturer(additionalInfo.manufacturer || '');
-        setMediguardEssentials(additionalInfo.mediguardDetails || '');
+        setMediguardEssentials(additionalInfo.mediguardEssentials || '');
+        setBulkDiscount(additionalInfo.bulkDiscount || '');
       }
     }
   }, [currentProduct]);
@@ -310,7 +328,6 @@ const ProductDetail = () => {
       setProductName(currentProduct.name || '');
       setPrice(currentProduct.price || '');
       setPriceLabel(currentProduct.priceLable || '');
-      setBulkDiscount(currentProduct.bulkDiscount || '');
       setDescription(currentProduct.description || '');
       setBrandName(currentProduct.brandName || '');
       setBenefits(currentProduct.benefits || '');
@@ -335,7 +352,8 @@ const ProductDetail = () => {
         setHowToUse(additionalInfo.howToUse || '');
         setSideEffects(additionalInfo.sideEffects || '');
         setManufacturer(additionalInfo.manufacturer || '');
-        setMediguardEssentials(additionalInfo.mediguardDetails || '');
+        setMediguardEssentials(additionalInfo.mediguardEssentials || '');
+        setBulkDiscount(additionalInfo.bulkDiscount || '');
       }
     }
   };

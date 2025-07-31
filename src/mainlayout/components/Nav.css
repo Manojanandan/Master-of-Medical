@@ -4,8 +4,7 @@
   left: 0;
   right: 0;
   z-index: 1000;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+  background: transparent;
   padding: 1rem 0;
   transition: all 0.3s ease;
 }
@@ -33,8 +32,9 @@
 .logo-text {
   font-size: 1.2rem;
   font-weight: bold;
-  color: #333;
+  color: white;
   text-transform: uppercase;
+  font-family: sans-serif;
 }
 
 .nav-links {
@@ -44,16 +44,17 @@
 
 .nav-link {
   text-decoration: none;
-  color: #333;
+  color: white;
   font-weight: bold;
   text-transform: uppercase;
   font-size: 1rem;
+  font-family: sans-serif;
   position: relative;
   transition: color 0.3s ease;
 }
 
 .nav-link:hover {
-  color: #c5225f;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .nav-link::after {
@@ -88,26 +89,29 @@
   cursor: pointer;
   transition: all 0.3s ease;
   text-transform: uppercase;
+  font-family: sans-serif;
+  background: white;
+  color: #c5225f;
 }
 
 .shop-now {
-  background: linear-gradient(135deg, #ff6b35, #c5225f);
-  color: white;
+  background: white;
+  color: #c5225f;
 }
 
 .shop-now:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(197, 34, 95, 0.3);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
 }
 
 .be-seller {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
+  background: white;
+  color: #c5225f;
 }
 
 .be-seller:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
 }
 
 .btn-icon {

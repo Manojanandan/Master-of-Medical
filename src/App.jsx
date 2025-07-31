@@ -48,16 +48,16 @@ const App = () => {
       {/* <Navbar /> */}
       <Routes>
         {/* Landing Page */}
-        <Route path="/" element={
+        {/* <Route path="/" element={
           <>
           <AnimatedPage animationType="fade" timeout={1000}>
             <LandingHomepage />
           </AnimatedPage>
           </>
-        } />
+        } /> */}
         
         {/* Latest Main Layout */}
-        <Route path="/latest-main" element={
+        <Route path="/" element={
           <>
           <AnimatedPage animationType="fade" timeout={1000}>
             <MainLayout />

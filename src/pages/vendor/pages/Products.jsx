@@ -669,7 +669,7 @@ const Products = () => {
                           boxShadow: '0 4px 12px rgba(44, 62, 80, 0.25)'
                         }
                       }}
-                      onClick={() => navigate(`/vendor/products/${product.id}`)}
+                      onClick={() => navigate(`/vendor/products/${product.id}?edit=true`)}
                     >
                       Edit
                     </Button>

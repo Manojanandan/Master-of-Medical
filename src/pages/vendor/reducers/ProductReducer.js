@@ -26,10 +26,12 @@ export const createProductData = createAsyncThunk(
       formData.append('name', productData.name);
       formData.append('description', productData.description);
       formData.append('category', productData.category);
-      formData.append('subCategory', productData.subcategory);
+      formData.append('subCategoryId', productData.subcategory);
       formData.append('postedBy', vendorId);
       formData.append('price', productData.price);
       formData.append('priceLable', productData.priceLabel);
+      formData.append('gst', productData.gst);
+      formData.append('hsnCode', productData.hsnCode);
       formData.append('brandName', productData.brandName);
       formData.append('benefits', productData.benefits);
       formData.append('expiresOn', productData.expiresOn);
@@ -41,7 +43,10 @@ export const createProductData = createAsyncThunk(
         country: productData.country,
         howToUse: productData.howToUse,
         sideEffects: productData.sideEffects,
-        manufacturer: productData.manufacturer
+        manufacturer: productData.manufacturer,
+        mediguardEssentials: productData.mediguardEssentials,
+        mrpPrice: productData.mrpPrice,
+        bulkDiscount: productData.bulkDiscount
       };
       formData.append('additionalInformation', JSON.stringify(additionalInfo));
 
@@ -136,14 +141,14 @@ export const updateProductData = createAsyncThunk(
       formData.append('name', productData.name);
       formData.append('description', productData.description);
       formData.append('category', productData.category);
-      formData.append('subCategory', productData.subcategory);
+      formData.append('subCategoryId', productData.subcategory);
       formData.append('postedBy', vendorId);
       formData.append('price', productData.price);
       formData.append('priceLable', productData.priceLabel);
       formData.append('brandName', productData.brandName);
       formData.append('benefits', productData.benefits);
       formData.append('expiresOn', productData.expiresOn);
-      formData.append('status', 'active');
+      formData.append('status', 'pending');
       
       // Additional information as JSON
       const additionalInfo = {
