@@ -150,22 +150,22 @@ const App = () => {
               <OrderTracking />
             </AnimatedPage>
           } />
-          <Route path="/ecommerceDashboard/disclaimer" element={
+          <Route path="disclaimer" element={
             <AnimatedPage animationType="slide" direction="up" timeout={600}>
               <Disclaimer />
             </AnimatedPage>
           } />
-          <Route path="/ecommerceDashboard/help-support" element={
+          <Route path="help-support" element={
             <AnimatedPage animationType="slide" direction="up" timeout={600}>
               <HelpSupport />
             </AnimatedPage>
           } />
-          <Route path="/ecommerceDashboard/returns-refunds" element={
+          <Route path="returns-refunds" element={
             <AnimatedPage animationType="slide" direction="up" timeout={600}>
               <ReturnsRefundsPolicy />
             </AnimatedPage>
           } />
-          <Route path="/ecommerceDashboard/about-us" element={
+          <Route path="about-us" element={
 
             <AnimatedPage animationType="slide" direction="up" timeout={600}>
               <AboutUs />
