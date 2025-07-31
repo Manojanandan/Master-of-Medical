@@ -260,30 +260,45 @@ const AddProduct = () => {
       return;
     }
 
+    // Get vendor ID from localStorage or context
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const vendorId = user.id || user._id || user.vendorId || '';
+
     // Prepare product data for Redux
     const productData = {
       name: productName,
       description: description,
-      category: category,
-      subcategory: subcategory,
-      mrpPrice: mrpPrice,
       price: price,
-      priceLabel: priceLabel,
-      bulkDiscount: bulkDiscount,
+      category: category,
+      subCategoryId: subcategory,
+      postedBy: vendorId,
+      priceLable: priceLabel,
+      gst: gst,
+      hsnCode: hsnCode,
       brandName: brandName,
       benefits: benefits,
       expiresOn: expiresOn,
-      shelfLife: shelfLife,
-      country: country,
-      howToUse: howToUse,
-      sideEffects: sideEffects,
-      manufacturer: manufacturer,
-      mediguardEssentials: mediguardEssentials,
-      gst: gst,
-      hsnCode: hsnCode,
+      additionalInformation: [
+        { name: 'mrpPrice', value: mrpPrice },
+        { name: 'bulkDiscount', value: bulkDiscount },
+        { name: 'shelfLife', value: shelfLife },
+        { name: 'country', value: country },
+        { name: 'howToUse', value: howToUse },
+        { name: 'sideEffects', value: sideEffects },
+        { name: 'manufacturer', value: manufacturer },
+        { name: 'mediguardEssentials', value: mediguardEssentials },
+      ],
+      thumbnailImage: thumbnail,
+      galleryImage: files,
       files: files,
       thumbnail: thumbnail
     };
+
+    console.log('Vendor ID:', vendorId);
+    console.log('User data from localStorage:', user);
+    console.log('Price Label value:', priceLabel);
+    console.log('Price Label type:', typeof priceLabel);
+    console.log('Submitting product data:', productData);
 
     // Dispatch the action
     dispatch(createProductData(productData));
@@ -427,7 +442,10 @@ const AddProduct = () => {
                 fullWidth 
                 size="small" 
                 value={priceLabel} 
-                onChange={e => setPriceLabel(e.target.value)} 
+                onChange={e => {
+                  console.log('Price label changed to:', e.target.value);
+                  setPriceLabel(e.target.value);
+                }} 
                 placeholder="Enter your price label" 
                 sx={{ mb: 2 }} 
                 error={!!formError.priceLabel} 

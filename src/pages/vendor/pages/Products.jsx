@@ -439,9 +439,9 @@ const Products = () => {
                     }}
                     image={product.thumbnailImage || 'https://via.placeholder.com/300x220?text=No+Image'}
                     alt={product.name}
-                    onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/300x220?text=No+Image';
-                    }}
+                    // onError={(e) => {
+                    //   e.target.src = 'https://via.placeholder.com/300x220?text=No+Image';
+                    // }}
                   />
                   
                   {/* Status Badge */}
