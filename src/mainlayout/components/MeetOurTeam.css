@@ -36,7 +36,8 @@
 }
 
 .team-card {
-  background: linear-gradient(135deg, #c5225f 0%, #ff6b35 50%, #667eea 100%);
+  /* background: linear-gradient(135deg, #c5225f 0%, #ff6b35 50%, #667eea 100%); */
+  background-size: cover;
   border-radius: 20px;
   padding: 0;
   color: white;

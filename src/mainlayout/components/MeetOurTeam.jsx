@@ -6,17 +6,20 @@ const MeetOurTeam = () => {
     {
       name: "Dr. John Stone",
       title: "Chief Medical Officer",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+      image: '/team1.png'
     },
     {
       name: "Dr. Bella Adesya",
       title: "Head of Operations",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+      image: '/team2.png'
     },
     {
       name: "Dr. Pulloh",
       title: "Technical Director",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+      image: '/team3.png'
     }
   ];
 
@@ -29,7 +32,7 @@ const MeetOurTeam = () => {
         </h2>
         <div className="team-cards">
           {teamMembers.map((member, index) => (
-            <div key={index} className="team-card">
+            <div key={index} className="team-card" style={{backgroundImage: `url(${member?.image})`}}>
               <div className="card-content">
                 <div className="member-info">
                   <h3 className="member-name">{member.name}
@@ -38,9 +41,9 @@ const MeetOurTeam = () => {
                   </h3>
                   <div className="plus-icon">+</div>
                 </div>
-                <div className="member-silhouette">
+                {/* <div className="member-silhouette">
                   <div className={`silhouette silhouette-${index + 1}`}></div>
-                </div>
+                </div> */}
               </div>
             </div>
           ))}

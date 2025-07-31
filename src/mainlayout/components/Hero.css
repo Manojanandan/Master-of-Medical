@@ -1,6 +1,8 @@
 .hero {
   min-height: 100vh;
-  background: linear-gradient(135deg, #ff6b35 0%, #ffd700 25%, #c5225f 75%, #667eea 100%);
+  /* background: linear-gradient(135deg, #ff6b35 0%, #ffd700 25%, #c5225f 75%, #667eea 100%); */
+  background-image: url("/banner.jpg");
+  background-size: cover;
   display: flex;
   align-items: center;
   padding-top: 80px;
