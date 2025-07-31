@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import pharmaLogo from '../../assets/pharmaSiteLogo.png';
+import pharmaLogo1 from '/white-logo.png';
 import './Nav.css';
 
 const Nav = () => {
@@ -42,7 +43,7 @@ const Nav = () => {
     <nav className="nav">
       <div className="nav-container">
         <div className="nav-logo">
-          <img src={pharmaLogo} alt="Master of Medical" />
+          <img src={pharmaLogo1} alt="Master of Medical" />
         </div>
         
         <div className="nav-links">
