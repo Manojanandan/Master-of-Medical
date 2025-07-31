@@ -43,7 +43,6 @@ const Nav = () => {
       <div className="nav-container">
         <div className="nav-logo">
           <img src={pharmaLogo} alt="Master of Medical" />
-          <span className="logo-text">MASTER OF MEDICAL</span>
         </div>
         
         <div className="nav-links">
@@ -54,11 +53,9 @@ const Nav = () => {
         
         <div className="nav-buttons">
           <button className="nav-btn shop-now" onClick={handleShopNowClick}>
-            <span className="btn-icon">🛒</span>
             <span>Shop Now</span>
           </button>
           <button className="nav-btn be-seller" onClick={handleBeASellerClick}>
-            <span className="btn-icon">🔒</span>
             <span>BE A SELLER</span>
           </button>
         </div>

@@ -13,7 +13,7 @@ import './MainLayout.css';
 const MainLayout = () => {
   return (
     <div className="main-layout">
-      {/* <Nav /> */}
+      <Nav />
       <Hero />
       <BrandPartners />
       <OurSolution />

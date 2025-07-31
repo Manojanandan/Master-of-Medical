@@ -136,6 +136,10 @@ const AddProduct = () => {
     if (success && message) {
       setSnackbar({ open: true, message, severity: 'success' });
       dispatch(clearSuccess());
+      // Navigate to products list after successful creation
+      setTimeout(() => {
+        navigate('/vendor/products');
+      }, 1500); // Wait 1.5 seconds to show success message
       // Reset form after successful submission
       setCategory('');
       setSubcategory('');
@@ -164,7 +168,7 @@ const AddProduct = () => {
       setSnackbar({ open: true, message: errorMessage, severity: 'error' });
       dispatch(clearError());
     }
-  }, [success, error, message, dispatch]);
+  }, [success, error, message, dispatch, navigate]);
 
   // File handling
   const handleFileChange = (e) => {
@@ -256,51 +260,70 @@ const AddProduct = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validate()) {
+      console.log('Validation failed. Form errors:', formError);
       setSnackbar({ open: true, message: 'Please fill all required fields.', severity: 'error' });
       return;
     }
+
+    console.log('Validation passed. Proceeding with FormData creation.');
 
     // Get vendor ID from localStorage or context
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const vendorId = user.id || user._id || user.vendorId || '';
 
-    // Prepare product data for Redux
+    // Debug: Check form values
+    console.log('Form values before FormData creation:', {
+      productName,
+      description,
+      price,
+      category,
+      subcategory,
+      priceLabel,
+      gst,
+      hsnCode,
+      brandName,
+      benefits,
+      expiresOn,
+      mrpPrice,
+      bulkDiscount,
+      shelfLife,
+      country,
+      howToUse,
+      sideEffects,
+      manufacturer,
+      mediguardEssentials,
+      thumbnail: thumbnail ? thumbnail.name : null,
+      files: files.map(f => f.name)
+    });
+
+    // Prepare product data as plain object (ProductReducer will create FormData)
     const productData = {
       name: productName,
       description: description,
       price: price,
       category: category,
-      subCategoryId: subcategory,
-      postedBy: vendorId,
-      priceLable: priceLabel,
+      subcategory: subcategory,
+      priceLabel: priceLabel, // ProductReducer expects priceLabel, not priceLable
       gst: gst,
       hsnCode: hsnCode,
       brandName: brandName,
       benefits: benefits,
       expiresOn: expiresOn,
-      additionalInformation: [
-        { name: 'mrpPrice', value: mrpPrice },
-        { name: 'bulkDiscount', value: bulkDiscount },
-        { name: 'shelfLife', value: shelfLife },
-        { name: 'country', value: country },
-        { name: 'howToUse', value: howToUse },
-        { name: 'sideEffects', value: sideEffects },
-        { name: 'manufacturer', value: manufacturer },
-        { name: 'mediguardEssentials', value: mediguardEssentials },
-      ],
-      thumbnailImage: thumbnail,
-      galleryImage: files,
-      files: files,
-      thumbnail: thumbnail
+      shelfLife: shelfLife,
+      country: country,
+      howToUse: howToUse,
+      sideEffects: sideEffects,
+      manufacturer: manufacturer,
+      mediguardEssentials: mediguardEssentials,
+      mrpPrice: mrpPrice,
+      bulkDiscount: bulkDiscount,
+      thumbnail: thumbnail,
+      files: files
     };
 
-    console.log('Vendor ID:', vendorId);
-    console.log('User data from localStorage:', user);
-    console.log('Price Label value:', priceLabel);
-    console.log('Price Label type:', typeof priceLabel);
-    console.log('Submitting product data:', productData);
+    console.log('Submitting product data as plain object:', productData);
 
-    // Dispatch the action
+    // Dispatch the action with plain object
     dispatch(createProductData(productData));
   };
 

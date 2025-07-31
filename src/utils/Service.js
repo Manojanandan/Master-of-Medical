@@ -58,8 +58,38 @@ export const getProductById = async(productId) =>{
 }
 
 export const updateProduct = async(productId, data) =>{
-    return await instance.put(`product/update-product/${productId}`, data)
-}
+    try {
+        const token = localStorage.getItem('token');
+        
+        // If data is FormData, append the product ID
+        if (data instanceof FormData) {
+            data.append('id', productId);
+        } else {
+            // If data is a plain object, create FormData and add the ID
+            const formData = new FormData();
+            formData.append('id', productId);
+            
+            // Add all other data to FormData
+            Object.keys(data).forEach(key => {
+                if (data[key] !== undefined && data[key] !== null) {
+                    formData.append(key, data[key]);
+                }
+            });
+            
+            data = formData;
+        }
+        
+        const response = await instance.put(`/product/update-product`, data, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
 
 // Public product APIs (for e-commerce)
 export const getPublicProducts = async(params = {}) =>{
