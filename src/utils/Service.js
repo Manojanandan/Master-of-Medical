@@ -1,3 +1,4 @@
+
 import { instance } from "./Instance";
 
 //vendor creation
@@ -18,6 +19,8 @@ export const userLogin = async(data,type) =>{
     }
 
 }
+
+
 
 //vendor profile APIs
 export const getVendorProfile = async(vendorId) =>{
@@ -146,7 +149,7 @@ export const createAddress = async(addressData) =>{
 }
 
 export const updateAddress = async(addressData) =>{
-    return await instance.put('address/update-address', addressData)
+    return await instance.put(`address/update-address/${addressData.id}`, addressData);
 }
 
 export const deleteAddress = async(addressId) =>{
@@ -211,4 +214,14 @@ export const getAllSubcategories = async(categoryId) =>{
 
 export const getAllCategoriesAndSubcategories = async() =>{
     return await instance.get('product/get-all-catagory-subcatagory')
+}
+// Support Query API
+export const createSupportQuery = async (data) => {
+  // Direct external API call, not using local instance
+  const response = await fetch('http://luxcycs.com:5500/support-query/create-query', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  return response;
 }

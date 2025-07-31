@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { CountrySelect, StateSelect, CitySelect } from "react-country-state-city";
 import "react-country-state-city/dist/react-country-state-city.css";
-import styles from '../Profile.module.css';
+import styles from '../AddressDialog.module.css';
+
 
 const AddressDialog = ({
   addressDialogOpen,
@@ -11,32 +12,26 @@ const AddressDialog = ({
   handleAddressInputChange,
   handleSaveAddress
 }) => {
-  // Country, State, City dropdown states
   const [country, setCountry] = useState(null);
   const [currentState, setCurrentState] = useState(null);
   const [currentCity, setCurrentCity] = useState(null);
 
-  // Handle country selection
   const handleCountryChange = (_country) => {
     setCountry(_country);
     handleAddressInputChange('country', _country?.name || "");
-    // Reset state and city when country changes
     setCurrentState(null);
     setCurrentCity(null);
     handleAddressInputChange('state', "");
     handleAddressInputChange('city', "");
   };
 
-  // Handle state selection
   const handleStateChange = (_state) => {
     setCurrentState(_state);
     handleAddressInputChange('state', _state?.name || "");
-    // Reset city when state changes
     setCurrentCity(null);
     handleAddressInputChange('city', "");
   };
 
-  // Handle city selection
   const handleCityChange = (_city) => {
     setCurrentCity(_city);
     handleAddressInputChange('city', _city?.name || "");
@@ -47,25 +42,23 @@ const AddressDialog = ({
       {addressDialogOpen && (
         <div className={styles.modalOverlay} onClick={closeAddressDialog}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            {/* Modal Header */}
             <div className={styles.modalHeader}>
               <div className={styles.modalTitle}>
-                <svg viewBox="0 0 24 24" fill="currentColor" className={styles.locationIcon}>
+                <svg viewBox="0 0 24 24" className={styles.locationIcon}>
                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                 </svg>
                 <span>{editingAddress ? 'Edit Address' : 'Add New Address'}</span>
               </div>
               <button className={styles.closeButton} onClick={closeAddressDialog}>
-                <svg viewBox="0 0 24 24" fill="currentColor">
+                <svg viewBox="0 0 24 24">
                   <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
                 </svg>
               </button>
             </div>
 
-            {/* Modal Body */}
             <div className={styles.modalBody}>
               <div className={styles.addressForm}>
-                <div className={styles.formGroup}>
+                <div className={`${styles.formGroup} ${styles.fullWidth}`}>
                   <label className={styles.formLabel}>
                     Street Address <span className={styles.required}>*</span>
                   </label>
@@ -135,10 +128,22 @@ const AddressDialog = ({
                     />
                   </div>
                 </div>
+
+                <div className={styles.checkboxContainer}>
+                  <input
+                    type="checkbox"
+                    id="defaultAddress"
+                    className={styles.checkbox}
+                    checked={addressForm.isDefault}
+                    onChange={(e) => handleAddressInputChange('isDefault', e.target.checked)}
+                  />
+                  <label htmlFor="defaultAddress" className={styles.checkboxLabel}>
+                    Set as default shipping address
+                  </label>
+                </div>
               </div>
             </div>
 
-            {/* Modal Footer */}
             <div className={styles.modalFooter}>
               <button className={`${styles.button} ${styles.buttonSecondary}`} onClick={closeAddressDialog}>
                 Cancel
@@ -154,4 +159,4 @@ const AddressDialog = ({
   );
 };
 
-export default AddressDialog; 
+export default AddressDialog;

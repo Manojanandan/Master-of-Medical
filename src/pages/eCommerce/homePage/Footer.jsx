@@ -1,452 +1,408 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react';
 import {
-    Box,
-    Typography,
-    TextField,
-    Button,
-    InputAdornment,
-    Grid,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemText,
-  } from '@mui/material';
-  import MailIcon from '@mui/icons-material/Mail';
-  import PhoneInTalkIcon from '@mui/icons-material/PhoneInTalk';
-  import FacebookIcon from '@mui/icons-material/Facebook';
-  import TwitterIcon from '@mui/icons-material/Twitter';
-  import InstagramIcon from '@mui/icons-material/Instagram';
-  import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import { Link, useNavigate } from 'react-router-dom';
+  Box,
+  Typography,
+  Grid,
+  List,
+  ListItem,
+  ListItemText,
+  Skeleton,
+  Fade,
+} from '@mui/material';
+import PhoneInTalkIcon from '@mui/icons-material/PhoneInTalk';
+import MailIcon from '@mui/icons-material/Mail';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import TwitterIcon from '@mui/icons-material/Twitter';
+import InstagramIcon from '@mui/icons-material/Instagram';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import YouTubeIcon from '@mui/icons-material/YouTube';
+import { useNavigate } from 'react-router-dom';
+import { useTheme, useMediaQuery } from '@mui/material';
+import { getAllCategoriesAndSubcategories } from '../../../utils/Service';
+
+const colors = {
+  primary: '#de3b6f',
+  secondary: '#f49507',
+  accent: '#873589',
+  background: '#fff',
+  border: '#f1ac1b',
+  text: '#22223b',
+  lightText: '#6b7280',
+  lightBg: '#f8f9fa',
+};
 
 const Footer = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  // Categories state
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setLoadingCategories(true);
+      try {
+        const response = await getAllCategoriesAndSubcategories();
+        if (response.data.success) {
+          setCategories(response.data.data);
+        } else {
+          console.error('Failed to fetch categories:', response.data);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
   return (
-    <React.Fragment>
-        <Box
+    <Box
+      sx={{
+        backgroundColor: colors.lightBg,
+        width: '100vw',
+        borderTop: `1px solid ${colors.border}`,
+        pt: { xs: 2, sm: 3 },
+        pb: { xs: 2, sm: 3 },
+      }}
+    >
+      {/* Main Content Section */}
+      <Box
         sx={{
-          backgroundColor:'#f3f4f6',
-          border:'solid 1px transparent'
+          width: '100%',
+          maxWidth: '1920px',
+          mx: 'auto',
+          px: { xs: 2, sm: 4 },
+          pb: { xs: 2, sm: 3 },
+          borderBottom: `1px solid ${colors.border}`,
         }}
       >
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              width: '97%',
-              borderBottom: 'solid 1.5px #2424',
-              alignItems:'center',
-              padding: '2% 0 3%',
-              margin:'2%'
-            }}
-          >
-            <Box sx={{ width: '50%',padding:'0 15px' }}>
-              <Typography
-                variant="h6"
-                component="h6"
-                sx={{ marginBottom: '2px',fontWeight:'bold' }}
-              >
-                Join our newsletter 
-              </Typography>
-              <Typography variant="p" component="p" sx={{ fontSize: '14px',color: '#9a9fa8' }}>
-                Register how to get latest updates on promotions & coupons.Don't worry,we are not spam!
-              </Typography>
-            </Box>
-
-            <Box sx={{ width: '42%', textAlign:'end',padding:'0px 15px' }}> 
-                <TextField
-                  id="outlined-basic"
-                  placeholder="Email"
-                  variant="outlined"
-                  size="small"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <MailIcon sx={{ color: 'gray' }} /> {/* Email Icon */}
-                      </InputAdornment>
-                    ),
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <Button
-                          variant="text"
-                          sx={{ backgroundColor: 'blue', color: 'white', }}
-                        >
-                          Send
-                        </Button>
-                      </InputAdornment>
-                    ),
-                    sx: {
-                      paddingRight: 0, 
-                      marginBottom: '10px',
-                      backgroundColor:'#fff',
-                      width:'350px'
-                    },
-                  }}
-                />
-                <Typography variant="p" component="p" sx={{ fontSize: 13,color: '#9a9fa8' }}>
-                  By subscribing you agree to our <Link to='/legal/terms-of-use' style={{fontWeight:'bold'}}>Terms & Conditions and </Link><Link to='/legal/privacy-policy' style={{fontWeight:'bold'}}>Privacy Policy </Link><Link to='/customer/cookies-policy' style={{fontWeight:'bold'}}>& Cookies Policy.</Link>
+        <Grid
+          container
+          spacing={{ xs: 3, sm: 4 }} // Increased spacing for better separation
+          columns={{ xs: 4, sm: 5, md: 5 }} // 5 columns in a single row
+          sx={{ justifyContent: 'space-between' }} // Ensure even distribution
+        >
+          {/* Need Help Section */}
+          <Grid item xs={4} sm={1} md={1} sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            <List disablePadding>
+              <ListItem disablePadding>
+                <Typography
+                  variant="h6"
+                  sx={{ fontSize: 15, fontWeight: 600, color: colors.text }}
+                >
+                  Need Help?
                 </Typography>
-              </Box>
-          </Box>
-          <Box
-            sx={{
-              borderBottom: 'solid 1.5px #2424',
-              width: '97%',
-              margin:'2%',
-              paddingBottom: '2%',
-            }}
-          >
-            <Grid
-              container
-              spacing={{ xs: 2, md: 3 }}
-              columns={{ xs: 4, sm: 8, md: 12 }}
-            >
-              <Grid item size={{ xs: 2, md: 2.5, sm: 3 }}>
-                <List>
-                  <ListItem>
+              </ListItem>
+              <ListItem disablePadding>
+                <Typography
+                  variant="body2"
+                  sx={{ fontSize: 13, color: colors.lightText, mt: 0.5 }}
+                >
+                  We're available to answer your queries and assist with your orders.
+                </Typography>
+              </ListItem>
+              <ListItem disablePadding sx={{ mt: 1.5 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <PhoneInTalkIcon sx={{ fontSize: 22, color: colors.primary }} />
+                  <Box>
                     <Typography
-                      variant="h6"
-                      component="h6"
-                      sx={{ fontSize: 14, fontWeight: 'bold', }}
+                      variant="body2"
+                      sx={{ fontSize: 12, color: colors.lightText }}
                     >
-                      Do you need help ?
+                      Monday - Friday: 8am-9pm
                     </Typography>
-                  </ListItem>
-                  <ListItem>
-                    <Typography variant="p" component="p" sx={{ fontSize: 13, color:'#6b7280',  }}>
-                      simply dummy text of the printing and typesetting
-                      industry. Lorem Ipsum
-                    </Typography>
-                  </ListItem>
-                  <ListItem>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'start',
-                        gap: '10%',
-                      }}
-                    >
-                      <Box>
-                        <PhoneInTalkIcon sx={{ fontSize: 25,marginLeft:'30%',marginTop:'20%' }} />
-                      </Box>
-                      <Box sx={{ display: 'flex', flexDirection: 'Column', }}>
-                        <Typography
-                          variant="p"
-                          component="p"
-                          sx={{ fontSize: 12,color:'#6b7280',width:'150px' }}
-                        >
-                          Monday - friday: 8am-9pm
-                        </Typography>
-                        <Typography
-                          variant="h6"
-                          component="h6"
-                          sx={{ fontSize: 17, fontWeight: 'bold' }}
-                        >
-                          +91-XXXXXXXXXX
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </ListItem>
-                  <ListItem>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        gap: '10%',
-                      }}
-                    >
-                      <Box>
-                        <MailIcon sx={{ color: 'gray',marginLeft:'30%' }} />
-                      </Box>
-                      <Box sx={{ display: 'flex', flexDirection: 'Column' }}>
-                        <Typography
-                          variant="p"
-                          component="p"
-                          sx={{ fontSize: 12,width: '160px' }}
-                        >
-                          Need help with your order ?
-                        </Typography>
-                        <Typography
-                          variant="h6"
-                          component="h6"
-                          sx={{ fontSize: 14, fontWeight: 'bold' }}
-                        >
-                          support@masterofmedical.in
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </ListItem>
-                </List>
-              </Grid>
-              <Grid item size={{ xs: 2, md: 2.5, sm: 2.5 }}>
-                <List >
-                  <ListItem disableGutters>
                     <Typography
-                      variant="h6"
-                      component="h6"
-                      sx={{ fontSize: 14, fontWeight: 'bold' }}
+                      variant="subtitle1"
+                      sx={{ fontSize: 16, fontWeight: 600, color: colors.text }}
                     >
-                      Legal & Policies
+                      +91-XXXXXXXXXX
                     </Typography>
-                  </ListItem>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{ fontSize: 16, fontWeight: 600, color: colors.text, mt: 0.5 }}
+                    >
+                      +91-YYYYYYYYYY
+                    </Typography>
+                  </Box>
+                </Box>
+              </ListItem>
+              <ListItem disablePadding sx={{ mt: 1.5 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <MailIcon sx={{ fontSize: 22, color: colors.primary }} />
+                  <Box>
+                    <Typography
+                      variant="body2"
+                      sx={{ fontSize: 12, color: colors.lightText }}
+                    >
+                      Need help with your order?
+                    </Typography>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{ fontSize: 14, fontWeight: 600, color: colors.text }}
+                    >
+                      support@masterofmedical.in
+                    </Typography>
+                  </Box>
+                </Box>
+              </ListItem>
+            </List>
+          </Grid>
 
-                  {[
-                    { text: 'Terms & Conditions', path: '/ecommerceDashboard/terms-conditions' },
-                    { text: 'Privacy Policy', path: '/ecommerceDashboard/privacy-policy' },
-                    { text: 'Cookies Policy', path: '/ecommerceDashboard/cookies-policy' },
-                    { text: 'Disclaimer', path: '/ecommerceDashboard/disclaimer' },
-                    { text: 'Returns & Refunds', path: '/ecommerceDashboard/returns-refunds' },
-                    { text: 'Shipping Policy', path: '#' },
-                    { text: 'Payment Terms', path: '#' },
-                    { text: 'Data Protection', path: '#' },
-                  ].map((item, index) => (
-                    <ListItem
-                      key={index}
-                      disableGutters
-                      sx={{ padding: '0px 0' }}
-                    >
-                      <ListItemButton
-                        onClick={() => navigate(item.path)}
-                        sx={{ padding: '0px 0' }}
-                      >
-                        <ListItemText
-                          sx={{ marginBottom: '2px', marginTop: '2px' }}
-                          primary={
-                            <Typography variant="body1" sx={{ fontSize: 13, color:'#6b7280', '&:hover': { color: '#de3b6f' } }}>
-                              {item.text}
-                            </Typography>
-                          }
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  ))}
-                </List>
-              </Grid>
-              <Grid item size={{ xs: 2, md: 2, sm: 2.5 }}>
-                <List >
-                  <ListItem disableGutters >
-                    <Typography
-                      variant="h6"
-                      component="h6"
-                      sx={{ fontSize: 14, fontWeight: 'bold' }}
-                    >
-                      Customer Support
-                    </Typography>
-                  </ListItem>
-
-                  {[
-                    { text: 'Help & Support', path: '/ecommerceDashboard/help-support' },
-                    { text: 'Order Tracking', path: '/ecommerceDashboard/order-tracking' },
-                    { text: 'Returns & Refunds', path: '/ecommerceDashboard/returns-refunds' },
-                    { text: 'FAQ', path: '/ecommerceDashboard/faq' },
-                    { text: 'Contact Us', path: '/ecommerceDashboard/contact' },
-                    { text: 'Shipping Info', path: '#' },
-                    { text: 'Payment Methods', path: '#' },
-                    { text: 'Size Guide', path: '#' },
-                  ].map((item, index) => (
-                    <ListItem
-                      key={index}
-                      disableGutters
-                      sx={{ padding: '0px 0' }}
-                    >
-                      <ListItemButton
-                        onClick={() => navigate(item.path)}
-                        sx={{ padding: '0px 0' }}
-                      >
-                        <ListItemText
-                          sx={{ marginBottom: '2px', marginTop: '2px' }}
-                          primary={
-                            <Typography variant="body1" sx={{ fontSize: 13, color:'#6b7280', '&:hover': { color: '#de3b6f' } }}>
-                              {item.text}
-                            </Typography>
-                          }
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  ))}
-                </List>
-              </Grid>
-              <Grid item size={{ xs: 2, md: 2, sm: 3 }}>
-                <List>
-                  <ListItem disableGutters >
-                    <Typography
-                      variant="h6"
-                      component="h6"
-                      sx={{ fontSize: 14, fontWeight: 'bold' }}
-                    >
-                      Company
-                    </Typography>
-                  </ListItem>
-
-                  {[
-                    { text: 'About Us', path: '/ecommerceDashboard/about-us' },
-                    { text: 'Contact Us', path: '/ecommerceDashboard/contact' },
-                    { text: 'Blog', path: '/ecommerceDashboard/blog' },
-                    { text: 'Careers', path: '#' },
-                    { text: 'Press & Media', path: '#' },
-                    { text: 'Partnerships', path: '#' },
-                    { text: 'Investor Relations', path: '#' },
-                    { text: 'Sustainability', path: '#' },
-                  ].map((item, index) => (
-                    <ListItem
-                      key={index}
-                      disableGutters
-                      sx={{ padding: '0px 0' }}
-                    >
-                      <ListItemButton
-                        onClick={() => navigate(item.path)}
-                        sx={{ padding: '0px 0' }}
-                      >
-                        <ListItemText
-                          sx={{ marginBottom: '2px', marginTop: '2px' }}
-                          primary={
-                            <Typography variant="body1" sx={{ fontSize: 13, color:'#6b7280', '&:hover': { color: '#de3b6f' } }}>
-                              {item.text}
-                            </Typography>
-                          }
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  ))}
-                </List>
-              </Grid>
-              <Grid item size={{ xs: 2, md: 2, sm: 2.5 }}>
-                <List>
-                  <ListItem sx={{ paddingLeft: '0px' }}>
-                    <Typography
-                      variant="h6"
-                      component="h6"
-                      sx={{ fontSize: 14, fontWeight: 'bold' }}
-                    >
-                      Download our app
-                    </Typography>
-                  </ListItem>
-                  <ListItem
-                    sx={{ paddingLeft: '0px', display: 'flex', gap: '10px',width:'300px' }}
-                  >
-                    <img
-                      component="img"
-                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Google_Play_Store_badge_EN.svg/2560px-Google_Play_Store_badge_EN.svg.png"
-                      alt="Google Play"
-                      height='50px'
-                      width='130px'
-                      loading="lazy"
-                      sx={{
-                        width: {
-                          xs: '65px',
-                          sm: '70px',
-                          md: '85px',
-                          lg: '85px',
-                        },
-                        height: 'auto',
-                      }}
-                    />
-                    <Box sx={{ gap: '10px',width:'150px' }}>
+          {/* Explore More */}
+          <Grid item xs={4} sm={1} md={1} sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            <List disablePadding>
+              <ListItem disablePadding>
+                <Typography
+                  variant="h6"
+                  sx={{ fontSize: 15, fontWeight: 600, color: colors.text }}
+                >
+                  Explore More
+                </Typography>
+              </ListItem>
+              {[
+                { text: 'Home', route: '/ecommerceDashboard' },
+                { text: 'About us', route: '/ecommerceDashboard/about' },
+                { text: 'Shop', route: '/ecommerceDashboard/shop' },
+                { text: 'Blogs', route: '/ecommerceDashboard/blogs' },
+                { text: 'Contact us', route: '/ecommerceDashboard/contact' },
+              ].map((item, index) => (
+                <ListItem key={index} disablePadding sx={{ py: 0.3 }}>
+                  <ListItemText
+                    primary={
                       <Typography
-                        variant="p"
-                        component="p"
-                        sx={{ fontSize: 13, fontWeight: 'bold',color:'#6b7280', }}
+                        variant="body2"
+                        sx={{
+                          fontSize: 13,
+                          color: colors.lightText,
+                          cursor: 'pointer',
+                          '&:hover': { color: colors.primary, textDecoration: 'underline' },
+                          transition: 'all 0.2s ease',
+                        }}
+                        onClick={() => navigate(item.route)}
                       >
-                        Download App Get -20% Discount
+                        {item.text}
                       </Typography>
-                    </Box>
+                    }
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </Grid>
+
+          {/* Categories Section */}
+          <Grid item xs={4} sm={1} md={1} sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            <List disablePadding>
+              <ListItem disablePadding>
+                <Typography
+                  variant="h6"
+                  sx={{ fontSize: 15, fontWeight: 600, color: colors.text }}
+                >
+                  Categories
+                </Typography>
+              </ListItem>
+              {loadingCategories ? (
+                Array.from({ length: 8 }).map((_, index) => (
+                  <ListItem key={index} disablePadding>
+                    <Fade in={true} timeout={300 + index * 100}>
+                      <Skeleton variant="text" width={80} height={20} />
+                    </Fade>
                   </ListItem>
-                  <ListItem
-                    sx={{
-                      paddingLeft: '0px',
-                      display: 'flex',
-                      gap: '10px',
-                      paddingBottom: '50px',
-                      width:'300px'
-                    }}
-                  >
-                    <img
-                      component="img"
-                      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzRNHdGo9kEMQfYp97VJI-cGl0FOb6NiCY3w&s"
-                      alt="Google Play"
-                      height='50px'
-                      width='130px'
-                      loading="lazy"
-                      sx={{
-                        width: {
-                          xs: '65px',
-                          sm: '70px',
-                          md: '85px',
-                          lg: '85px',
-                        },
-                        height: 'auto',
-                      }}
-                    />
-                    <Box sx={{width:'150px'}}>
-                      <Typography
-                        variant="p"
-                        component="p"
-                        sx={{ fontSize: 13, fontWeight: 'bold',color:'#6b7280', }}
-                      >
-                        Download App Get -20% Discount
-                      </Typography>
-                    </Box>
-                  </ListItem>
-                  <ListItem sx={{ padding: '0px 2px' }}>
+                ))
+              ) : categories.length > 0 ? (
+                categories.map((item, index) => (
+                  <ListItem key={item.id || index} disablePadding sx={{ py: 0.3 }}>
                     <ListItemText
                       primary={
-                        <Typography variant="body1" sx={{ fontSize: 12 }}>
-                          Follow us on Social Media
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontSize: 13,
+                            color: colors.lightText,
+                            cursor: 'pointer',
+                            '&:hover': { color: colors.primary, textDecoration: 'underline' },
+                            transition: 'all 0.2s ease',
+                          }}
+                          title={item.name}
+                        >
+                          {item.name}
                         </Typography>
                       }
                     />
                   </ListItem>
-                  <Box sx={{ display: 'flex',justifyContent:'space-around',width:'150px',marginTop:'2%' }}>
-                    <Box>
-                      <FacebookIcon sx={{ color: 'blue', fontSize: 28, }} />
-                    </Box>
-                    <Box>
-                      <TwitterIcon sx={{ color: 'skyblue', fontSize: 28 }} />
-                    </Box>
-                    <Box>
-                      <InstagramIcon sx={{ color: 'pink', fontSize: 28 }} />
-                    </Box>
-                    <Box>
-                      <LinkedInIcon sx={{ color: 'blue', fontSize: 28 }} />
-                    </Box>
-                  </Box>
-                </List>
-              </Grid>
-            </Grid>
-          </Box>
-          <Box sx={{ display: 'flex',width: '97%', margin:'2%',justifyContent:'space-between'}}>
-            <Box sx={{ width: '50%' }}>
-              <Typography variant="p" component="p" sx={{ fontSize: 13, color:'#6b7280', }}>
-                Copyright 2025 © Master Of Medcal 
+                ))
+              ) : (
+                <ListItem disablePadding>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      fontSize: 12,
+                      color: colors.lightText,
+                      textAlign: 'center',
+                      mt: 2,
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    No categories available
+                  </Typography>
+                </ListItem>
+              )}
+            </List>
+          </Grid>
+
+          {/* Help & Support */}
+          <Grid item xs={4} sm={1} md={1} sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            <List disablePadding>
+              <ListItem disablePadding>
+                <Typography
+                  variant="h6"
+                  sx={{ fontSize: 15, fontWeight: 600, color: colors.text }}
+                >
+                  Help & Support
+                </Typography>
+              </ListItem>
+              {[
+                { text: 'FAQ', route: '/ecommerceDashboard/faq' },
+                { text: 'Returns and refunds policy', route: '/ecommerceDashboard/returns-refunds' },
+                { text: 'Order tracking', route: '/ecommerceDashboard/orderTracking' },
+                { text: 'Disclaimer', route: '/ecommerceDashboard/disclaimer' },
+                { text: 'Terms of use', route: '/ecommerceDashboard/termsofuse' },
+                { text: 'Privacy policy', route: '/ecommerceDashboard/privacyPolicy' },
+                { text: 'Cookies Policy', route: '/ecommerceDashboard/cookies-policy' },
+              ].map((item, index) => (
+                <ListItem key={index} disablePadding sx={{ py: 0.3 }}>
+                  <ListItemText
+                    primary={
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontSize: 13,
+                          color: colors.lightText,
+                          cursor: 'pointer',
+                          '&:hover': { color: colors.primary, textDecoration: 'underline' },
+                          transition: 'all 0.2s ease',
+                        }}
+                        onClick={() => navigate(item.route)}
+                      >
+                        {item.text}
+                      </Typography>
+                    }
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </Grid>
+
+          {/* Connect with Us & Download App */}
+          <Grid item xs={4} sm={1} md={1} sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            <Box sx={{ mb: 3 }}>
+              <Typography
+                variant="h6"
+                sx={{ fontSize: 15, fontWeight: 600, color: colors.text, mb: 1 }}
+              >
+                Download Our App
               </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Box
+                  component="img"
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Google_Play_Store_badge_EN.svg/2560px-Google_Play_Store_badge_EN.svg.png"
+                  alt="Google Play"
+                  sx={{
+                    width: { xs: '110px', sm: '120px' },
+                    height: 'auto',
+                    cursor: 'pointer',
+                    '&:hover': { opacity: 0.8 },
+                    transition: 'opacity 0.3s ease',
+                  }}
+                  onClick={() => window.open('https://play.google.com/store', '_blank')}
+                />
+                <Box
+                  component="img"
+                  src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
+                  alt="App Store"
+                  sx={{
+                    width: { xs: '110px', sm: '120px' },
+                    height: 'auto',
+                    cursor: 'pointer',
+                    '&:hover': { opacity: 0.8 },
+                    transition: 'opacity 0.3s ease',
+                  }}
+                  onClick={() => window.open('https://www.apple.com/app-store/', '_blank')}
+                />
+              </Box>
             </Box>
-            <Box sx={{ width: '30%', textAlign: 'center',color:'blue' }}>
-              <Typography variant="p" component="p" sx={{ fontSize: 13,color:'blue',cursor:'pointer'  }}>
-                <span
 
-                  style={{ textDecoration: 'underline', marginRight: '6px' }} onClick={()=>navigate('/legal/terms-of-use')}
-                >
-                  Terms & Conditions
-                </span>{' '}
-                <span
-                  style={{ textDecoration: 'underline', marginRight: '6px' }} onClick={()=>navigate('/legal/privacy-policy')}
-                >
-                  Privacy Policy
-                </span>{' '}
-                <span
-
-                  style={{ textDecoration: 'underline', marginRight: '6px' }} onClick={()=>navigate('/customer/order-tracking')}
-                >
-                  Order Tracking
-                </span>
+            <Box>
+              <Typography
+                variant="h6"
+                sx={{ fontSize: 15, fontWeight: 600, color: colors.text, mb: 1 }}
+              >
+                Follow Us
               </Typography>
+              <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+                {[
+                  { Icon: FacebookIcon, url: 'https://www.facebook.com', color: '#4267B2' },
+                  { Icon: TwitterIcon, url: 'https://www.twitter.com', color: '#1DA1F2' },
+                  { Icon: InstagramIcon, url: 'https://www.instagram.com', color: '#E1306C' },
+                  { Icon: LinkedInIcon, url: 'https://www.linkedin.com', color: '#0077B5' },
+                  { Icon: YouTubeIcon, url: 'https://www.youtube.com', color: '#FF0000' },
+                ].map(({ Icon, url, color }, index) => (
+                  <Icon
+                    key={index}
+                    sx={{
+                      fontSize: 28,
+                      color,
+                      cursor: 'pointer',
+                      '&:hover': { color: colors.primary, transform: 'scale(1.1)' },
+                      transition: 'all 0.3s ease',
+                    }}
+                    onClick={() => window.open(url, '_blank')}
+                    aria-label={`Visit our ${Icon.name} page`}
+                    role="link"
+                  />
+                ))}
+              </Box>
             </Box>
-          </Box>
-      ` </Box>
-    </React.Fragment>
-  )
-}
+          </Grid>
+        </Grid>
+      </Box>
 
-export default Footer
+      {/* Bottom Section */}
+      <Box
+        sx={{
+          width: '100%',
+          maxWidth: '1920px',
+          mx: 'auto',
+          px: { xs: 2, sm: 4 },
+          py: { xs: 1.5, sm: 2 },
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          justifyContent: 'space-between',
+          alignItems: { xs: 'flex-start', sm: 'center' },
+          gap: 2,
+          
+        }}
+      >
+        <Typography 
+          variant="body2" 
+          sx={{ 
+            fontSize: 13, 
+            color: colors.lightText, 
+            width: '100%',
+            textAlign: 'center',
+          }}
+        >
+          Copyright 2025 © Master of Medical
+        </Typography>
+
+      </Box>
+    </Box>
+  );
+};
+
+export default Footer;

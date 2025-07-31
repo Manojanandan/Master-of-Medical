@@ -130,6 +130,7 @@ const BestSeller = () => {
                 image={product.image} 
                 badge={product.badge} 
                 title={product.title} 
+                
                 rating={product.rating} 
                 price={product.price} 
                 originalPrice={product.originalPrice}
