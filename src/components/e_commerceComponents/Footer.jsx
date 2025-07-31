@@ -64,7 +64,7 @@ const Footer = () => {
   return (
     <Box
       sx={{
-        backgroundColor:" #f79300",
+        backgroundColor: colors.lightBg,
         width: '100vw',
         borderTop: `1px solid ${colors.border}`,
         pt: { xs: 2, sm: 3 },
