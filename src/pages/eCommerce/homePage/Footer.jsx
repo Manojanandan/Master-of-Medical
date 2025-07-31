@@ -166,11 +166,11 @@ const Footer = () => {
                 </Typography>
               </ListItem>
               {[
-                { text: 'Home', route: '/ecommerceDashboard' },
-                { text: 'About us', route: '/ecommerceDashboard/about' },
-                { text: 'Shop', route: '/ecommerceDashboard/shop' },
-                { text: 'Blogs', route: '/ecommerceDashboard/blogs' },
-                { text: 'Contact us', route: '/ecommerceDashboard/contact' },
+                { text: 'Home', route: '/customer' },
+                { text: 'About us', route: '/customer/about' },
+                { text: 'Shop', route: '/customer/shop' },
+                { text: 'Blogs', route: '/customer/blogs' },
+                { text: 'Contact us', route: '/customer/contact' },
               ].map((item, index) => (
                 <ListItem key={index} disablePadding sx={{ py: 0.3 }}>
                   <ListItemText
@@ -267,13 +267,13 @@ const Footer = () => {
                 </Typography>
               </ListItem>
               {[
-                { text: 'FAQ', route: '/ecommerceDashboard/faq' },
-                { text: 'Returns and refunds policy', route: '/ecommerceDashboard/returns-refunds' },
-                { text: 'Order tracking', route: '/ecommerceDashboard/orderTracking' },
-                { text: 'Disclaimer', route: '/ecommerceDashboard/disclaimer' },
-                { text: 'Terms of use', route: '/ecommerceDashboard/termsofuse' },
-                { text: 'Privacy policy', route: '/ecommerceDashboard/privacyPolicy' },
-                { text: 'Cookies Policy', route: '/ecommerceDashboard/cookies-policy' },
+                { text: 'FAQ', route: '/customer/faq' },
+                { text: 'Returns and refunds policy', route: '/customer/returns-refunds' },
+                { text: 'Order tracking', route: '/customer/orderTracking' },
+                { text: 'Disclaimer', route: '/customer/disclaimer' },
+                { text: 'Terms of use', route: '/customer/termsofuse' },
+                { text: 'Privacy policy', route: '/customer/privacyPolicy' },
+                { text: 'Cookies Policy', route: '/customer/cookies-policy' },
               ].map((item, index) => (
                 <ListItem key={index} disablePadding sx={{ py: 0.3 }}>
                   <ListItemText

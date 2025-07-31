@@ -281,7 +281,7 @@ const ProductDetail = () => {
         <Box sx={{ mb: 3 }}>
           <Button
             startIcon={<ArrowBack />}
-            onClick={() => navigate('/ecommerceDashboard')}
+            onClick={() => navigate('/customer')}
             sx={{ color: '#666', fontWeight: 500 }}
           >
             Back to Products
@@ -300,7 +300,7 @@ const ProductDetail = () => {
         <Box sx={{ mb: 3 }}>
           <Button
             startIcon={<ArrowBack />}
-            onClick={() => navigate('/ecommerceDashboard')}
+            onClick={() => navigate('/customer')}
             sx={{ color: '#666', fontWeight: 500 }}
           >
             Back to Products
@@ -457,21 +457,21 @@ const ProductDetail = () => {
                   >
                     <Link
                       color="inherit"
-                      onClick={() => navigate('/ecommerceDashboard')}
+                      onClick={() => navigate('/customer')}
                       sx={{ cursor: 'pointer' }}
                     >
                       Home
                     </Link>
                     <Link
                       color="inherit"
-                      onClick={() => navigate(`/ecommerceDashboard?category=${parsedAdditionalInfo.categoryName}`)}
+                      onClick={() => navigate(`/customer?category=${parsedAdditionalInfo.categoryName}`)}
                       sx={{ cursor: 'pointer' }}
                     >
                       {parsedAdditionalInfo.categoryName || (console.warn('Category name not found in additionalInformation'), 'Category')}
                     </Link>
                     <Link
                       color="inherit"
-                      onClick={() => navigate(`/ecommerceDashboard?subCategory=${subCategoryName}`)}
+                      onClick={() => navigate(`/customer?subCategory=${subCategoryName}`)}
                       sx={{ cursor: 'pointer' }}
                     >
                       {subCategoryName || (console.warn('Subcategory name not found'), 'Sub Category')}
