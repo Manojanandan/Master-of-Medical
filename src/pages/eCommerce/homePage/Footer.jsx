@@ -84,7 +84,7 @@ const Footer = () => {
                   }}
                 />
                 <Typography variant="p" component="p" sx={{ fontSize: 13,color: '#9a9fa8' }}>
-                  By subscribing you agree to our <Link to='/ecommerceDashboard/termsofuse' style={{fontWeight:'bold'}}>Terms & Conditions and </Link><Link to='/ecommerceDashboard/privacyPolicy' style={{fontWeight:'bold'}}>Privacy Policy </Link><Link to='/ecommerceDashboard/cookiesPolicy' style={{fontWeight:'bold'}}>& Cookies Policy.</Link>
+                  By subscribing you agree to our <Link to='/legal/terms-of-use' style={{fontWeight:'bold'}}>Terms & Conditions and </Link><Link to='/legal/privacy-policy' style={{fontWeight:'bold'}}>Privacy Policy </Link><Link to='/customer/cookies-policy' style={{fontWeight:'bold'}}>& Cookies Policy.</Link>
                 </Typography>
               </Box>
           </Box>
@@ -425,22 +425,19 @@ const Footer = () => {
             <Box sx={{ width: '30%', textAlign: 'center',color:'blue' }}>
               <Typography variant="p" component="p" sx={{ fontSize: 13,color:'blue',cursor:'pointer'  }}>
                 <span
-                  style={{ textDecoration: 'underline', marginRight: '6px' }} onClick={()=>navigate('/ecommerceDashboard/terms-conditions')}
+
+                  style={{ textDecoration: 'underline', marginRight: '6px' }} onClick={()=>navigate('/legal/terms-of-use')}
                 >
                   Terms & Conditions
                 </span>{' '}
                 <span
-                  style={{ textDecoration: 'underline', marginRight: '6px' }} onClick={()=>navigate('/ecommerceDashboard/privacy-policy')}
+                  style={{ textDecoration: 'underline', marginRight: '6px' }} onClick={()=>navigate('/legal/privacy-policy')}
                 >
                   Privacy Policy
                 </span>{' '}
                 <span
-                  style={{ textDecoration: 'underline', marginRight: '6px' }} onClick={()=>navigate('/ecommerceDashboard/cookies-policy')}
-                >
-                  Cookies Policy
-                </span>{' '}
-                <span
-                  style={{ textDecoration: 'underline', marginRight: '6px' }} onClick={()=>navigate('/ecommerceDashboard/order-tracking')}
+
+                  style={{ textDecoration: 'underline', marginRight: '6px' }} onClick={()=>navigate('/customer/order-tracking')}
                 >
                   Order Tracking
                 </span>

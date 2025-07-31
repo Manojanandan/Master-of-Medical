@@ -10,8 +10,26 @@ const ThankYou = () => {
 
   useEffect(() => {
     // Scroll to top on component mount
-    window.scrollTo(0, 0);
-  }, []);
+//     window.scrollTo(0, 0);
+//   }, []);
+    // Get order ID from navigation state
+    if (location.state?.orderId) {
+      setOrderId(location.state.orderId);
+    }
+    
+    // Clear cart after successful order
+    dispatch(clearCart());
+  }, [location.state, dispatch]);
+
+  const handleContinueShopping = () => {
+    setLoading(true);
+            navigate('/customer');
+  };
+
+  const handleViewOrders = () => {
+    setLoading(true);
+            navigate('/customer/profile');
+  };
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },

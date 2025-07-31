@@ -291,7 +291,7 @@ const Profile = () => {
     sessionStorage.removeItem('jwt');
     sessionStorage.removeItem('userData');
     sessionStorage.removeItem('userType');
-    navigate('/login');
+    navigate('/');
   };
 
   const handleSectionChange = (section) => {

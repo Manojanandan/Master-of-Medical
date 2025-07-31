@@ -69,7 +69,7 @@ const Navbar = () => {
     if (isLoggedIn) {
       setAnchorEl(event.currentTarget);
     } else {
-      navigate("/login");
+      navigate("/");
     }
   };
 
@@ -79,7 +79,7 @@ const Navbar = () => {
 
   const handleProfileMenuClick = () => {
     handleMenuClose();
-    navigate("/ecommerceDashboard/profile");
+    navigate("/customer/profile");
   };
 
   const handleLogout = () => {
@@ -89,7 +89,7 @@ const Navbar = () => {
     sessionStorage.removeItem("userType");
     setUserInfo(null);
     setIsLoggedIn(false);
-    navigate("/login");
+    navigate("/");
   };
 
   return (
@@ -132,7 +132,7 @@ const Navbar = () => {
                 alignItems: "center",
                 cursor: "pointer",
               }}
-              onClick={() => navigate("/ecommerceDashboard")}
+              onClick={() => navigate("/customer")}
             >
               <img
                 src={Logo}
@@ -228,7 +228,7 @@ const Navbar = () => {
                 alignItems: "center",
                 cursor: "pointer",
               }}
-              onClick={() => navigate("/ecommerceDashboard/cart")}
+              onClick={() => navigate("/customer/cart")}
             >
               <Badge badgeContent={totalItems || 0} color="secondary">
                 <ShoppingCartOutlined color="action" sx={{ fontSize: "2rem" }} />
@@ -343,19 +343,19 @@ const Navbar = () => {
             onClick={() => {
               switch(item) {
                 case "Home":
-                  navigate("/ecommerceDashboard");
+                  navigate("/customer");
                   break;
                 case "Shop":
-                  navigate("/ecommerceDashboard/products");
+                  navigate("/customer/products");
                   break;
                 case "About Us":
-                  navigate("/ecommerceDashboard/about-us");
+                  navigate("/customer/about-us");
                   break;
                 case "Blog":
-                  navigate("/ecommerceDashboard/blog");
+                  navigate("/customer/blog");
                   break;
                 case "Contact":
-                  navigate("/ecommerceDashboard/contact");
+                  navigate("/customer/contact");
                   break;
                 default:
                   break;
@@ -385,7 +385,7 @@ const Navbar = () => {
       <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
         {/* <Box 
           sx={{ display: "flex", alignItems: "center", gap: 0.5, cursor: "pointer" }}
-          onClick={() => navigate("/ecommerceDashboard/products")}
+          onClick={() => navigate("/customer/products")}
         >
           <Typography 
             sx={{ 

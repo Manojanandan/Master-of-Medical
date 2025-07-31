@@ -313,13 +313,14 @@ const ProductDetail = () => {
         <Box sx={{ mb: 3 }}>
           <Button
             startIcon={<ArrowBack />}
-            onClick={() => navigate('/ecommerceDashboard')}
+            onClick={() => navigate('/customer')}
             sx={{ color: '#666', fontWeight: 500 }}
           >
             Back to Products
           </Button>
         </Box>
         <Alert severity="error" sx={{ mb: 2, borderRadius: 1 }}>
+
           {error?.message || 'Failed to load product details'}
         </Alert>
       </Container>
@@ -332,13 +333,14 @@ const ProductDetail = () => {
         <Box sx={{ mb: 3 }}>
           <Button
             startIcon={<ArrowBack />}
-            onClick={() => navigate('/ecommerceDashboard')}
+            onClick={() => navigate('/customer')}
             sx={{ color: '#666', fontWeight: 500 }}
           >
             Back to Products
           </Button>
         </Box>
         <Alert severity="error" sx={{ mb: 2, borderRadius: 1 }}>
+
           Product not found
         </Alert>
       </Container>
@@ -359,26 +361,87 @@ const ProductDetail = () => {
   // ========================================
   
   return (
-    <Box sx={{ bgcolor: '#ffffff', minHeight: '100vh', py: 2 }}>
-      <Container maxWidth="xl" sx={{ px: 3 }}>
+//     <Box sx={{ bgcolor: '#ffffff', minHeight: '100vh', py: 2 }}>
+//       <Container maxWidth="xl" sx={{ px: 3 }}>
         
-        {/* ========================================
-            MAIN PRODUCT SECTION
-        ======================================== */}
-        <Box sx={{
-          bgcolor: 'white',
-          borderRadius: 2,
-          p: 1,
-          mb: 4,
-          mx: { xs: 0, md: 8 }
-        }}>
-          <Grid container spacing={8}>
+//         {/* ========================================
+//             MAIN PRODUCT SECTION
+//         ======================================== */}
+//         <Box sx={{
+//           bgcolor: 'white',
+//           borderRadius: 2,
+//           p: 1,
+//           mb: 4,
+//           mx: { xs: 0, md: 8 }
+//         }}>
+//           <Grid container spacing={8}>
             
-            {/* ========================================
-                LEFT COLUMN - IMAGE GALLERY
-            ======================================== */}
-            <Grid item xs={12} md={6}>
-              <Box sx={{
+//             {/* ========================================
+//                 LEFT COLUMN - IMAGE GALLERY
+//             ======================================== */}
+//             <Grid item xs={12} md={6}>
+//               <Box sx={{
+    <Box sx={{ py: { xs: 1, md: 4 }, width: '90%', mx: 'auto' }}>
+      {/* Back to Products Button */}
+      {/* <Button
+        startIcon={<ArrowBack />}
+        onClick={() => navigate('/customer')}
+        sx={{ mb: 3, color: 'text.secondary' }}
+      >
+        Back to Products
+      </Button> */}
+      
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          gap: { xs: 3, md: 6 },
+        }}
+      >
+        {/* Main Image Section - 50% width on desktop */}
+        <Box
+          sx={{
+            width: { xs: '100%', md: '50%' },
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: 400,
+          }}
+        >
+          <Card
+            elevation={0}
+            sx={{
+              p: 2,
+              bgcolor: 'background.paper',
+              borderRadius: 4,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%',
+              height: { xs: 300, sm: 350, md: 400 },
+              mb: 3,
+            }}
+          >
+            <CardMedia
+              component="img"
+              image={product?.galleryImage && product.galleryImage[selectedImage] ? product.galleryImage[selectedImage] : product?.thumbnailImage}
+              alt={product?.name}
+              sx={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                borderRadius: 3,
+                background: '#f8f8f8',
+              }}
+            />
+          </Card>
+
+          {/* Thumbnail Images - Now below the main image */}
+          {(product?.galleryImage && product.galleryImage.length > 0) && (
+            <Box
+              sx={{
+
                 display: 'flex',
                 gap: 2,
                 alignItems: 'flex-start'
