@@ -16,22 +16,22 @@ const BrandPartners = () => {
         <div className="brand-cards">
           <div className="brand-card">
             <div className="brand-placeholder">
-              <img src={c1} alt="" srcset="" />
+              <img src={c1} alt="" srcSet="" />
             </div>
           </div>
           <div className="brand-card">
             <div className="brand-placeholder">
-              <img src={c2} alt="" srcset="" />
+              <img src={c2} alt="" srcSet="" />
             </div>
           </div>
           <div className="brand-card">
             <div className="brand-placeholder">
-              <img src={c3} alt="" srcset="" />
+              <img src={c3} alt="" srcSet="" />
             </div>
           </div>
           <div className="brand-card">
             <div className="brand-placeholder">
-              <img src={c4} alt="" srcset="" />
+              <img src={c4} alt="" srcSet="" />
             </div>
           </div>
         </div>
