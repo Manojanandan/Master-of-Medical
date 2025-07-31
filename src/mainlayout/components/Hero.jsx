@@ -39,7 +39,7 @@ const Hero = () => {
             </button>
           </div>
           
-          <div className="hero-visual">
+          {/* <div className="hero-visual">
             <div className="medical-crosses">
               <span className="cross">+</span>
               <span className="cross">+</span>
@@ -76,7 +76,7 @@ const Hero = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>
