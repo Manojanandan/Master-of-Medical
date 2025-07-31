@@ -16,6 +16,7 @@ import {
   useTheme,
   Chip,
   Divider,
+  Button,
   CircularProgress,
   Alert
 } from '@mui/material';
@@ -305,10 +306,9 @@ const Overview = () => {
               <TableRow sx={{ background: '#f8f9fa' }}>
                 <TableCell sx={{ fontWeight: 700, color: '#2c3e50', fontSize: '0.875rem' }}>Order ID</TableCell>
                 <TableCell sx={{ fontWeight: 700, color: '#2c3e50', fontSize: '0.875rem' }}>Customer</TableCell>
-                <TableCell sx={{ fontWeight: 700, color: '#2c3e50', fontSize: '0.875rem' }}>Product</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 700, color: '#2c3e50', fontSize: '0.875rem' }}>Quantity</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 700, color: '#2c3e50', fontSize: '0.875rem' }}>Amount</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 700, color: '#2c3e50', fontSize: '0.875rem' }}>Status</TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#2c3e50', fontSize: '0.875rem' }}>Amount</TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#2c3e50', fontSize: '0.875rem' }}>Status</TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#2c3e50', fontSize: '0.875rem' }}>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -336,10 +336,8 @@ const Overview = () => {
                   >
                     <TableCell sx={{ color: '#666', fontWeight: 500 }}>#{order.id}</TableCell>
                     <TableCell sx={{ color: '#333', fontWeight: 600 }}>{order.customerInfo?.name || 'N/A'}</TableCell>
-                    <TableCell sx={{ color: '#333', fontWeight: 600 }}>{order.productInfo?.name || 'N/A'}</TableCell>
-                    <TableCell align="right" sx={{ color: '#666', fontWeight: 500 }}>{order.productInfo?.quantity || 1}</TableCell>
-                    <TableCell align="right" sx={{ color: '#333', fontWeight: 600 }}>₹{order.totalCost || order.productInfo?.total || '0.00'}</TableCell>
-                    <TableCell align="right">
+                    <TableCell  sx={{ color: '#333', fontWeight: 600 }}>₹{order.totalCost || order.productInfo?.total || '0.00'}</TableCell>
+                    <TableCell >
                       <Chip
                         label={order.status?.charAt(0).toUpperCase() + order.status?.slice(1) || 'N/A'}
                         size="small"
@@ -354,6 +352,11 @@ const Overview = () => {
                           }
                         }}
                       />
+                    </TableCell>
+                    <TableCell>
+                      <Button variant="contained" color="primary">
+                        View Detail
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))
