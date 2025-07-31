@@ -1,54 +1,42 @@
-/* import { Box, Typography } from '@mui/material'
-import React from 'react'
-import BreadCrumbs from '../../../components/e_commerceComponents/BreadCrumbs'
-
-const Termsofuse = () => {
-  return (
-    <Box sx={{ height: 'auto', width: '100%', }}>
-      <BreadCrumbs title={"TermsOfUse"} />
-      <Box sx={{ height: '100%', width: '90%', margin: '2% auto' }}>
-        <Typography variant='h5' sx={{ fontWeight: 'bold', margin: '1% 0' }}>Note</Typography>
-        <Typography variant='p' sx={{ fontSize: '16px', }}>By accessing and using the M.O.M platform, you agree to the following:</Typography><br />
-        <Typography variant='p' sx={{ fontSize: '16px', lineHeight: '50px', marginLeft: '2%' }}>1. 	All users must register with accurate and updated information.</Typography><br />
-        <Typography variant='p' sx={{ fontSize: '16px', lineHeight: '50px', marginLeft: '2%' }}>2.	Buyers must use the platform for institutional or business use only.</Typography><br />
-        <Typography variant='p' sx={{ fontSize: '16px', lineHeight: '50px', marginLeft: '2%' }}>3.	Sellers are responsible for ensuring their product listings, inventory, and pricing are accurate and compliant with applicable laws.</Typography><br />
-        <Typography variant='p' sx={{ fontSize: '16px', lineHeight: '50px', marginLeft: '2%' }}>4.	Any misuse of the platform, false information, or breach of these terms may lead to suspension or legal action.</Typography><br />
-        <Typography variant='p' sx={{ fontSize: '16px', lineHeight: '50px' }}>We reserve the right to update these terms as necessary.</Typography><br />
-
-      </Box>
-    </Box>
-  )
-}
-
-export default Termsofuse */
-
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Typography, Container, Paper } from '@mui/material';
 
-const Termsofuse = () => {
+const TermsOfUse = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#f5f5f5', py: 4 }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: '#ffffff', py: 0 }}>
       <Container maxWidth="lg">
-        <Paper elevation={3} sx={{ p: { xs: 3, md: 5 }, mt: 3, borderRadius: 2 }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: { xs: 3, md: 5 },
+            mt: 0,
+            borderRadius: 2,
+            bgcolor: '#ffffff',
+          }}
+        >
           <Typography
             variant="h4"
             sx={{
-              fontWeight: 'bold',
+              fontWeight: 700,
               mb: 3,
-              color: '#1a237e',
+              color: '#de3b6f', // Title color from ReturnsRefundsPolicy
               textAlign: 'center',
               fontSize: { xs: '1.8rem', md: '2.5rem' },
             }}
           >
-            Terms and Conditions
+            Terms of Use
           </Typography>
+
           <Typography
             variant="h6"
             sx={{
-              fontWeight: 'medium',
+              fontWeight: 600,
               mb: 2,
-              color: '#424242',
+              color: '#000', // Changed subtitle color to black
               fontSize: { xs: '1.2rem', md: '1.5rem' },
             }}
           >
@@ -58,79 +46,82 @@ const Termsofuse = () => {
             variant="body1"
             sx={{
               fontSize: { xs: '0.9rem', md: '1rem' },
-              color: '#616161',
+              color: '#666', // Body text color from ReturnsRefundsPolicy
               mb: 4,
-              lineHeight: 1.8,
+              lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
             }}
           >
-            By accessing and using the M.O.M platform, you agree to comply with the following terms and conditions:
+            By accessing and using the M.O.M platform, you agree to the following:
           </Typography>
           <Box sx={{ pl: { xs: 2, md: 4 }, mb: 4 }}>
             <Typography
               variant="body1"
               sx={{
                 fontSize: { xs: '0.9rem', md: '1rem' },
-                color: '#212121',
+                color: '#666', // Body text color from ReturnsRefundsPolicy
                 mb: 2,
-                lineHeight: 2,
+                lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
                 display: 'flex',
                 alignItems: 'flex-start',
               }}
             >
-              <Box component="span" sx={{ mr: 2, color: '#1a237e' }}>1.</Box>
+              <Box component="span" sx={{ mr: 2, color: '#873589' }}>1.</Box> {/* Bullet color updated to #873589 */}
               All users must register with accurate and updated information.
             </Typography>
             <Typography
               variant="body1"
               sx={{
                 fontSize: { xs: '0.9rem', md: '1rem' },
-                color: '#212121',
+                color: '#666', // Body text color from ReturnsRefundsPolicy
                 mb: 2,
-                lineHeight: 2,
+                lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
                 display: 'flex',
                 alignItems: 'flex-start',
               }}
             >
-              <Box component="span" sx={{ mr: 2, color: '#1a237e' }}>2.</Box>
+              <Box component="span" sx={{ mr: 2, color: '#873589' }}>2.</Box> {/* Bullet color updated to #873589 */}
               Buyers must use the platform for institutional or business use only.
             </Typography>
             <Typography
               variant="body1"
               sx={{
                 fontSize: { xs: '0.9rem', md: '1rem' },
-                color: '#212121',
+                color: '#666', // Body text color from ReturnsRefundsPolicy
                 mb: 2,
-                lineHeight: 2,
+                lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
                 display: 'flex',
                 alignItems: 'flex-start',
               }}
             >
-              <Box component="span" sx={{ mr: 2, color: '#1a237e' }}>3.</Box>
+              <Box component="span" sx={{ mr: 2, color: '#873589' }}>3.</Box> {/* Bullet color updated to #873589 */}
               Sellers are responsible for ensuring their product listings, inventory, and pricing are accurate and compliant with applicable laws.
             </Typography>
             <Typography
               variant="body1"
               sx={{
                 fontSize: { xs: '0.9rem', md: '1rem' },
-                color: '#212121',
+                color: '#666', // Body text color from ReturnsRefundsPolicy
                 mb: 2,
-                lineHeight: 2,
+                lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
                 display: 'flex',
                 alignItems: 'flex-start',
               }}
             >
-              <Box component="span" sx={{ mr: 2, color: '#1a237e' }}>4.</Box>
+              <Box component="span" sx={{ mr: 2, color: '#873589' }}>4.</Box> {/* Bullet color updated to #873589 */}
               Any misuse of the platform, false information, or breach of these terms may lead to suspension or legal action.
             </Typography>
             <Typography
               variant="body1"
               sx={{
                 fontSize: { xs: '0.9rem', md: '1rem' },
-                color: '#212121',
-                mt: 2,
-                lineHeight: 2,
+                color: '#666', // Body text color from ReturnsRefundsPolicy
+                mb: 2,
+                lineHeight: 1.7, // Line height from ReturnsRefundsPolicy
+                display: 'flex',
+                alignItems: 'flex-start',
               }}
             >
+              <Box component="span" sx={{ mr: 2, color: '#873589' }}>5.</Box> {/* Bullet color updated to #873589 */}
               We reserve the right to update these terms as necessary.
             </Typography>
           </Box>
@@ -138,7 +129,7 @@ const Termsofuse = () => {
             variant="body2"
             sx={{
               fontSize: { xs: '0.8rem', md: '0.9rem' },
-              color: '#757575',
+              color: '#873589', // Note color from ReturnsRefundsPolicy
               textAlign: 'center',
               mt: 4,
             }}
@@ -151,4 +142,4 @@ const Termsofuse = () => {
   );
 };
 
-export default Termsofuse;
+export default TermsOfUse;

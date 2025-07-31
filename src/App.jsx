@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Routes, Route } from "react-router-dom";
 import StatusCheck from "./components/StatusCheck";
 import AnimatedPage from "./components/AnimatedPage";
@@ -21,6 +21,9 @@ import Termsofuse from "./pages/eCommerce/termsCondition/Termsofuse.jsx";
 import PrivacyPolicy from "./pages/eCommerce/privacyPolicy/PrivacyPolicy.jsx";
 import CookiesPolicy from "./pages/eCommerce/cookiesPolicy/CookiesPolicy.jsx";
 import OrderTracking from "./pages/eCommerce/orderTracking/OrderTracking.jsx";
+import Disclaimer from "./pages/eCommerce/Disclaimer.jsx";
+import HelpSupport from "./pages/eCommerce/Help & Suuport.jsx";
+import ReturnsRefundsPolicy from "./pages/eCommerce/Returns and refunds policy.jsx";
 import ProductDetail from "./pages/eCommerce/ProductDetail.jsx";
 import CustomerProfile from "./pages/eCommerce/Profile.jsx";
 import AboutUs from "./pages/eCommerce/AboutUs.jsx";
@@ -147,7 +150,23 @@ const App = () => {
               <OrderTracking />
             </AnimatedPage>
           } />
-            <Route path="about-us" element={
+          <Route path="/ecommerceDashboard/disclaimer" element={
+            <AnimatedPage animationType="slide" direction="up" timeout={600}>
+              <Disclaimer />
+            </AnimatedPage>
+          } />
+          <Route path="/ecommerceDashboard/help-support" element={
+            <AnimatedPage animationType="slide" direction="up" timeout={600}>
+              <HelpSupport />
+            </AnimatedPage>
+          } />
+          <Route path="/ecommerceDashboard/returns-refunds" element={
+            <AnimatedPage animationType="slide" direction="up" timeout={600}>
+              <ReturnsRefundsPolicy />
+            </AnimatedPage>
+          } />
+          <Route path="/ecommerceDashboard/about-us" element={
+
             <AnimatedPage animationType="slide" direction="up" timeout={600}>
               <AboutUs />
             </AnimatedPage>
