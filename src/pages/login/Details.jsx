@@ -161,6 +161,7 @@ const Details = () => {
             const tempUserData = sessionStorage.getItem("tempUserData");
             if (tempUserData) {
                 const parsedData = JSON.parse(tempUserData);
+                console.log(parsedData ,    "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS")
                 setAlldata(prev => ({
                     ...prev,
                     email: parsedData.email || "",
@@ -631,7 +632,6 @@ const Details = () => {
                 formData.append('name', allData.fullName);
                 formData.append('email', allData.email);
                 formData.append('phone', allData.number);
-                formData.append('userName', allData.fullName)
                 formData.append('password', allData.password);
                 formData.append('address', address);
                 formData.append('city', allData.city);
@@ -663,7 +663,6 @@ const Details = () => {
                 formData.append('address', address);
                 formData.append('phone', allData.number);
                 formData.append('city', allData.city);
-                formData.append('userName', allData.fullName)
                 formData.append('state', allData.state);
                 formData.append('postalCode', allData.pincode);
                 formData.append('name', allData.fullName);
@@ -708,292 +707,151 @@ const Details = () => {
                     {message}
                 </Alert>
             </Snackbar>}
-            <Box sx={{ 
-                minHeight: '100vh',
-                display: 'flex',
-                flexDirection: 'column',
-                backgroundColor: '#f8f9fa',
-                padding: { xs: '1rem', md: '3%' }
-            }}>
-                {/* Main Card */}
-                <Box sx={{ 
-                    width: { xs: '100%', md: '80%', lg: '70%' },
-                    maxWidth: '1200px',
-                    margin: '0 auto',
-                    backgroundColor: '#fff',
-                    borderRadius: '12px',
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-                    padding: { xs: '1.5rem', md: '2.5rem' },
-                    mb: 3
-                }}>
-                    <Stack spacing={3}>
-                        {/* Header */}
-                        <Box textAlign="center">
-                            <Typography variant="h4" sx={{ 
-                                fontWeight: 'bold',
-                                color: 'text.primary',
-                                mb: 1
-                            }}>
-                                User Details
-                            </Typography>
-                            <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                                Complete your registration by providing the required information
-                            </Typography>
-                        </Box>
-                        
-                        {/* Registration Stepper */}
-                        <Box sx={{ width: '100%', mb: 2 }}>
-                            <RegistrationStepper currentStep={2} />
-                        </Box>
-                        
-                        {/* Form */}
-                        <Box component="form">
-                            <Grid container spacing={3}>
-                                {/* Username and Email - Read Only */}
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                        Username
-                                    </Typography>
-                                    <TextField 
-                                        disabled 
-                                        fullWidth 
-                                        id="userName" 
-                                        size="medium" 
-                                        value={allData.userName || ''} 
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                borderRadius: '8px',
-                                                backgroundColor: '#f5f5f5'
-                                            }
-                                        }}
+            <Box sx={{ height: '100%', width: '100%',backgroundColor:'#f2f3f5',padding:'4% 0' }}>
+                <Box sx={{ border: 'solid 1.5px #fff', height: 'auto', margin: '0% auto', backgroundColor: '#fff', borderRadius: '15px', width: '65%' }}>
+                    <Stack direction='column'>
+                        <Typography variant='p' sx={{ margin: '2% auto', textTransform: 'capitalize',fontSize:'2rem' }}>User Details</Typography>
+                    </Stack>
+                    
+                    {/* Registration Stepper */}
+                    <Box sx={{ width: '95%', margin: '0 auto 2%' }}>
+                        <RegistrationStepper currentStep={2} />
+                    </Box>
+                    
+                    <Box sx={{ width: '95%', margin: '1% auto', }}>
+                        <Grid container columnSpacing={2}>
+                            <Grid item size={6} >
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '1% 0 1%' }}>Username</Typography>
+                                <TextField disabled fullWidth id="userName" size="small" value={allData.userName || ''} />
+                            </Grid>
+                            <Grid item size={6} >
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '1% 0 1%' }}>Email</Typography>
+                                <TextField disabled fullWidth id="email" size="small" value={allData.email || ''} />
+                            </Grid>
+                            <Grid item size={6} >
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 1%' }}>Full Name<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                {errorMsg.fullNameError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.fullNameError}</Typography>}
+                                <TextField 
+                                    fullWidth 
+                                    id="fullName" 
+                                    size="small" 
+                                    onChange={handleChange}
+                                    placeholder="Enter your full name"
+                                    value={allData.fullName || ''}
+                                />
+                            </Grid>
+                             <Grid item size={6} >
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 1%' }}>Contact Number<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                {errorMsg.numberError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.numberError}</Typography>}
+                                <TextField 
+                                    value={allData.number} 
+                                    autoComplete='off' 
+                                    fullWidth 
+                                    id="number" 
+                                    size="small" 
+                                    onChange={handleChange}
+                                    placeholder="Enter 10-digit contact number"
+                                    inputProps={{
+                                        maxLength: 10,
+                                        pattern: "[0-9]{10}"
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item size={12} >
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '2% 0 1%', }}>Address<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                {errorMsg.addressLine1Error && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.addressLine1Error}</Typography>}
+                                <TextField 
+                                    value={allData.addressLine1} 
+                                    autoComplete='off' 
+                                    fullWidth 
+                                    id="addressLine1" 
+                                    size="small" 
+                                    sx={{ marginBottom: '1%' }} 
+                                    onChange={handleChange}
+                                    placeholder="Enter address line 1"
+                                />
+                                <TextField 
+                                    value={allData.addressLine2} 
+                                    autoComplete='off' 
+                                    fullWidth 
+                                    id="addressLine2" 
+                                    size="small" 
+                                    onChange={handleChange}
+                                    placeholder="Enter address line 2 (optional)"
+                                />
+                            </Grid>
+                           
+
+                            <Grid item size={6} >
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '5% 0 1%' }}>Country<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                {errorMsg.countryError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.countryError}</Typography>}
+                                <div style={{ marginBottom: '10px' }}>
+                                    <CountrySelect
+                                        containerClassName="form-group"
+                                        inputClassName=""
+                                        onChange={handleCountryChange}
+                                        onTextChange={(_txt) => console.log(_txt)}
+                                        placeHolder="Select Country"
                                     />
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                        Email
-                                    </Typography>
-                                    <TextField 
-                                        disabled 
-                                        fullWidth 
-                                        id="email" 
-                                        size="medium" 
-                                        value={allData.email || ''} 
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                borderRadius: '8px',
-                                                backgroundColor: '#f5f5f5'
-                                            }
-                                        }}
+                                </div>
+                            </Grid>
+                            <Grid item size={6} >
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '5% 0 1%' }}>State<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                {errorMsg.stateError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.stateError}</Typography>}
+                                <div style={{ marginBottom: '10px' }}>
+                                    <StateSelect
+                                        countryid={country?.id}
+                                        containerClassName="form-group"
+                                        inputClassName=""
+                                        onChange={handleStateChange}
+                                        onTextChange={(_txt) => console.log(_txt)}
+                                        defaultValue={currentState}
+                                        placeHolder="Select State"
                                     />
-                                </Grid>
-                                
-                                {/* Full Name and Contact Number */}
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                        Full Name <span style={{ color: 'red' }}>*</span>
-                                    </Typography>
-                                    {errorMsg.fullNameError && (
-                                        <Typography variant="caption" sx={{ color: 'red', display: 'block', mb: 0.5 }}>
-                                            {errorMsg.fullNameError}
-                                        </Typography>
-                                    )}
-                                    <TextField 
-                                        fullWidth 
-                                        id="fullName" 
-                                        size="medium" 
-                                        onChange={handleChange}
-                                        placeholder="Enter your full name"
-                                        value={allData.fullName || ''}
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                borderRadius: '8px'
-                                            }
-                                        }}
+                                </div>
+                            </Grid>
+                            <Grid item size={6} >
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '5% 0 1%' }}>City<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                {errorMsg.cityError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.cityError}</Typography>}
+                                <div style={{ marginBottom: '10px' }}>
+                                    <CitySelect
+                                        countryid={country?.id}
+                                        stateid={currentState?.id}
+                                        onChange={handleCityChange}
+                                        defaultValue={currentCity}
+                                        placeHolder="Select City"
                                     />
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                        Contact Number <span style={{ color: 'red' }}>*</span>
-                                    </Typography>
-                                    {errorMsg.numberError && (
-                                        <Typography variant="caption" sx={{ color: 'red', display: 'block', mb: 0.5 }}>
-                                            {errorMsg.numberError}
-                                        </Typography>
-                                    )}
-                                    <TextField 
-                                        value={allData.number} 
-                                        autoComplete='off' 
-                                        fullWidth 
-                                        id="number" 
-                                        size="medium" 
-                                        onChange={handleChange}
-                                        placeholder="Enter 10-digit contact number"
-                                        inputProps={{
-                                            maxLength: 10,
-                                            pattern: "[0-9]{10}"
-                                        }}
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                borderRadius: '8px'
-                                            }
-                                        }}
-                                    />
-                                </Grid>
-                                
-                                {/* Address */}
-                                <Grid item xs={12}>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                        Address <span style={{ color: 'red' }}>*</span>
-                                    </Typography>
-                                    {errorMsg.addressLine1Error && (
-                                        <Typography variant="caption" sx={{ color: 'red', display: 'block', mb: 0.5 }}>
-                                            {errorMsg.addressLine1Error}
-                                        </Typography>
-                                    )}
-                                    <Stack spacing={2}>
-                                        <TextField 
-                                            value={allData.addressLine1} 
-                                            autoComplete='off' 
-                                            fullWidth 
-                                            id="addressLine1" 
-                                            size="medium" 
-                                            onChange={handleChange}
-                                            placeholder="Enter address line 1"
-                                            sx={{
-                                                '& .MuiOutlinedInput-root': {
-                                                    borderRadius: '8px'
-                                                }
-                                            }}
-                                        />
-                                        <TextField 
-                                            value={allData.addressLine2} 
-                                            autoComplete='off' 
-                                            fullWidth 
-                                            id="addressLine2" 
-                                            size="medium" 
-                                            onChange={handleChange}
-                                            placeholder="Enter address line 2 (optional)"
-                                            sx={{
-                                                '& .MuiOutlinedInput-root': {
-                                                    borderRadius: '8px'
-                                                }
-                                            }}
-                                        />
-                                    </Stack>
-                                </Grid>
-                                
-                                {/* Country, State, City, Pincode */}
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                        Country <span style={{ color: 'red' }}>*</span>
-                                    </Typography>
-                                    {errorMsg.countryError && (
-                                        <Typography variant="caption" sx={{ color: 'red', display: 'block', mb: 0.5 }}>
-                                            {errorMsg.countryError}
-                                        </Typography>
-                                    )}
-                                    <div style={{ marginBottom: '10px' }}>
-                                        <CountrySelect
-                                            containerClassName="form-group"
-                                            inputClassName=""
-                                            onChange={handleCountryChange}
-                                            onTextChange={(_txt) => console.log(_txt)}
-                                            placeHolder="Select Country"
-                                        />
-                                    </div>
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                        State <span style={{ color: 'red' }}>*</span>
-                                    </Typography>
-                                    {errorMsg.stateError && (
-                                        <Typography variant="caption" sx={{ color: 'red', display: 'block', mb: 0.5 }}>
-                                            {errorMsg.stateError}
-                                        </Typography>
-                                    )}
-                                    <div style={{ marginBottom: '10px' }}>
-                                        <StateSelect
-                                            countryid={country?.id}
-                                            containerClassName="form-group"
-                                            inputClassName=""
-                                            onChange={handleStateChange}
-                                            onTextChange={(_txt) => console.log(_txt)}
-                                            defaultValue={currentState}
-                                            placeHolder="Select State"
-                                        />
-                                    </div>
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                        City <span style={{ color: 'red' }}>*</span>
-                                    </Typography>
-                                    {errorMsg.cityError && (
-                                        <Typography variant="caption" sx={{ color: 'red', display: 'block', mb: 0.5 }}>
-                                            {errorMsg.cityError}
-                                        </Typography>
-                                    )}
-                                    <div style={{ marginBottom: '10px' }}>
-                                        <CitySelect
-                                            countryid={country?.id}
-                                            stateid={currentState?.id}
-                                            onChange={handleCityChange}
-                                            defaultValue={currentCity}
-                                            placeHolder="Select City"
-                                        />
-                                    </div>
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                        Pincode <span style={{ color: 'red' }}>*</span>
-                                    </Typography>
-                                    {errorMsg.pincodeError && (
-                                        <Typography variant="caption" sx={{ color: 'red', display: 'block', mb: 0.5 }}>
-                                            {errorMsg.pincodeError}
-                                        </Typography>
-                                    )}
-                                    <TextField 
-                                        value={allData.pincode} 
-                                        autoComplete='off' 
-                                        fullWidth 
-                                        id="pincode" 
-                                        size="medium" 
-                                        onChange={handleChange}
-                                        placeholder="Enter 6-digit pincode"
-                                        inputProps={{
-                                            maxLength: 6,
-                                            pattern: "[0-9]{6}"
-                                        }}
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                borderRadius: '8px'
-                                            }
-                                        }}
-                                    />
-                                </Grid>
-                                
-                                {/* User Type Selection */}
-                                {type !== "vendor" ? (
-                                    <Grid item xs={12}>
-                                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2 }}>
-                                            Type of users <span style={{ color: 'red' }}>*</span>
-                                        </Typography>
-                                        {errorMsg.vendorTypeError && (
-                                            <Typography variant="caption" sx={{ color: 'red', display: 'block', mb: 1 }}>
-                                                {errorMsg.vendorTypeError}
-                                            </Typography>
-                                        )}
+                                </div>
+                            </Grid>
+                            <Grid item size={6} >
+                                <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '5% 0 1%' }}>Pincode<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                {errorMsg.pincodeError && <Typography variant='span' sx={{ color: 'red', fontSize: '14px' }}>{errorMsg.pincodeError}</Typography>}
+                                <TextField 
+                                    value={allData.pincode} 
+                                    autoComplete='off' 
+                                    fullWidth 
+                                    id="pincode" 
+                                    size="small" 
+                                    onChange={handleChange}
+                                    placeholder="Enter 6-digit pincode"
+                                    inputProps={{
+                                        maxLength: 6,
+                                        pattern: "[0-9]{6}"
+                                    }}
+                                />
+                            </Grid>
+                            {type !== "vendor" ? (
+                                <React.Fragment>
+                                    <Grid item size={12} >
+                                        <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: '3% 0 0' }}>Type of users<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                        {errorMsg.vendorTypeError &&
+                                            <Typography sx={{ color: 'red', fontSize: '14px', marginTop: '5px' }}>{errorMsg.vendorTypeError}</Typography>}
                                         <FormControl>
                                             <RadioGroup
                                                 row
                                                 name="radio"
                                                 value={labelChanges}
                                                 onChange={(e) => handleUserTypeChange(e.target.value)}
-                                                sx={{
-                                                    '& .MuiFormControlLabel-root': {
-                                                        marginRight: 3,
-                                                        marginBottom: 1
-                                                    }
-                                                }}
                                             >
                                                 <FormControlLabel value="H" control={<Radio />} label="Hospital" />
                                                 <FormControlLabel value="P" control={<Radio />} label="Pathology Labs" />
@@ -1005,16 +863,629 @@ const Details = () => {
                                             </RadioGroup>
                                         </FormControl>
                                     </Grid>
-                                ) : (
-                                    <Grid item xs={12}>
-                                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2 }}>
-                                            Type of vendors <span style={{ color: 'red' }}>*</span>
-                                        </Typography>
-                                        {errorMsg.vendorTypeError && (
-                                            <Typography variant="caption" sx={{ color: 'red', display: 'block', mb: 1 }}>
-                                                {errorMsg.vendorTypeError}
-                                            </Typography>
-                                        )}
+                                    {labelChanges === "H" && (
+                                        <>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Hospital Name</Typography>
+                                                <TextField 
+                                                    fullWidth 
+                                                    id="hospitalName" 
+                                                    size="small"
+                                                    value={allData.additionalInformation.find(item => item.name === 'hospitalName')?.value || ''}
+                                                    onChange={(e) => handleAdditionalInfoChange('hospitalName', e.target.value)}
+                                                    placeholder="Enter hospital name"
+                                                />
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Medical Council License</Typography>
+                                                <TextField 
+                                                    fullWidth 
+                                                    id="medicalCouncilLicense" 
+                                                    size="small"
+                                                    value={allData.additionalInformation.find(item => item.name === 'medicalCouncilLicense')?.value || ''}
+                                                    onChange={(e) => handleAdditionalInfoChange('medicalCouncilLicense', e.target.value)}
+                                                    placeholder="Enter medical council license number"
+                                                />
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Hospital Registration Certificate<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <Button
+                                                    sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                    component="label"
+                                                    variant="contained"
+                                                    tabIndex={-1}
+                                                    startIcon={<CloudUploadIcon />}
+                                                >
+                                                    Upload
+                                                    <VisuallyHiddenInput
+                                                        type="file"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'hospitalRegistrationCertificate')}
+                                                    />
+                                                </Button>
+                                                {manufacturingImageFile.hospitalRegistrationCertificate && (
+                                                    <div style={{ marginTop: '5%', border: '1px solid #ddd', padding: '10px', borderRadius: '5px' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                            <div>
+                                                                <Typography variant="body2" sx={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                                                                    {allData.files.hospitalRegistrationCertificate?.fileName || 'Hospital Registration Certificate'}
+                                                                </Typography>
+                                                                {allData.files.hospitalRegistrationCertificate?.size && (
+                                                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                                                        Size: {formatFileSize(allData.files.hospitalRegistrationCertificate.size)}
+                                                                    </Typography>
+                                                                )}
+                                                            </div>
+                                                            <Button
+                                                                size="small"
+                                                                variant="outlined"
+                                                                color="error"
+                                                                onClick={() => removeFile('hospitalRegistrationCertificate')}
+                                                                sx={{ minWidth: 'auto', padding: '4px 8px' }}
+                                                            >
+                                                                Remove
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', marginTop: '5px' }}>
+                                                    Note: Maximum file size allowed is 10MB
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <Button
+                                                    sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                    component="label"
+                                                    variant="contained"
+                                                    tabIndex={-1}
+                                                    startIcon={<CloudUploadIcon />}
+                                                >
+                                                    Upload
+                                                    <VisuallyHiddenInput
+                                                        type="file"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'hospitalAddressProof')}
+                                                    />
+                                                </Button>
+                                                {manufacturingImageFile.hospitalAddressProof && (
+                                                    <div style={{ marginTop: '5%', border: '1px solid #ddd', padding: '10px', borderRadius: '5px' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                            <div>
+                                                                <Typography variant="body2" sx={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                                                                    {allData.files.hospitalAddressProof?.fileName || 'Hospital Address Proof'}
+                                                                </Typography>
+                                                                {allData.files.hospitalAddressProof?.size && (
+                                                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                                                        Size: {formatFileSize(allData.files.hospitalAddressProof.size)}
+                                                                    </Typography>
+                                                                )}
+                                                            </div>
+                                                            <Button
+                                                                size="small"
+                                                                variant="outlined"
+                                                                color="error"
+                                                                onClick={() => removeFile('hospitalAddressProof')}
+                                                                sx={{ minWidth: 'auto', padding: '4px 8px' }}
+                                                            >
+                                                                Remove
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', marginTop: '5px' }}>
+                                                    Note: Maximum file size allowed is 10MB
+                                                </Typography>
+                                            </Grid>
+                                        </>
+                                    )}
+                                    {labelChanges === "P" && (
+                                        <>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Pathology Name<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <TextField 
+                                                    fullWidth 
+                                                    id="pathologyName" 
+                                                    size="small"
+                                                    value={allData.additionalInformation.find(item => item.name === 'pathologyName')?.value || ''}
+                                                    onChange={(e) => handleAdditionalInfoChange('pathologyName', e.target.value)}
+                                                    placeholder="Enter pathology lab name"
+                                                />
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Lab Registration Certificate<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <Button
+                                                    sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                    component="label"
+                                                    variant="contained"
+                                                    tabIndex={-1}
+                                                    startIcon={<CloudUploadIcon />}
+                                                >
+                                                    Upload
+                                                    <VisuallyHiddenInput
+                                                        type="file"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'labRegistrationCertificate')}
+                                                    />
+                                                </Button>
+                                                {manufacturingImageFile.labRegistrationCertificate && (
+                                                    <div style={{ marginTop: '5%', border: '1px solid #ddd', padding: '10px', borderRadius: '5px' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                            <div>
+                                                                <Typography variant="body2" sx={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                                                                    {allData.files.labRegistrationCertificate?.fileName || 'Lab Registration Certificate'}
+                                                                </Typography>
+                                                                {allData.files.labRegistrationCertificate?.size && (
+                                                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                                                        Size: {formatFileSize(allData.files.labRegistrationCertificate.size)}
+                                                                    </Typography>
+                                                                )}
+                                                            </div>
+                                                            <Button
+                                                                size="small"
+                                                                variant="outlined"
+                                                                color="error"
+                                                                onClick={() => removeFile('labRegistrationCertificate')}
+                                                                sx={{ minWidth: 'auto', padding: '4px 8px' }}
+                                                            >
+                                                                Remove
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', marginTop: '5px' }}>
+                                                    Note: Maximum file size allowed is 10MB
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Identity Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <TextField 
+                                                    fullWidth 
+                                                    id="pathologyIdentityProof" 
+                                                    size="small"
+                                                    value={allData.additionalInformation.find(item => item.name === 'pathologyIdentityProof')?.value || ''}
+                                                    onChange={(e) => handleAdditionalInfoChange('pathologyIdentityProof', e.target.value)}
+                                                    placeholder="Enter identity proof number"
+                                                />
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <Button
+                                                    sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                    component="label"
+                                                    variant="contained"
+                                                    tabIndex={-1}
+                                                    startIcon={<CloudUploadIcon />}
+                                                >
+                                                    Upload
+                                                    <VisuallyHiddenInput
+                                                        type="file"
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'pathologyAddressProof')}
+                                                    />
+                                                </Button>
+                                                {manufacturingImageFile.pathologyAddressProof && (
+                                                    <div style={{ marginTop: '5%', border: '1px solid #ddd', padding: '10px', borderRadius: '5px' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                            <div>
+                                                                <Typography variant="body2" sx={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                                                                    {allData.files.pathologyAddressProof?.fileName || 'Pathology Address Proof'}
+                                                                </Typography>
+                                                                {allData.files.pathologyAddressProof?.size && (
+                                                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                                                        Size: {formatFileSize(allData.files.pathologyAddressProof.size)}
+                                                                    </Typography>
+                                                                )}
+                                                            </div>
+                                                            <Button
+                                                                size="small"
+                                                                variant="outlined"
+                                                                color="error"
+                                                                onClick={() => removeFile('pathologyAddressProof')}
+                                                                sx={{ minWidth: 'auto', padding: '4px 8px' }}
+                                                            >
+                                                                Remove
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', marginTop: '5px' }}>
+                                                    Note: Maximum file size allowed is 10MB
+                                                </Typography>
+                                            </Grid>
+                                        </>
+                                    )}
+                                    {labelChanges === "D" && (
+                                        <>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Diagnostic Center Registration Certificate<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <Button
+                                                    sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                    component="label"
+                                                    variant="contained"
+                                                    tabIndex={-1}
+                                                    startIcon={<CloudUploadIcon />}
+                                                >
+                                                    Upload
+                                                    <VisuallyHiddenInput
+                                                        type="file"
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'diagnosticRegistrationCertificate')}
+                                                    />
+                                                </Button>
+                                                {manufacturingImage.diagnosticRegistrationCertificate && (
+                                                    <div style={{ marginTop: '5%' }}>
+                                                        <img
+                                                            src={manufacturingImage.diagnosticRegistrationCertificate}
+                                                            alt="Diagnostic Registration Certificate"
+                                                            style={{
+                                                                width: '200px',
+                                                                height: 'auto',
+                                                            }}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Identity Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <TextField 
+                                                    fullWidth 
+                                                    id="diagnosticIdentityProof" 
+                                                    size="small"
+                                                    value={allData.additionalInformation.find(item => item.name === 'diagnosticIdentityProof')?.value || ''}
+                                                    onChange={(e) => handleAdditionalInfoChange('diagnosticIdentityProof', e.target.value)}
+                                                    placeholder="Enter identity proof number"
+                                                />
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <Button
+                                                    sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                    component="label"
+                                                    variant="contained"
+                                                    tabIndex={-1}
+                                                    startIcon={<CloudUploadIcon />}
+                                                >
+                                                    Upload
+                                                    <VisuallyHiddenInput
+                                                        type="file"
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'diagnosticAddressProof')}
+                                                    />
+                                                </Button>
+                                                {manufacturingImage.diagnosticAddressProof && (
+                                                    <div style={{ marginTop: '5%' }}>
+                                                        <img
+                                                            src={manufacturingImage.diagnosticAddressProof}
+                                                            alt="Diagnostic Address Proof"
+                                                            style={{
+                                                                width: '200px',
+                                                                height: 'auto',
+                                                            }}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </Grid>
+                                        </>
+                                    )}
+                                    {labelChanges === "Physio" && (
+                                        <>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Establishment Registration Certificate<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <Button
+                                                    sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                    component="label"
+                                                    variant="contained"
+                                                    tabIndex={-1}
+                                                    startIcon={<CloudUploadIcon />}
+                                                >
+                                                    Upload
+                                                    <VisuallyHiddenInput
+                                                        type="file"
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'physioEstablishmentCertificate')}
+                                                    />
+                                                </Button>
+                                                {manufacturingImage.physioEstablishmentCertificate && (
+                                                    <div style={{ marginTop: '5%' }}>
+                                                        <img
+                                                            src={manufacturingImage.physioEstablishmentCertificate}
+                                                            alt="Physio Establishment Certificate"
+                                                            style={{
+                                                                width: '200px',
+                                                                height: 'auto',
+                                                            }}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Trade License<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <Button
+                                                    sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                    component="label"
+                                                    variant="contained"
+                                                    tabIndex={-1}
+                                                    startIcon={<CloudUploadIcon />}
+                                                >
+                                                    Upload
+                                                    <VisuallyHiddenInput
+                                                        type="file"
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'physioTradeLicense')}
+                                                    />
+                                                </Button>
+                                                {manufacturingImage.physioTradeLicense && (
+                                                    <div style={{ marginTop: '5%' }}>
+                                                        <img
+                                                            src={manufacturingImage.physioTradeLicense}
+                                                            alt="Physio Trade License"
+                                                            style={{
+                                                                width: '200px',
+                                                                height: 'auto',
+                                                            }}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <Button
+                                                    sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                    component="label"
+                                                    variant="contained"
+                                                    tabIndex={-1}
+                                                    startIcon={<CloudUploadIcon />}
+                                                >
+                                                    Upload
+                                                    <VisuallyHiddenInput
+                                                        type="file"
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'physioAddressProof')}
+                                                    />
+                                                </Button>
+                                                {manufacturingImage.physioAddressProof && (
+                                                    <div style={{ marginTop: '5%' }}>
+                                                        <img
+                                                            src={manufacturingImage.physioAddressProof}
+                                                            alt="Physio Address Proof"
+                                                            style={{
+                                                                width: '200px',
+                                                                height: 'auto',
+                                                            }}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </Grid>
+                                        </>
+                                    )}
+                                    {labelChanges === "Re" && (
+                                        <>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Establishment Registration Certificate</Typography>
+                                                <Button
+                                                    sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                    component="label"
+                                                    variant="contained"
+                                                    tabIndex={-1}
+                                                    startIcon={<CloudUploadIcon />}
+                                                >
+                                                    Upload
+                                                    <VisuallyHiddenInput
+                                                        type="file"
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'rehabEstablishmentCertificate')}
+                                                    />
+                                                </Button>
+                                                {manufacturingImage.rehabEstablishmentCertificate && (
+                                                    <div style={{ marginTop: '5%' }}>
+                                                        <img
+                                                            src={manufacturingImage.rehabEstablishmentCertificate}
+                                                            alt="Rehabilitation Establishment Certificate"
+                                                            style={{
+                                                                width: '200px',
+                                                                height: 'auto',
+                                                            }}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Identity Proof</Typography>
+                                                <TextField 
+                                                    fullWidth 
+                                                    id="rehabIdentityProof" 
+                                                    size="small"
+                                                    value={allData.additionalInformation.find(item => item.name === 'rehabIdentityProof')?.value || ''}
+                                                    onChange={(e) => handleAdditionalInfoChange('rehabIdentityProof', e.target.value)}
+                                                    placeholder="Enter identity proof number"
+                                                />
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <Button
+                                                    sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                    component="label"
+                                                    variant="contained"
+                                                    tabIndex={-1}
+                                                    startIcon={<CloudUploadIcon />}
+                                                >
+                                                    Upload
+                                                    <VisuallyHiddenInput
+                                                        type="file"
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'rehabAddressProof')}
+                                                    />
+                                                </Button>
+                                                {manufacturingImage.rehabAddressProof && (
+                                                    <div style={{ marginTop: '5%' }}>
+                                                        <img
+                                                            src={manufacturingImage.rehabAddressProof}
+                                                            alt="Rehabilitation Address Proof"
+                                                            style={{
+                                                                width: '200px',
+                                                                height: 'auto',
+                                                            }}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </Grid>
+                                        </>
+                                    )}
+                                    {labelChanges === "Pc" && (
+                                        <>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Trade License</Typography>
+                                                <Button
+                                                    sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                    component="label"
+                                                    variant="contained"
+                                                    tabIndex={-1}
+                                                    startIcon={<CloudUploadIcon />}
+                                                >
+                                                    Upload
+                                                    <VisuallyHiddenInput
+                                                        type="file"
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'polyclinicTradeLicense')}
+                                                    />
+                                                </Button>
+                                                {manufacturingImage.polyclinicTradeLicense && (
+                                                    <div style={{ marginTop: '5%' }}>
+                                                        <img
+                                                            src={manufacturingImage.polyclinicTradeLicense}
+                                                            alt="Polyclinic Trade License"
+                                                            style={{
+                                                                width: '200px',
+                                                                height: 'auto',
+                                                            }}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Clinical Registration Certificate</Typography>
+                                                <Button
+                                                    sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                    component="label"
+                                                    variant="contained"
+                                                    tabIndex={-1}
+                                                    startIcon={<CloudUploadIcon />}
+                                                >
+                                                    Upload
+                                                    <VisuallyHiddenInput
+                                                        type="file"
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'polyclinicClinicalCertificate')}
+                                                    />
+                                                </Button>
+                                                {manufacturingImage.polyclinicClinicalCertificate && (
+                                                    <div style={{ marginTop: '5%' }}>
+                                                        <img
+                                                            src={manufacturingImage.polyclinicClinicalCertificate}
+                                                            alt="Polyclinic Clinical Certificate"
+                                                            style={{
+                                                                width: '200px',
+                                                                height: 'auto',
+                                                            }}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Address Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <Button
+                                                    sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                    component="label"
+                                                    variant="contained"
+                                                    tabIndex={-1}
+                                                    startIcon={<CloudUploadIcon />}
+                                                >
+                                                    Upload
+                                                    <VisuallyHiddenInput
+                                                        type="file"
+                                                        accept="image/png, image/jpeg"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'polyclinicAddressProof')}
+                                                    />
+                                                </Button>
+                                                {manufacturingImage.polyclinicAddressProof && (
+                                                    <div style={{ marginTop: '5%' }}>
+                                                        <img
+                                                            src={manufacturingImage.polyclinicAddressProof}
+                                                            alt="Polyclinic Address Proof"
+                                                            style={{
+                                                                width: '200px',
+                                                                height: 'auto',
+                                                            }}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </Grid>
+                                        </>
+                                    )}
+                                    {labelChanges === "Student" && (
+                                        <>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Student ID<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <TextField 
+                                                    fullWidth 
+                                                    id="studentId" 
+                                                    size="small"
+                                                    value={allData.additionalInformation.find(item => item.name === 'studentId')?.value || ''}
+                                                    onChange={(e) => handleAdditionalInfoChange('studentId', e.target.value)}
+                                                    placeholder="Enter your student ID"
+                                                />
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Student ID Card<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <Button
+                                                    sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                    component="label"
+                                                    variant="contained"
+                                                    tabIndex={-1}
+                                                    startIcon={<CloudUploadIcon />}
+                                                >
+                                                    Upload
+                                                    <VisuallyHiddenInput
+                                                        type="file"
+                                                        onChange={(e) => handleAdditionalFileChange(e, 'studentIdCard')}
+                                                    />
+                                                </Button>
+                                                {manufacturingImageFile.studentIdCard && (
+                                                    <div style={{ marginTop: '5%', border: '1px solid #ddd', padding: '10px', borderRadius: '5px' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                            <div>
+                                                                <Typography variant="body2" sx={{ fontWeight: 'bold', marginBottom: '5px' }}>
+                                                                    {allData.files.studentIdCard?.fileName || 'Student ID Card'}
+                                                                </Typography>
+                                                                {allData.files.studentIdCard?.size && (
+                                                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                                                        Size: {formatFileSize(allData.files.studentIdCard.size)}
+                                                                    </Typography>
+                                                                )}
+                                                            </div>
+                                                            <Button
+                                                                size="small"
+                                                                variant="outlined"
+                                                                color="error"
+                                                                onClick={() => removeFile('studentIdCard')}
+                                                                sx={{ minWidth: 'auto', padding: '4px 8px' }}
+                                                            >
+                                                                Remove
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', marginTop: '5px' }}>
+                                                    Note: Maximum file size allowed is 10MB
+                                                </Typography>
+                                            </Grid>
+                                        </>
+                                    )}
+                                </React.Fragment>
+                            ) : (
+                                <React.Fragment>
+                                    <Grid item size={12} >
+                                        <Typography sx={{ fontSize: '18px', fontWeight: 'bold', margin: '3% 0 0' }}>Type of vendors<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                        {errorMsg.vendorTypeError &&
+                                            <Typography sx={{ color: 'red', fontSize: '14px', marginTop: '5px' }}>{errorMsg.vendorTypeError}</Typography>}
                                         <FormControl>
                                             <RadioGroup
                                                 row
@@ -1025,213 +1496,632 @@ const Details = () => {
                                                     setAlldata({ ...allData, vendorType: e.target.value })
                                                     setErrorMsg({ ...errorMsg, vendorTypeError: "" })
                                                 }}
-                                                sx={{
-                                                    '& .MuiFormControlLabel-root': {
-                                                        marginRight: 3,
-                                                        marginBottom: 1
-                                                    }
-                                                }}
+                                                
                                             >
-                                                <FormControlLabel value="manufacturing" control={<Radio />} label="Manufacturing" />
+                                                <FormControlLabel  value="manufacturing" control={<Radio />} label="Manufacturing" />
                                                 <FormControlLabel value="oem" control={<Radio />} label="OEM" />
                                                 <FormControlLabel value="dealer" control={<Radio />} label="C&F / Super Stockist / Dealer's" />
                                             </RadioGroup>
                                         </FormControl>
                                     </Grid>
-                                )}
-                                
-                                {/* Dynamic Fields based on User/Vendor Type */}
-                                {/* ... existing dynamic fields code remains the same ... */}
-                                {labelChanges === "H" && (
-                                    <>
-                                        <Grid item xs={12} md={6}>
-                                            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                                Hospital Name
-                                            </Typography>
-                                            <TextField 
-                                                fullWidth 
-                                                id="hospitalName" 
-                                                size="medium"
-                                                value={allData.additionalInformation.find(item => item.name === 'hospitalName')?.value || ''}
-                                                onChange={(e) => handleAdditionalInfoChange('hospitalName', e.target.value)}
-                                                placeholder="Enter hospital name"
-                                                sx={{
-                                                    '& .MuiOutlinedInput-root': {
-                                                        borderRadius: '8px'
-                                                    }
-                                                }}
-                                            />
-                                        </Grid>
-                                        <Grid item xs={12} md={6}>
-                                            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                                Medical Council License
-                                            </Typography>
-                                            <TextField 
-                                                fullWidth 
-                                                id="medicalCouncilLicense" 
-                                                size="medium"
-                                                value={allData.additionalInformation.find(item => item.name === 'medicalCouncilLicense')?.value || ''}
-                                                onChange={(e) => handleAdditionalInfoChange('medicalCouncilLicense', e.target.value)}
-                                                placeholder="Enter medical council license number"
-                                                sx={{
-                                                    '& .MuiOutlinedInput-root': {
-                                                        borderRadius: '8px'
-                                                    }
-                                                }}
-                                            />
-                                        </Grid>
-                                        <Grid item xs={12} md={6}>
-                                            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                                Hospital Registration Certificate <span style={{ color: 'red' }}>*</span>
-                                            </Typography>
-                                            <Button
-                                                sx={{ 
-                                                    textTransform: 'none', 
-                                                    fontSize: '0.875rem', 
-                                                    backgroundColor: '#009e92',
-                                                    borderRadius: '8px',
-                                                    '&:hover': {
-                                                        backgroundColor: '#007a6e'
-                                                    }
-                                                }}
-                                                component="label"
-                                                variant="contained"
-                                                tabIndex={-1}
-                                                startIcon={<CloudUploadIcon />}
-                                            >
-                                                Upload Certificate
-                                                <VisuallyHiddenInput
-                                                    type="file"
-                                                    onChange={(e) => handleAdditionalFileChange(e, 'hospitalRegistrationCertificate')}
-                                                />
-                                            </Button>
-                                            {manufacturingImageFile.hospitalRegistrationCertificate && (
-                                                <Box sx={{ 
-                                                    mt: 2, 
-                                                    p: 2, 
-                                                    border: '1px solid #e0e0e0', 
-                                                    borderRadius: '8px',
-                                                    backgroundColor: '#f8f9fa'
-                                                }}>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                        <Box>
-                                                            <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-                                                                {allData.files.hospitalRegistrationCertificate?.fileName || 'Hospital Registration Certificate'}
-                                                            </Typography>
-                                                            {allData.files.hospitalRegistrationCertificate?.size && (
-                                                                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                                                                    Size: {formatFileSize(allData.files.hospitalRegistrationCertificate.size)}
-                                                                </Typography>
-                                                            )}
-                                                        </Box>
+                                    {allData.vendorType === "manufacturing" && (
+                                        <>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>MDM License<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <div style={{ display: 'flex', alignItems: 'center', }}>
+                                                    <div >
                                                         <Button
-                                                            size="small"
-                                                            variant="outlined"
-                                                            color="error"
-                                                            onClick={() => removeFile('hospitalRegistrationCertificate')}
-                                                            sx={{ minWidth: 'auto', px: 2 }}
+                                                            sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                            component="label"
+                                                            variant="contained"
+                                                            tabIndex={-1}
+                                                            startIcon={<CloudUploadIcon />}
+
                                                         >
-                                                            Remove
+                                                            Upload
+                                                            <VisuallyHiddenInput
+                                                                type="file"
+                                                                accept="
+                                                        image/png,
+                                                        image/jpeg,
+                                                        application/pdf,
+                                                        application/msword,
+                                                        application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                                        application/vnd.ms-excel,
+                                                        application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                                                        " // Restrict file types to PNG, JPEG, PDF, DOC, DOCX, XLS, XLSX
+                                                                onChange={(e) => handleFileChange(e, 'mdmLicense')}
+                                                            />
                                                         </Button>
-                                                    </Box>
-                                                </Box>
-                                            )}
-                                            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 1 }}>
-                                                Note: Maximum file size allowed is 10MB
-                                            </Typography>
-                                        </Grid>
-                                        <Grid item xs={12} md={6}>
-                                            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                                Address Proof <span style={{ color: 'red' }}>*</span>
-                                            </Typography>
-                                            <Button
-                                                sx={{ 
-                                                    textTransform: 'none', 
-                                                    fontSize: '0.875rem', 
-                                                    backgroundColor: '#009e92',
-                                                    borderRadius: '8px',
-                                                    '&:hover': {
-                                                        backgroundColor: '#007a6e'
-                                                    }
-                                                }}
-                                                component="label"
-                                                variant="contained"
-                                                tabIndex={-1}
-                                                startIcon={<CloudUploadIcon />}
-                                            >
-                                                Upload Address Proof
-                                                <VisuallyHiddenInput
-                                                    type="file"
-                                                    onChange={(e) => handleAdditionalFileChange(e, 'hospitalAddressProof')}
-                                                />
-                                            </Button>
-                                            {manufacturingImageFile.hospitalAddressProof && (
-                                                <Box sx={{ 
-                                                    mt: 2, 
-                                                    p: 2, 
-                                                    border: '1px solid #e0e0e0', 
-                                                    borderRadius: '8px',
-                                                    backgroundColor: '#f8f9fa'
-                                                }}>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                        <Box>
-                                                            <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-                                                                {allData.files.hospitalAddressProof?.fileName || 'Hospital Address Proof'}
-                                                            </Typography>
-                                                            {allData.files.hospitalAddressProof?.size && (
-                                                                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                                                                    Size: {formatFileSize(allData.files.hospitalAddressProof.size)}
-                                                                </Typography>
-                                                            )}
-                                                        </Box>
+                                                    </div>
+                                                    <div>
+                                                        {manufacturingImage.mdmLicense && (
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                                                                <img src={imageType?.mdmLicense === "pdf" ? PDFIcon : imageType?.mdmLicense === "docx" ? WordIcon : imageType?.mdmLicense === "png" ? PngIcon : imageType?.mdmLicense === "jpeg" ? JpegIcon : imageType.mdmLicense === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
+                                                                <a
+                                                                    href={URL.createObjectURL(manufacturingImageFile.mdmLicense)}
+                                                                    download={manufacturingImageFile.mdmLicense.name}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                                                                >
+                                                                    {manufacturingImageFile.mdmLicense.name}
+                                                                </a>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>GST (Optional)</Typography>
+                                                <div style={{ display: 'flex', alignItems: 'center', }}>
+                                                    <div >
                                                         <Button
-                                                            size="small"
-                                                            variant="outlined"
-                                                            color="error"
-                                                            onClick={() => removeFile('hospitalAddressProof')}
-                                                            sx={{ minWidth: 'auto', px: 2 }}
+                                                            sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                            component="label"
+                                                            variant="contained"
+                                                            tabIndex={-1}
+                                                            startIcon={<CloudUploadIcon />}
+
                                                         >
-                                                            Remove
+                                                            Upload
+                                                            <VisuallyHiddenInput
+                                                                type="file"
+                                                                accept="
+                                                        image/png,
+                                                        image/jpeg,
+                                                        application/pdf,
+                                                        application/msword,
+                                                        application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                                        application/vnd.ms-excel,
+                                                        application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                                                        " // Restrict file types to PNG, JPEG, PDF, DOC, DOCX, XLS, XLSX
+                                                                onChange={(e) => handleFileChange(e, 'gst')}
+                                                            />
                                                         </Button>
-                                                    </Box>
-                                                </Box>
-                                            )}
-                                            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 1 }}>
-                                                Note: Maximum file size allowed is 10MB
-                                            </Typography>
-                                        </Grid>
-                                    </>
-                                )}
-                                
-                                {/* Continue with other user types... */}
-                                {/* ... existing code for other user types remains the same ... */}
-                                
-                                {/* Vendor specific fields remain the same */}
-                                {/* ... existing vendor fields code remains the same ... */}
-                            </Grid>
-                        </Box>
-                        
-                        {/* Submit Button */}
-                        <Box sx={{ textAlign: 'center', mt: 4 }}>
-                            <Button 
-                                onClick={handleSubmit} 
-                                variant='contained' 
-                                sx={{ 
-                                    width: { xs: '100%', sm: '300px' },
-                                    textTransform: 'none', 
-                                    padding: '12px 32px', 
-                                    fontSize: '1rem', 
-                                    fontWeight: 'bold',
-                                    backgroundColor: '#009e92',
-                                    borderRadius: '8px',
-                                    '&:hover': {
-                                        backgroundColor: '#007a6e'
-                                    }
-                                }}
-                            >
-                                Confirm Registration
-                            </Button>
-                        </Box>
+                                                    </div>
+                                                    <div>
+                                                        {manufacturingImage.gst && (
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                                                                <img src={imageType?.gst === "pdf" ? PDFIcon : imageType?.gst === "docx" ? WordIcon : imageType?.gst === "png" ? PngIcon : imageType?.gst === "jpeg" ? JpegIcon : imageType.gst === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '30px', width: '30px' }} />
+                                                                <a
+                                                                    href={URL.createObjectURL(manufacturingImageFile.gst)}
+                                                                    download={manufacturingImageFile.gst.name}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                                                                >
+                                                                    {manufacturingImageFile.gst.name}
+                                                                </a>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>BIS (Optional)</Typography>
+                                                <div style={{ display: 'flex', alignItems: 'center', }}>
+                                                    <div >
+                                                        <Button
+                                                            sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                            component="label"
+                                                            variant="contained"
+                                                            tabIndex={-1}
+                                                            startIcon={<CloudUploadIcon />}
+
+                                                        >
+                                                            Upload
+                                                            <VisuallyHiddenInput
+                                                                type="file"
+                                                                accept="
+                                                        image/png,
+                                                        image/jpeg,
+                                                        application/pdf,
+                                                        application/msword,
+                                                        application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                                        application/vnd.ms-excel,
+                                                        application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                                                        " // Restrict file types to PNG, JPEG, PDF, DOC, DOCX, XLS, XLSX
+                                                                onChange={(e) => handleFileChange(e, 'bis')}
+                                                            />
+                                                        </Button>
+                                                    </div>
+                                                    <div>
+                                                        {manufacturingImage.bis && (
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center',color:'#009e92' }}>
+                                                                <img src={imageType?.bis === "pdf" ? PDFIcon : imageType?.bis === "docx" ? WordIcon : imageType?.bis === "png" ? PngIcon : imageType?.bis === "jpeg" ? JpegIcon : imageType.bis === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '30px', width: '30px' }} />
+                                                                <a
+                                                                    href={URL.createObjectURL(manufacturingImageFile.bis)}
+                                                                    download={manufacturingImageFile.bis.name}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                                                                >
+                                                                    {manufacturingImageFile.bis.name}
+                                                                </a>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>ISO/FDA/CE (Optional)</Typography>
+                                                <div style={{ display: 'flex', alignItems: 'center', }}>
+                                                    <div >
+                                                        <Button
+                                                            sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                            component="label"
+                                                            variant="contained"
+                                                            tabIndex={-1}
+                                                            startIcon={<CloudUploadIcon />}
+
+                                                        >
+                                                            Upload
+                                                            <VisuallyHiddenInput
+                                                                type="file"
+                                                                accept="
+                                                        image/png,
+                                                        image/jpeg,
+                                                        application/pdf,
+                                                        application/msword,
+                                                        application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                                        application/vnd.ms-excel,
+                                                        application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                                                        " // Restrict file types to PNG, JPEG, PDF, DOC, DOCX, XLS, XLSX
+                                                                onChange={(e) => handleFileChange(e, 'iso')}
+                                                            />
+                                                        </Button>
+                                                    </div>
+                                                    <div>
+                                                        {manufacturingImage.iso && (
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                                                                <img src={imageType?.iso === "pdf" ? PDFIcon : imageType?.iso === "docx" ? WordIcon : imageType?.iso === "png" ? PngIcon : imageType?.iso === "jpeg" ? JpegIcon : imageType.iso === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '30px', width: '30px' }} />
+                                                                <a
+                                                                    href={URL.createObjectURL(manufacturingImageFile.iso)}
+                                                                    download={manufacturingImageFile.iso.name}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                                                                >
+                                                                    {manufacturingImageFile.iso.name}
+                                                                </a>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </Grid>
+                                        </>
+                                    )}
+                                    {allData.vendorType === "oem" && (
+                                        <>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Loan License<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <div style={{ display: 'flex', alignItems: 'center', }}>
+                                                    <div >
+                                                        <Button
+                                                            sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                            component="label"
+                                                            variant="contained"
+                                                            tabIndex={-1}
+                                                            startIcon={<CloudUploadIcon />}
+
+                                                        >
+                                                            Upload
+                                                            <VisuallyHiddenInput
+                                                                type="file"
+                                                                accept="
+                                                        image/png,
+                                                        image/jpeg,
+                                                        application/pdf,
+                                                        application/msword,
+                                                        application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                                        application/vnd.ms-excel,
+                                                        application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                                                        " // Restrict file types to PNG, JPEG, PDF, DOC, DOCX, XLS, XLSX
+                                                                onChange={(e) => handleFileChange(e, 'loanLicense')}
+                                                            />
+                                                        </Button>
+                                                    </div>
+                                                    <div>
+                                                        {manufacturingImage.loanLicense && (
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                                                                <img src={imageType?.loanLicense === "pdf" ? PDFIcon : imageType?.loanLicense === "docx" ? WordIcon : imageType?.loanLicense === "png" ? PngIcon : imageType?.loanLicense === "jpeg" ? JpegIcon : imageType.loanLicense === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
+                                                                <a
+                                                                    href={URL.createObjectURL(manufacturingImageFile.loanLicense)}
+                                                                    download={manufacturingImageFile.loanLicense.name}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                                                                >
+                                                                    {manufacturingImageFile.loanLicense.name}
+                                                                </a>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Establishment Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <div style={{ display: 'flex', alignItems: 'center', }}>
+                                                    <div >
+                                                        <Button
+                                                            sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                            component="label"
+                                                            variant="contained"
+                                                            tabIndex={-1}
+                                                            startIcon={<CloudUploadIcon />}
+
+                                                        >
+                                                            Upload
+                                                            <VisuallyHiddenInput
+                                                                type="file"
+                                                                accept="
+                                                        image/png,
+                                                        image/jpeg,
+                                                        application/pdf,
+                                                        application/msword,
+                                                        application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                                        application/vnd.ms-excel,
+                                                        application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                                                        " // Restrict file types to PNG, JPEG, PDF, DOC, DOCX, XLS, XLSX
+                                                                onChange={(e) => handleFileChange(e, 'establishmentProof')}
+                                                            />
+                                                        </Button>
+                                                    </div>
+                                                    <div>
+                                                        {manufacturingImage.establishmentProof && (
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                                                                <img src={imageType?.establishmentProof === "pdf" ? PDFIcon : imageType?.establishmentProof === "docx" ? WordIcon : imageType?.establishmentProof === "png" ? PngIcon : imageType?.establishmentProof === "jpeg" ? JpegIcon : imageType.establishmentProof === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
+                                                                <a
+                                                                    href={URL.createObjectURL(manufacturingImageFile.establishmentProof)}
+                                                                    download={manufacturingImageFile.establishmentProof.name}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                                                                >
+                                                                    {manufacturingImageFile.establishmentProof.name}
+                                                                </a>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>D/L (Optional)</Typography>
+                                                <div style={{ display: 'flex', alignItems: 'center', }}>
+                                                    <div >
+                                                        <Button
+                                                            sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                            component="label"
+                                                            variant="contained"
+                                                            tabIndex={-1}
+                                                            startIcon={<CloudUploadIcon />}
+
+                                                        >
+                                                            Upload
+                                                            <VisuallyHiddenInput
+                                                                type="file"
+                                                                accept="
+                                                        image/png,
+                                                        image/jpeg,
+                                                        application/pdf,
+                                                        application/msword,
+                                                        application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                                        application/vnd.ms-excel,
+                                                        application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                                                        " // Restrict file types to PNG, JPEG, PDF, DOC, DOCX, XLS, XLSX
+                                                                onChange={(e) => handleFileChange(e, 'dl')}
+                                                            />
+                                                        </Button>
+                                                    </div>
+                                                    <div>
+                                                        {manufacturingImage.dl && (
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                                                                <img src={imageType?.dl === "pdf" ? PDFIcon : imageType?.dl === "docx" ? WordIcon : imageType?.dl === "png" ? PngIcon : imageType?.dl === "jpeg" ? JpegIcon : imageType.dl === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
+                                                                <a
+                                                                    href={URL.createObjectURL(manufacturingImageFile.dl)}
+                                                                    download={manufacturingImageFile.dl.name}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                                                                >
+                                                                    {manufacturingImageFile.dl.name}
+                                                                </a>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>ISO/FDA/CE (Optional)</Typography>
+                                                <div style={{ display: 'flex', alignItems: 'center', }}>
+                                                    <div >
+                                                        <Button
+                                                            sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                            component="label"
+                                                            variant="contained"
+                                                            tabIndex={-1}
+                                                            startIcon={<CloudUploadIcon />}
+
+                                                        >
+                                                            Upload
+                                                            <VisuallyHiddenInput
+                                                                type="file"
+                                                                accept="
+                                                        image/png,
+                                                        image/jpeg,
+                                                        application/pdf,
+                                                        application/msword,
+                                                        application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                                        application/vnd.ms-excel,
+                                                        application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                                                        " // Restrict file types to PNG, JPEG, PDF, DOC, DOCX, XLS, XLSX
+                                                                onChange={(e) => handleFileChange(e, 'fda')}
+                                                            />
+                                                        </Button>
+                                                    </div>
+                                                    <div>
+                                                        {manufacturingImage.fda && (
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                                                                <img src={imageType?.fda === "pdf" ? PDFIcon : imageType?.fda === "docx" ? WordIcon : imageType?.fda === "png" ? PngIcon : imageType?.fda === "jpeg" ? JpegIcon : imageType.fda === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
+                                                                <a
+                                                                    href={URL.createObjectURL(manufacturingImageFile.fda)}
+                                                                    download={manufacturingImageFile.fda.name}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                                                                >
+                                                                    {manufacturingImageFile.fda.name}
+                                                                </a>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </Grid>
+                                        </>
+                                    )}
+                                    {allData.vendorType === "dealer" && (
+                                        <>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>D/L<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <div style={{ display: 'flex', alignItems: 'center', }}>
+                                                    <div >
+                                                        <Button
+                                                            sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                            component="label"
+                                                            variant="contained"
+                                                            tabIndex={-1}
+                                                            startIcon={<CloudUploadIcon />}
+
+                                                        >
+                                                            Upload
+                                                            <VisuallyHiddenInput
+                                                                type="file"
+                                                                accept="
+                                                        image/png,
+                                                        image/jpeg,
+                                                        application/pdf,
+                                                        application/msword,
+                                                        application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                                        application/vnd.ms-excel,
+                                                        application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                                                        " // Restrict file types to PNG, JPEG, PDF, DOC, DOCX, XLS, XLSX
+                                                                onChange={(e) => handleFileChange(e, 'cfDL')}
+                                                            />
+                                                        </Button>
+                                                    </div>
+                                                    <div>
+                                                        {manufacturingImage.cfDL && (
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                                                                <img src={imageType?.cfDL === "pdf" ? PDFIcon : imageType?.cfDL === "docx" ? WordIcon : imageType?.cfDL === "png" ? PngIcon : imageType?.cfDL === "jpeg" ? JpegIcon : imageType.cfDL === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
+                                                                <a
+                                                                    href={URL.createObjectURL(manufacturingImageFile.cfDL)}
+                                                                    download={manufacturingImageFile.cfDL.name}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                                                                >
+                                                                    {manufacturingImageFile.cfDL.name}
+                                                                </a>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Gumasta<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <div style={{ display: 'flex', alignItems: 'center', }}>
+                                                    <div >
+                                                        <Button
+                                                            sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                            component="label"
+                                                            variant="contained"
+                                                            tabIndex={-1}
+                                                            startIcon={<CloudUploadIcon />}
+
+                                                        >
+                                                            Upload
+                                                            <VisuallyHiddenInput
+                                                                type="file"
+                                                                accept="
+                                                        image/png,
+                                                        image/jpeg,
+                                                        application/pdf,
+                                                        application/msword,
+                                                        application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                                        application/vnd.ms-excel,
+                                                        application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                                                        " // Restrict file types to PNG, JPEG, PDF, DOC, DOCX, XLS, XLSX
+                                                                onChange={(e) => handleFileChange(e, 'cfGumasta')}
+                                                            />
+                                                        </Button>
+                                                    </div>
+                                                    <div>
+                                                        {manufacturingImage.cfGumasta && (
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                                                                <img src={imageType?.cfGumasta === "pdf" ? PDFIcon : imageType?.cfGumasta === "docx" ? WordIcon : imageType?.cfGumasta === "png" ? PngIcon : imageType?.cfGumasta === "jpeg" ? JpegIcon : imageType.cfGumasta === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
+                                                                <a
+                                                                    href={URL.createObjectURL(manufacturingImageFile.cfGumasta)}
+                                                                    download={manufacturingImageFile.cfGumasta.name}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                                                                >
+                                                                    {manufacturingImageFile.cfGumasta.name}
+                                                                </a>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>GST (Optional)</Typography>
+                                                <div style={{ display: 'flex', alignItems: 'center', }}>
+                                                    <div >
+                                                        <Button
+                                                            sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                            component="label"
+                                                            variant="contained"
+                                                            tabIndex={-1}
+                                                            startIcon={<CloudUploadIcon />}
+
+                                                        >
+                                                            Upload
+                                                            <VisuallyHiddenInput
+                                                                type="file"
+                                                                accept="
+                                                        image/png,
+                                                        image/jpeg,
+                                                        application/pdf,
+                                                        application/msword,
+                                                        application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                                        application/vnd.ms-excel,
+                                                        application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                                                        " // Restrict file types to PNG, JPEG, PDF, DOC, DOCX, XLS, XLSX
+                                                                onChange={(e) => handleFileChange(e, 'cfGst')}
+                                                            />
+                                                        </Button>
+                                                    </div>
+                                                    <div>
+                                                        {manufacturingImage.cfGst && (
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                                                                <img src={imageType?.cfGst === "pdf" ? PDFIcon : imageType?.cfGst === "docx" ? WordIcon : imageType?.cfGst === "png" ? PngIcon : imageType?.cfGst === "jpeg" ? JpegIcon : imageType.cfGst === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
+                                                                <a
+                                                                    href={URL.createObjectURL(manufacturingImageFile.cfGst)}
+                                                                    download={manufacturingImageFile.cfGst.name}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                                                                >
+                                                                    {manufacturingImageFile.cfGst.name}
+                                                                </a>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Establishment Proof<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <div style={{ display: 'flex', alignItems: 'center', }}>
+                                                    <div >
+                                                        <Button
+                                                            sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                            component="label"
+                                                            variant="contained"
+                                                            tabIndex={-1}
+                                                            startIcon={<CloudUploadIcon />}
+
+                                                        >
+                                                            Upload
+                                                            <VisuallyHiddenInput
+                                                                type="file"
+                                                                accept="
+                                                        image/png,
+                                                        image/jpeg,
+                                                        application/pdf,
+                                                        application/msword,
+                                                        application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                                        application/vnd.ms-excel,
+                                                        application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                                                        " // Restrict file types to PNG, JPEG, PDF, DOC, DOCX, XLS, XLSX
+                                                                onChange={(e) => handleFileChange(e, 'cfEstablishmentProof')}
+                                                            />
+                                                        </Button>
+                                                    </div>
+                                                    <div>
+                                                        {manufacturingImage.cfEstablishmentProof && (
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                                                                <img src={imageType?.cfEstablishmentProof === "pdf" ? PDFIcon : imageType?.cfEstablishmentProof === "docx" ? WordIcon : imageType?.cfEstablishmentProof === "png" ? PngIcon : imageType?.cfEstablishmentProof === "jpeg" ? JpegIcon : imageType.cfEstablishmentProof === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
+                                                                <a
+                                                                    href={URL.createObjectURL(manufacturingImageFile.cfEstablishmentProof)}
+                                                                    download={manufacturingImageFile.cfEstablishmentProof.name}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                                                                >
+                                                                    {manufacturingImageFile.cfEstablishmentProof.name}
+                                                                </a>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </Grid>
+                                            <Grid item size={6}>
+                                                <Typography sx={{ fontSize: '16px', fontWeight: 'bold', margin: ' 3% 0' }}>Authorization of Company<span style={{color:'red',marginLeft:'5px'}}>*</span></Typography>
+                                                <div style={{ display: 'flex', alignItems: 'center', }}>
+                                                    <div >
+                                                        <Button
+                                                            sx={{ textTransform: 'capitalize', fontSize: '16px', backgroundColor: '#02998e' }}
+                                                            component="label"
+                                                            variant="contained"
+                                                            tabIndex={-1}
+                                                            startIcon={<CloudUploadIcon />}
+
+                                                        >
+                                                            Upload
+                                                            <VisuallyHiddenInput
+                                                                type="file"
+                                                                accept="
+                                                        image/png,
+                                                        image/jpeg,
+                                                        application/pdf,
+                                                        application/msword,
+                                                        application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                                        application/vnd.ms-excel,
+                                                        application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                                                        " // Restrict file types to PNG, JPEG, PDF, DOC, DOCX, XLS, XLSX
+                                                                onChange={(e) => handleFileChange(e, 'cfAuthorization')}
+                                                            />
+                                                        </Button>
+                                                    </div>
+                                                    <div>
+                                                        {manufacturingImage.cfAuthorization && (
+                                                            <div style={{ height: 'auto', width: '95%', marginLeft: '15px', fontSize: '15px', display: 'flex', alignItems: 'center' }}>
+                                                                <img src={imageType?.cfAuthorization === "pdf" ? PDFIcon : imageType?.cfAuthorization === "docx" ? WordIcon : imageType?.cfAuthorization === "png" ? PngIcon : imageType?.cfAuthorization === "jpeg" ? JpegIcon : imageType.cfAuthorization === "jpg" ? JpgIcon : ExcelIcon} alt='' style={{ height: '25px', width: '25px' }} />
+                                                                <a
+                                                                    href={URL.createObjectURL(manufacturingImageFile.cfAuthorization)}
+                                                                    download={manufacturingImageFile.cfAuthorization.name}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    style={{ wordBreak: 'break-all', marginLeft: '10px', fontWeight: 'bold',color:'#1c1c1b' }}
+                                                                >
+                                                                    {manufacturingImageFile.cfAuthorization.name}
+                                                                </a>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </Grid>
+                                        </>
+                                    )}
+                                </React.Fragment>
+                            )
+                            }
+
+                        </Grid>
+                    </Box>
+                    <Stack direction='column'>
+                        <Button onClick={handleSubmit} variant='contained' sx={{ width: '400px', margin: '4% auto 4%',textTransform: 'capitalize', padding: '1%', fontSize: '18px', fontWeight: 'bold',backgroundColor:'#009e92',borderRadius:'10px' }}>Confirm</Button>
                     </Stack>
                 </Box>
             </Box>
