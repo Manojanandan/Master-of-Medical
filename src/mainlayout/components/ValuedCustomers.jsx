@@ -15,18 +15,18 @@ const ValuedCustomers = () => {
         <div className="customer-cards">
           <div className="customer-card">
             <div className="customer-placeholder">
-              <img src={c1} alt="" srcset="" />
+              <img src={c1} alt="" srcSet="" />
             </div>
           </div>
           {/* featured */}
           <div className="customer-card ">
             <div className="customer-placeholder">
-              <img src={c2} alt="" srcset="" />
+              <img src={c2} alt="" srcSet="" />
             </div>
           </div>
           <div className="customer-card">
             <div className="customer-placeholder">
-              <img src={c3} alt="" srcset="" />
+              <img src={c3} alt="" srcSet="" />
             </div>
           </div>
         </div>

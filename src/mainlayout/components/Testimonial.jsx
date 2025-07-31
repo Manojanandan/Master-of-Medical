@@ -40,7 +40,7 @@ const Testimonial = () => {
                 key={index} 
                 className={`testimonial-card ${index === currentSlide ? 'active' : ''}`}
               >
-                <div className="quote-marks"><img src="/test-quote.png" width={60} alt="" srcset="" /></div>
+                <div className="quote-marks"><img src="/test-quote.png" width={60} alt="" srcSet="" /></div>
                 <div className="testimonial-header">
                   <div className="testimonial-avatar"></div>
                   <div className="author-info">
