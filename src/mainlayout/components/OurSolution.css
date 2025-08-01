@@ -1,0 +1,267 @@
+.our-solution {
+  padding: 4rem 0;
+  background: white;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background decorative shapes */
+.our-solution::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  left: -50px;
+  width: 200px;
+  height: 200px;
+  background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(197, 34, 95, 0.1));
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.our-solution::after {
+  content: '';
+  position: absolute;
+  bottom: -50px;
+  right: -50px;
+  width: 150px;
+  height: 150px;
+  background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(197, 34, 95, 0.1));
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.solution-container {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.solution-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.solution-visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.visual-placeholder {
+  width: 400px;
+  height: 500px;
+  background: #663399;
+  border-radius: 0px 40px 0px 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(102, 51, 153, 0.3);
+  position: relative;
+}
+
+.visual-placeholder::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(197, 34, 95, 0.1));
+  border-radius: 20px;
+  z-index: -1;
+}
+
+.placeholder-content {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.solution-text {
+  padding: 2rem 0;
+}
+
+.solution-title {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.title-our {
+  color: #C5225F;
+  display: block;
+}
+
+.title-solution {
+  color: #333;
+  display: block;
+}
+
+.solution-intro {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: #FFD700;
+  margin-bottom: 3rem;
+  font-weight: 500;
+}
+
+.solution-stepper {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  position: relative;
+}
+
+.solution-stepper::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 30px;
+  bottom: 30px;
+  width: 2px;
+  background: repeating-linear-gradient(
+    to bottom,
+    #FF6B35 0px,
+    #FF6B35 4px,
+    transparent 4px,
+    transparent 8px
+  );
+  z-index: 0;
+}
+
+.stepper-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.stepper-bullet {
+  width: 30px;
+  height: 30px;
+  background: #FF6B35;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 5px;
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+}
+
+.stepper-content {
+  flex: 1;
+}
+
+.stepper-title {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.stepper-text {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #FFD700;
+  font-weight: 500;
+}
+
+/* Mobile responsive */
+@media (max-width: 1024px) {
+  .solution-content {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    text-align: center;
+  }
+  
+  .visual-placeholder {
+    width: 300px;
+    height: 400px;
+  }
+  
+  .solution-title {
+    font-size: 2.5rem;
+  }
+  
+  .solution-stepper::before {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .stepper-item {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .our-solution {
+    padding: 3rem 0;
+  }
+  
+  .solution-container {
+    padding: 0 1rem;
+  }
+  
+  .solution-title {
+    font-size: 2rem;
+  }
+  
+  .solution-intro {
+    font-size: 1.1rem;
+  }
+  
+  .visual-placeholder {
+    width: 250px;
+    height: 300px;
+  }
+  
+  .stepper-title {
+    font-size: 1.1rem;
+  }
+  
+  .stepper-text {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .solution-title {
+    font-size: 1.5rem;
+  }
+  
+  .solution-intro {
+    font-size: 1rem;
+  }
+  
+  .visual-placeholder {
+    width: 200px;
+    height: 250px;
+  }
+  
+  .placeholder-content {
+    font-size: 1rem;
+  }
+  
+  .stepper-bullet {
+    width: 25px;
+    height: 25px;
+  }
+  
+  .stepper-title {
+    font-size: 1rem;
+  }
+  
+  .stepper-text {
+    font-size: 0.8rem;
+  }
+} 

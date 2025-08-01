@@ -1,0 +1,22 @@
+import { combineReducers } from "@reduxjs/toolkit";
+import  signUpReducer  from "../pages/login/Signup/SignUpReducer";
+import  loginReducer  from "../pages/login/LoginReducer";
+import vendorProfileReducer from "../pages/vendor/reducers/VendorProfileReducer";
+import productReducer from "../pages/vendor/reducers/ProductReducer";
+import vendorOrdersReducer from "../pages/vendor/reducers/VendorOrdersReducer";
+import publicProductReducer from "./PublicProductReducer";
+import cartReducer from "./CartReducer";
+import reviewReducer from "./ReviewReducer";
+
+ const rootReducer = combineReducers({
+    signUpReducer: signUpReducer,
+    loginReducer: loginReducer,
+    vendorProfileReducer: vendorProfileReducer,
+    productReducer: productReducer,
+    vendorOrdersReducer: vendorOrdersReducer,
+    publicProductReducer: publicProductReducer,
+    cartReducer: cartReducer,
+    reviewReducer: reviewReducer,
+})
+
+export default rootReducer  
